@@ -204,7 +204,7 @@ function drawWater(w,h,depth,time) {
   ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);
 }
  
-function drawRock(function drawRock(x,y,scale,time) {
+function drawRock(x,y,scale,time) {
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const body=ctx.createLinearGradient(-45,-50,40,38);
   body.addColorStop(0,'#42616a');body.addColorStop(0.35,'#1d3d4c');body.addColorStop(1,'#081b29');
@@ -427,7 +427,7 @@ function drawFishSchools(w,h,time,still,depth,delta) {
   drawFishSide(x,y,0.72,FISH_PALETTE[4],1.3,time,1,0.13,0);
 }
 
-function drawJellyfish(function drawJellyfish(x,y,scale,phase,time,alpha=0.85) {
+function drawJellyfish(x,y,scale,phase,time,alpha=0.85) {
   ctx.save();ctx.translate(x,y+Math.sin(time*0.001+phase)*10*scale);ctx.scale(scale,scale);
   ctx.globalAlpha=alpha;
   const glow=ctx.createRadialGradient(0,-8,1,0,0,50);
@@ -930,5 +930,4 @@ function frame(time) {
   ctx.fillStyle=edge;ctx.fillRect(0,0,w,h);
 
   requestAnimationFrame(frame);
-}  requestAnimationFrame(frame);
 }
