@@ -15,6 +15,8 @@ let kelp = [];
 let lastSpecies = -1;
 let predator = null;
 let lastFrame = 0;
+let threeDRenderer = null;
+let threeDActive = false;
 
 const species = [
   { name: 'Great white', color: '#9eb8c5', belly: '#e7f4ef', fin: '#506d80', eye: '#07131b', shape: 'shark' },
@@ -49,10 +51,29 @@ export function startScene(depthFn, stillFn) {
   resize();
   addEventListener('resize', resize, { passive: true });
   requestAnimationFrame(frame);
+  // Prefer the WebGL renderer. The existing Canvas animation remains as an automatic fallback.
+  import('./scene3d.js').then(mod => {
+    try {
+      mod.startScene3D(getDepth, isStill, canvas);
+      threeDRenderer = mod;
+      threeDActive = true;
+      if (attackCanvas) attackCanvas.style.display = 'none';
+      canvas.dataset.renderer = 'fallback';
+    } catch (error) {
+      console.warn('DEEPWELL 3D renderer unavailable; using Canvas fallback.', error);
+      try { mod.stopScene3D(); } catch {}
+    }
+  }).catch(error => {
+    console.warn('DEEPWELL 3D module failed to load; using Canvas fallback.', error);
+  });
 }
 
 // Called only by the answer-resolution path. It changes visuals only; no game state.
 export function triggerPredatorAttack() {
+  if (threeDActive && threeDRenderer) {
+    threeDRenderer.triggerPredatorAttack();
+    return;
+  }
   let pick = Math.floor(Math.random() * species.length);
   if (species.length > 1 && pick === lastSpecies) pick = (pick + 1 + Math.floor(Math.random() * (species.length - 1))) % species.length;
   lastSpecies = pick;
@@ -789,7 +810,7 @@ function drawAttack(w, h, time, still) {
 }
 
 function frame(time) {
-  if (!ctx || !canvas) return;
+  if (threeDActive || !ctx || !canvas) return;
   const w = innerWidth, h = innerHeight;
   const depth = clamp((Number(getDepth()) || 0) / CONFIG.MAX_DEPTH_VISUAL, 0, 1);
   const still = Boolean(isStill());
