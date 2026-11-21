@@ -2,11 +2,11 @@
 //   1. pre-built pack   data/packs/<id>.json  (built from Wikidata by scripts/build-data.mjs)
 //   2. offline seed     js/seed.js            (small hand-curated fallback bundled with the site)
 //   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Dive)
-import { CONFIG } from './config.js?v=answer-expansion-20261121';
-import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=answer-expansion-20261121';
+import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
+import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=ten-thousand-prompts-20261121';
 import { SEED } from './seed.js';
-import { fetchLive, fromPack } from './wikidata.js?v=answer-expansion-20261121';
-import { normalize } from './engine.js?v=answer-expansion-20261121';
+import { fetchLive, fromPack } from './wikidata.js?v=ten-thousand-prompts-20261121';
+import { normalize } from './engine.js?v=ten-thousand-prompts-20261121';
 
 let manifest = { version: 0, built: null, packs: {} };
 const rawCache = new Map(); // entry id -> {items, source}
@@ -59,7 +59,10 @@ export function parseSeed(entry) {
 async function fromPackFile(entry) {
   const res = await fetch(`${CONFIG.PACK_DIR}/${entry.id}.json?v=${manifest.version || 0}`);
   if (!res.ok) throw new Error('pack ' + res.status);
-  const items = fromPack(await res.json());
+  let items = fromPack(await res.json());
+  if (entry.startsWith) items = items.filter(i => i.n.toLowerCase().startsWith(entry.startsWith.toLowerCase()));
+  const answerLimit = Math.max(1, Math.min(Number(entry.answerLimit) || 1000, 1000));
+  items = items.slice(0, answerLimit);
   if (items.length < Math.min(entry.minPool || 20, 8)) throw new Error('pack too small');
   return { items, source: 'wikidata' };
 }
@@ -80,7 +83,7 @@ export async function loadRawPool(entry, { allowLive = false } = {}) {
   }
   if (!result && allowLive) {
     const items = await fetchLive(entry, { endpoint: CONFIG.WIKIDATA_ENDPOINT, timeoutMs: CONFIG.LIVE_TIMEOUT_MS });
-    if (items.length >= Math.min(entry.minPool || 20, 12)) result = { items, source: 'live' };
+    if (items.length >= Math.min(entry.minPool || 20, 8)) result = { items, source: 'live' };
   }
   if (!result) throw new Error('no data for ' + entry.id);
   rawCache.set(entry.id, result);
