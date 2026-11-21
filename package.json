@@ -1,0 +1,13 @@
+{
+  "name": "deepwell",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "DEEPWELL - a rare-answer descent. Static site for deepwell.games (GitHub Pages).",
+  "scripts": {
+    "serve": "python3 -m http.server 8080",
+    "test": "node scripts/selftest.mjs",
+    "build-data": "node scripts/build-data.mjs --out data/packs"
+  },
+  "engines": { "node": ">=20" }
+}
