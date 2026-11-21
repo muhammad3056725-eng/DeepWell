@@ -27,15 +27,13 @@ export function show(id) {
 
 export function updateDepthUI(depth) {
   const d = Math.round(depth);
-  const pct = Math.min(92, 20 + d / 100);
-  $('topDepth').textContent = d + ' m below';
-  $('depthValue').textContent = d + ' m';
-  $('bestValue').textContent = Math.max(S.store.best, d) + ' m';
-  $('meterLine').style.height = pct + '%';
-  $('sub').style.bottom = `calc(${pct}% - 13px)`;
+  const zone = d < 250 ? 'UPPER WATER' : d < 1000 ? 'REEF EDGE' : d < 2200 ? 'BLUE DEPTH' : d < 4000 ? 'TWILIGHT' : 'ABYSS';
+  const readout = $('topDepth');
+  if (readout) readout.textContent = `${d.toLocaleString()} m · ${zone}`;
+  document.body.dataset.depth = zone.toLowerCase().replace(/\s+/g, '-');
 }
 
-function untilReset() {
+function untilReset() {function untilReset() {
   const now = new Date();
   const next = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
   const mins = Math.max(1, Math.round((next - now.getTime()) / 60000));
