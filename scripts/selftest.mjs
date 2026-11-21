@@ -40,6 +40,12 @@ ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item 
 ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language candidate search has a 5,000-row limit');
 ok(/LIMIT 1000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
 ok(buildQuery(foodF, { limit: 5000, minSL: 1 }).includes('STRSTARTS(LCASE(STR(?itemLabel)), "f")'), 'food F query filters labels by F');
+const foodFQuery = buildQuery(foodF, { limit: 5000, minSL: 1 });
+ok(foodFQuery.indexOf('STRSTARTS') < foodFQuery.indexOf('LIMIT 5000'), 'food F prefix is applied before candidate truncation');
+const insectA = { ...taxon, startsWith: 'A' };
+const insectAQuery = buildQuery(insectA, { limit: 5000, minSL: 1 });
+ok(insectAQuery.includes('STRSTARTS(LCASE(STR(?filterName)), "a")'), 'taxon letter filtering is applied to common names before candidate limit');
+ok(insectAQuery.indexOf('STRSTARTS') < insectAQuery.indexOf('LIMIT 5000'), 'taxon prefix is applied before candidate truncation');
 ok(/LIMIT 1000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than 1,000 answers');
 ok(/LIMIT 118$/.test(buildQuery(elementEntry)), 'chemical-element query respects its 118-answer limit');
 
