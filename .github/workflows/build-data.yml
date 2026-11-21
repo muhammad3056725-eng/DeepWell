@@ -61,6 +61,7 @@ jobs:
           BATCH: ${{ github.event.inputs.batch }}
           BATCH_SIZE: ${{ github.event.inputs.batch_size }}
           CANDIDATE_OFFSET: ${{ github.event.inputs.candidate_offset }}
+          CANDIDATE_OFFSET: ${{ github.event.inputs.candidate_offset }}
         run: |
           ARGS=()
           if [ -n "$ONLY" ]; then ARGS+=(--only "$ONLY"); fi
@@ -161,5 +162,5 @@ jobs:
             -f ref=main \
             -f 'inputs[wide]=true' \
             -f "inputs[batch]=$NEXT_BATCH" \
-            -f "inputs[batch_size]=${BATCH_SIZE:-500}" \\
+            -f "inputs[batch_size]=${BATCH_SIZE:-500}" \
             -f "inputs[candidate_offset]=${CANDIDATE_OFFSET:-0}"
