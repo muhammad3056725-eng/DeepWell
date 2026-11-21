@@ -27,12 +27,8 @@ export function show(id) {
 
 export function updateDepthUI(depth) {
   const d = Math.round(depth);
-  const pct = Math.min(92, 20 + d / 100);
-  $('topDepth').textContent = d + ' m below';
-  $('depthValue').textContent = d + ' m';
-  $('bestValue').textContent = Math.max(S.store.best, d) + ' m';
-  $('meterLine').style.height = pct + '%';
-  $('sub').style.bottom = `calc(${pct}% - 13px)`;
+  const readout = $('topDepth');
+  if (readout) readout.textContent = `${d.toLocaleString()} m below`;
 }
 
 function untilReset() {

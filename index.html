@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#061d2b">
+<meta name="theme-color" content="#041522">
 <title>DEEPWELL — a rare-answer descent</title>
 <meta name="description" content="Seven prompts. One breath. The rarer your answer, the deeper you dive. A daily rare-answer trivia game.">
 <meta property="og:title" content="DEEPWELL">
 <meta property="og:description" content="Seven prompts. One breath. Go deeper by thinking sideways.">
 <meta property="og:url" content="https://deepwell.games/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306131e'/%3E%3Cpath d='M12 34 40 22 54 34 40 46Z' fill='%2368e2e8'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=immersive-descent-20261121">
 </head>
 <body>
 <canvas id="scene" aria-hidden="true"></canvas><div id="vignette"></div>
@@ -40,11 +40,7 @@
 <div class="confirm" id="confirmBox"><span>Did you mean <b id="confirmName"></b>?</span><button class="button primary" id="confirmYes">Yes</button><button class="button secondary" id="confirmNo">No</button></div>
 <div class="feedback" id="feedback" aria-live="polite"></div>
 </div>
-<aside class="panel side-panel">
-<div class="meter"><div class="meter-line" id="meterLine"></div><div class="sub" id="sub">◆</div></div>
-<div class="stat-block"><div class="stat-label">Current depth</div><div class="stat-value" id="depthValue">0 m</div></div>
-<div class="stat-block"><div class="stat-label">Best depth</div><div class="stat-value" id="bestValue">0 m</div></div>
-</aside></div></section>
+</div></section>
 
 <section class="screen modal-screen" id="results"><div class="panel modal result-card">
 <p class="eyebrow">Dive complete</p><h2 id="resultHeading">The well remembers.</h2>
@@ -92,7 +88,7 @@
 </div></section>
 </main>
 <div class="toast" id="toast"></div><div id="live" aria-live="polite"></div>
-<script type="module" src="js/main.js?v=cinematic-2d-20261121"></script>
+<script type="module" src="js/main.js?v=immersive-descent-20261121"></script>
 <noscript><p style="position:relative;z-index:3;padding:24px;color:#e7fbff">DEEPWELL needs JavaScript.</p></noscript>
 </body>
 </html>

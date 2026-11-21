@@ -6,7 +6,10 @@ import { CONFIG } from './config.js';
 const canvas = document.getElementById('scene');
 const ctx = canvas?.getContext('2d', { alpha: false });
 let getDepth = () => 0;
+let getProgress = () => 0;
 let isStill = () => false;
+let visualDepth = 0;
+let visualStage = 0;
 let bubbles = [];
 let plankton = [];
 let fish = [];
@@ -29,11 +32,10 @@ const smooth = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
 const easeOut = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3.3);
 
 const FISH_PALETTE = [
-  ['#d7a84b','#fff1b8','#60472b'], ['#df7957','#ffe3bc','#633d34'],
-  ['#56aeb0','#d2f6e8','#19485a'], ['#8577bd','#e8d4ff','#453c66'],
-  ['#c6a15c','#f9e8af','#4f4834'], ['#6e9b75','#d8edc0','#2b5242'],
-  ['#76a9c6','#e7f7f4','#31536b'], ['#d77c9d','#ffe1e9','#633c55'],
-  ['#e4b34d','#fff1c2','#76552f'], ['#4b9c8e','#c5f4df','#244b47']
+  ['#526e78','#b6c7c2','#1b303a'], ['#687b72','#c1c9b7','#263b39'],
+  ['#506b83','#c0ced0','#22384b'], ['#78816d','#c8c7ae','#303c36'],
+  ['#657b87','#d0d7cc','#2a3d49'], ['#8a795f','#d0c2a0','#3d3c31'],
+  ['#476d70','#b6c9bd','#203b3e']
 ];
 
 const SHARKS = [
@@ -56,41 +58,42 @@ function resize() {
   canvas.style.height = height + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-  bubbles = Array.from({length:Math.min(230,Math.floor(width/5))},()=>({
+  bubbles = Array.from({length:Math.min(88,Math.floor(width/17))},()=>({
     x:rand(0,width), y:rand(0,height), r:rand(0.6,4.1),
     speed:rand(0.15,0.82), drift:rand(0.3,1.8), phase:rand(0,TAU),
     alpha:rand(0.12,0.5), near:Math.random()<0.17
   }));
-  plankton = Array.from({length:420},()=>({
+  plankton = Array.from({length:190},()=>({
     x:rand(0,width),y:rand(0,height),r:rand(0.45,1.8),
     speed:rand(0.08,0.4),phase:rand(0,TAU),alpha:rand(0.08,0.36)
   }));
-  fish = Array.from({length:Math.min(74,Math.max(38,Math.floor(width/22)))},(_,i)=>({
-    u:rand(-0.48,0.48),v:rand(-0.48,0.38),z:rand(0.015,0.9),
-    scale:rand(0.78,1.26),speed:rand(0.00013,0.00028),
+  fish = Array.from({length:Math.min(42,Math.max(22,Math.floor(width/39)))},(_,i)=>({
+    u:rand(-0.72,0.72),v:rand(-0.52,0.4),z:rand(0.015,0.72),
+    scale:rand(0.48,0.92),speed:rand(0.00010,0.00021),
     dir:Math.random()<0.5?-1:1, phase:rand(0,TAU),
     palette:FISH_PALETTE[i%FISH_PALETTE.length],kind:i%5
   }));
   kelp = Array.from({length:24},(_,i)=>({
     x:(i/23)*width+rand(-24,24),height:rand(75,260),width:rand(3,10),
-    phase:rand(0,TAU),color:['#125d58','#1c7668','#32876d','#4b9871'][i%4],
+    phase:rand(0,TAU),color:['#123f3d','#20594c','#2c6652','#426e55'][i%4],
     lean:rand(-1,1)
   }));
   reef = [];
   for(let side of [-1,1]){
-    for(let i=0;i<12;i++){
+    for(let i=0;i<9;i++){
       reef.push({
         x:side*rand(width*0.01,width*0.16), y:height*rand(0.73,1.02),
-        scale:rand(0.55,1.45), color:['#e87859','#e9ae62','#bf6b9e','#75b99a','#7896c8'][i%5],
+        scale:rand(0.55,1.45), color:['#657b63','#a58c61','#587b70','#71868a','#8b795f'][i%5],
         type:i%4, phase:rand(0,TAU)
       });
     }
   }
 }
 
-export function startScene(depthFn, stillFn) {
+export function startScene(depthFn, stillFn, progressFn) {
   getDepth = typeof depthFn==='function' ? depthFn : getDepth;
   isStill = typeof stillFn==='function' ? stillFn : isStill;
+  getProgress = typeof progressFn==='function' ? progressFn : getProgress;
   resize();
   window.addEventListener('resize',resize,{passive:true});
   if(!frameStarted){
@@ -100,6 +103,10 @@ export function startScene(depthFn, stillFn) {
 }
 
 // Visual-only signal from the existing answer resolution. It never changes score or progression.
+export function resetDiveVisual() {
+  visualDepth=0;visualStage=0;eventScene=null;previousTime=0;frozenTime=0;
+}
+
 export function triggerAnswerVisual(points, state) {
   const failed = state !== 'hit';
   let pool;
@@ -120,7 +127,7 @@ export function triggerAnswerVisual(points, state) {
   eventScene={
     kind,
     start:performance.now(),
-    duration:kind==='shark'||kind==='barracuda'||kind==='reef_shark'?2450:3000,
+    duration:kind==='shark'||kind==='barracuda'||kind==='reef_shark'?3900:3400,
     seed:rand(0,TAU),
     variant:(()=>{let v=Math.floor(rand(0,SHARKS.length));if(SHARKS.length>1&&v===lastSharkVariant)v=(v+1+Math.floor(rand(0,SHARKS.length-1)))%SHARKS.length;lastSharkVariant=v;return v;})(),
     lane:rand(-0.16,0.16),
@@ -133,58 +140,59 @@ export function triggerAnswerVisual(points, state) {
 export function triggerPredatorAttack() { triggerAnswerVisual(0,'miss'); }
 
 function waterPalette(depth) {
-  if(depth<0.15) return ['#0b7884','#075067','#032b43'];
-  if(depth<0.38) return ['#075a78','#063e5d','#031b35'];
-  if(depth<0.66) return ['#123e62','#0b2a48','#06162e'];
-  return ['#101e3b','#08152b','#020813'];
+  if(depth<0.16) return ['#0a5361','#073647','#041d2b'];
+  if(depth<0.38) return ['#083c51','#062b40','#031522'];
+  if(depth<0.66) return ['#092a3d','#061d2d','#020e19'];
+  if(depth<0.84) return ['#071d2e','#04121f','#010811'];
+  return ['#061523','#030b14','#00050b'];
 }
 
 function drawWater(w,h,depth,time) {
   const colors=waterPalette(depth);
-  const g=ctx.createLinearGradient(0,0,w*0.2,h);
-  g.addColorStop(0,colors[0]);g.addColorStop(0.45,colors[1]);g.addColorStop(1,colors[2]);
+  const g=ctx.createLinearGradient(w*0.16,0,w*0.72,h);
+  g.addColorStop(0,colors[0]);g.addColorStop(0.48,colors[1]);g.addColorStop(1,colors[2]);
   ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
 
-  // Diffuse ocean light, gradually extinguished with depth.
-  const lightPower=(1-depth)*0.32;
-  const halo=ctx.createRadialGradient(w*0.5,-h*0.06,8,w*0.5,h*0.05,h*0.95);
-  halo.addColorStop(0,'rgba(190,255,232,'+lightPower+')');
-  halo.addColorStop(0.38,'rgba(83,200,211,'+(lightPower*0.48)+')');
-  halo.addColorStop(1,'rgba(10,52,89,0)');
+  // The surface glow dies away as the camera descends.
+  const lightPower=Math.pow(1-depth,1.75)*0.42;
+  const halo=ctx.createRadialGradient(w*0.48,-h*0.08,4,w*0.48,h*0.12,h*0.96);
+  halo.addColorStop(0,'rgba(183,230,220,'+lightPower+')');
+  halo.addColorStop(0.34,'rgba(82,166,178,'+(lightPower*0.42)+')');
+  halo.addColorStop(1,'rgba(5,35,54,0)');
   ctx.fillStyle=halo;ctx.fillRect(0,0,w,h);
 
-  // Volumetric sun shafts: slightly different angles and speeds for natural movement.
-  if(depth<0.88){
+  // Narrow, soft shafts retain direction without the graphic stripe effect.
+  if(depth<0.76){
     ctx.save();ctx.globalCompositeOperation='screen';
-    for(let i=0;i<13;i++){
-      const phase=time*0.000035+i*1.91;
-      const x=w*(0.025+i*0.079)+Math.sin(phase)*w*0.018;
-      const spread=w*(0.024+(i%4)*0.012);
-      const beam=ctx.createLinearGradient(x,0,x+spread*1.3,h*0.86);
-      const a=lightPower*(0.22+(i%3)*0.07);
-      beam.addColorStop(0,'rgba(183,255,234,'+a+')');
-      beam.addColorStop(0.4,'rgba(82,202,218,'+(a*0.45)+')');
-      beam.addColorStop(1,'rgba(54,168,205,0)');
+    for(let i=0;i<8;i++){
+      const phase=time*0.000025+i*2.13;
+      const x=w*(0.04+i*0.13)+Math.sin(phase)*w*0.012;
+      const spread=w*(0.018+(i%3)*0.012);
+      const beam=ctx.createLinearGradient(x,0,x+spread,h*0.82);
+      const a=lightPower*(0.13+(i%2)*0.045);
+      beam.addColorStop(0,'rgba(191,235,220,'+a+')');
+      beam.addColorStop(0.46,'rgba(95,181,190,'+(a*0.32)+')');
+      beam.addColorStop(1,'rgba(45,112,144,0)');
       ctx.fillStyle=beam;
       ctx.beginPath();
-      ctx.moveTo(x-spread*0.18,0);ctx.lineTo(x+spread*0.55,0);
-      ctx.lineTo(x+spread*2.8,h*0.88);ctx.lineTo(x-spread*1.35,h*0.88);
+      ctx.moveTo(x-spread*0.12,0);ctx.lineTo(x+spread*0.45,0);
+      ctx.lineTo(x+spread*2.15,h*0.84);ctx.lineTo(x-spread*1.1,h*0.84);
       ctx.closePath();ctx.fill();
     }
     ctx.restore();
   }
 
-  // Fine moving caustic lattice in the upper reef water.
-  if(depth<0.5){
+  // Surface caustics are faint and disappear quickly below the reef.
+  if(depth<0.18){
     ctx.save();ctx.globalCompositeOperation='screen';
-    ctx.globalAlpha=(0.045+(0.5-depth)*0.22);
-    ctx.strokeStyle='#a4fff0';ctx.lineWidth=1;
-    for(let row=0;row<16;row++){
+    ctx.globalAlpha=(0.018+(0.18-depth)*0.13);
+    ctx.strokeStyle='#b5e7df';ctx.lineWidth=0.8;
+    for(let row=0;row<11;row++){
       ctx.beginPath();
-      const baseY=h*(0.035+row*0.037);
-      for(let x=-20;x<w+30;x+=18){
-        const wave= Math.sin(x*0.014+time*0.00065+row*0.73)*5
-          +Math.sin(x*0.006-time*0.00042+row)*8;
+      const baseY=h*(0.035+row*0.042);
+      for(let x=-20;x<w+30;x+=24){
+        const wave=Math.sin(x*0.011+time*0.00048+row*0.73)*3.5
+          +Math.sin(x*0.005-time*0.00032+row)*6;
         if(x===-20)ctx.moveTo(x,baseY+wave);else ctx.lineTo(x,baseY+wave);
       }
       ctx.stroke();
@@ -192,14 +200,14 @@ function drawWater(w,h,depth,time) {
     ctx.restore();
   }
 
-  // Suspended haze pushes distance layers backwards.
-  const haze=ctx.createLinearGradient(0,h*0.12,0,h);
-  haze.addColorStop(0,'rgba(2,21,39,0)');
-  haze.addColorStop(0.55,'rgba(2,18,35,'+(0.02+depth*0.07)+')');
-  haze.addColorStop(1,'rgba(0,6,19,'+(0.35+depth*0.43)+')');
+  // Depth haze compresses contrast in the distance; at depth it becomes cold and dark.
+  const haze=ctx.createLinearGradient(0,0,0,h);
+  haze.addColorStop(0,'rgba(2,17,29,'+(0.015+depth*0.07)+')');
+  haze.addColorStop(0.54,'rgba(1,13,23,'+(0.08+depth*0.13)+')');
+  haze.addColorStop(1,'rgba(0,5,12,'+(0.35+depth*0.48)+')');
   ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);
 }
-
+ 
 function drawRock(x,y,scale,time) {
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const body=ctx.createLinearGradient(-45,-50,40,38);
@@ -239,7 +247,7 @@ function drawBranchCoral(x,y,scale,color,phase,time) {
 }
 
 function drawReefAndKelp(w,h,time,depth,still) {
-  const reefAlpha=clamp(1-depth*1.35,0,1);
+  const reefAlpha=clamp(1-depth*1.95,0,1);
   if(reefAlpha>0.02){
     ctx.save();ctx.globalAlpha=reefAlpha;
     // Foreground rock shelves frame the diver and provide a strong scale cue.
@@ -271,6 +279,47 @@ function drawReefAndKelp(w,h,time,depth,still) {
     }
     ctx.restore();
   }
+}
+
+function drawDepthWalls(w,h,depth,time) {
+  const wall= smooth(clamp((depth-0.17)/0.52,0,1));
+  if(wall<0.015)return;
+  ctx.save();ctx.globalAlpha=wall*0.88;
+  const left=ctx.createLinearGradient(0,0,w*0.23,0);
+  left.addColorStop(0,'rgba(2,10,17,0.98)');
+  left.addColorStop(0.62,'rgba(8,27,39,0.78)');
+  left.addColorStop(1,'rgba(12,37,49,0)');
+  ctx.fillStyle=left;ctx.beginPath();
+  ctx.moveTo(0,0);ctx.lineTo(w*0.07,h*0.08);ctx.lineTo(w*0.12,h*0.29);
+  ctx.lineTo(w*0.19,h*0.47);ctx.lineTo(w*0.14,h*0.73);
+  ctx.lineTo(w*0.23,h);ctx.lineTo(0,h);ctx.closePath();ctx.fill();
+
+  const right=ctx.createLinearGradient(w,0,w*0.77,0);
+  right.addColorStop(0,'rgba(1,8,15,0.98)');
+  right.addColorStop(0.62,'rgba(7,24,36,0.76)');
+  right.addColorStop(1,'rgba(10,33,46,0)');
+  ctx.fillStyle=right;ctx.beginPath();
+  ctx.moveTo(w,0);ctx.lineTo(w*0.94,h*0.12);ctx.lineTo(w*0.88,h*0.33);
+  ctx.lineTo(w*0.81,h*0.55);ctx.lineTo(w*0.86,h*0.77);
+  ctx.lineTo(w*0.76,h);ctx.lineTo(w,h);ctx.closePath();ctx.fill();
+
+  // Broken sedimentary seams catch only a trace of the remaining light.
+  ctx.lineWidth=1;
+  for(let i=0;i<7;i++){
+    const y=h*(0.16+i*0.115)+Math.sin(time*0.00008+i)*h*0.008;
+    ctx.strokeStyle='rgba(126,165,166,'+(0.025+wall*0.055)+')';
+    ctx.beginPath();ctx.moveTo(0,y);ctx.bezierCurveTo(w*0.06,y-h*0.025,w*0.11,y+h*0.018,w*0.19,y+h*0.035);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(w,y+h*0.02);ctx.bezierCurveTo(w*0.94,y-h*0.02,w*0.89,y+h*0.014,w*0.81,y+h*0.03);ctx.stroke();
+  }
+  // A dark floor slowly rises into view in the deepest part of the descent.
+  const floor=smooth(clamp((depth-0.62)/0.35,0,1));
+  if(floor>0){
+    const fg=ctx.createLinearGradient(0,h*0.78,0,h);
+    fg.addColorStop(0,'rgba(1,7,13,0)');
+    fg.addColorStop(1,'rgba(0,3,8,'+(floor*0.92)+')');
+    ctx.fillStyle=fg;ctx.fillRect(0,h*0.72,w,h*0.28);
+  }
+  ctx.restore();
 }
 
 function drawBubble(x,y,r,alpha) {
@@ -346,10 +395,9 @@ function drawFishSide(x,y,scale,palette,phase,time,dir=1,alpha=1,detail=1) {
     ctx.beginPath();ctx.moveTo(-35,-5);ctx.quadraticCurveTo(0,-12,34,-4);ctx.stroke();
   }
   // Eye with socket, iris and wet specular reflection.
-  ctx.fillStyle='rgba(4,17,25,0.76)';ctx.beginPath();ctx.ellipse(36,-6,5.7,5.4,-0.15,0,TAU);ctx.fill();
-  ctx.fillStyle='#e8f3d8';ctx.beginPath();ctx.arc(37,-6,3.15,0,TAU);ctx.fill();
-  ctx.fillStyle='#08131a';ctx.beginPath();ctx.arc(38,-6,1.7,0,TAU);ctx.fill();
-  ctx.fillStyle='rgba(255,255,255,0.9)';ctx.beginPath();ctx.arc(38.8,-7.1,0.9,0,TAU);ctx.fill();
+  ctx.fillStyle='rgba(4,17,25,0.8)';ctx.beginPath();ctx.ellipse(36,-6,3.2,2.8,-0.15,0,TAU);ctx.fill();
+  ctx.fillStyle='#d5e1d8';ctx.beginPath();ctx.arc(36.6,-6,1.55,0,TAU);ctx.fill();
+  ctx.fillStyle='#08131a';ctx.beginPath();ctx.arc(37,-6,0.85,0,TAU);ctx.fill();
   // Mouth and snout highlight.
   ctx.strokeStyle='rgba(8,24,31,0.65)';ctx.lineWidth=1.2;
   ctx.beginPath();ctx.moveTo(48,5);ctx.quadraticCurveTo(53,7,56,3);ctx.stroke();
@@ -359,32 +407,28 @@ function drawFishSide(x,y,scale,palette,phase,time,dir=1,alpha=1,detail=1) {
 }
 
 function drawFishSchools(w,h,time,still,depth,delta) {
-  // Far-to-near perspective: every fish swims out of the distant blue towards the diver.
+  // Small, separated silhouettes retain scale and distance; the camera is the diver's eye.
   for(const f of fish){
     if(!still){
       f.z+=f.speed*delta;
-      f.phase+=delta*0.0007;
-      if(f.z>1.02){f.z=rand(0.005,0.045);f.u=rand(-0.46,0.46);f.v=rand(-0.5,0.34);}
+      f.phase+=delta*0.00055;
+      if(f.z>0.9){f.z=rand(0.008,0.075);f.u=rand(-0.72,0.72);f.v=rand(-0.48,0.34);}
     }
-    const perspective=0.12+f.z*1.36;
+    const perspective=0.08+f.z*0.92;
     const x=w*0.5+f.u*w*perspective;
-    const y=h*(0.34+f.v*perspective);
-    const size=(0.2+f.z*2.05)*f.scale;
-    const alpha=0.16+f.z*0.78;
-    if(x>-170&&x<w+170&&y>-120&&y<h+100){
-      drawFishSide(x,y,size,f.palette,f.phase,time,f.dir,alpha,f.z>0.34);
+    const y=h*(0.35+f.v*perspective);
+    const size=(0.15+f.z*0.74)*f.scale;
+    const alpha=(0.055+f.z*0.34)*(1-depth*0.35);
+    if(x>-90&&x<w+90&&y>-80&&y<h+80){
+      drawFishSide(x,y,size,f.palette,f.phase,time,f.dir,alpha,f.z>0.42);
     }
   }
 
-  // A near-camera fish crosses each side every few seconds; it creates convincing foreground parallax.
-  const sweep=(time*0.000035)%1;
-  for(let i=0;i<3;i++){
-    const phase=(sweep+i/3)%1;
-    const x=mix(-180,w+180,phase);
-    const y=h*(0.23+i*0.16)+Math.sin(time*0.0008+i)*22;
-    const scale=1.25+(i%2)*0.72;
-    drawFishSide(x,y,scale,FISH_PALETTE[(i+3)%FISH_PALETTE.length],i*3.1,time,x<w*0.5?1:-1,0.28,0);
-  }
+  // An occasional nearby fish crosses an outer edge, never filling the frame.
+  const sweep=(time*0.000025)%1;
+  const x=mix(-125,w+125,sweep);
+  const y=h*0.29+Math.sin(time*0.0006)*h*0.035;
+  drawFishSide(x,y,0.72,FISH_PALETTE[4],1.3,time,1,0.13,0);
 }
 
 function drawJellyfish(x,y,scale,phase,time,alpha=0.85) {
@@ -432,11 +476,11 @@ function drawManta(x,y,scale,phase,time,alpha=1) {
 function drawTurtle(x,y,scale,phase,time,alpha=1) {
   ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(time*0.001+phase)*0.08);ctx.scale(scale,scale);ctx.globalAlpha=alpha;
   const shell=ctx.createRadialGradient(-14,-14,5,0,0,60);
-  shell.addColorStop(0,'#96aa73');shell.addColorStop(0.55,'#4d755b');shell.addColorStop(1,'#193d3c');
+  shell.addColorStop(0,'#879176');shell.addColorStop(0.55,'#526957');shell.addColorStop(1,'#1b302e');
   ctx.fillStyle=shell;ctx.beginPath();ctx.ellipse(0,0,54,39,0,0,TAU);ctx.fill();
   ctx.strokeStyle='rgba(213,223,157,0.5)';ctx.lineWidth=2;
   for(let i=-2;i<=2;i++){ctx.beginPath();ctx.ellipse(i*17,0,12,28,i*0.1,0,TAU);ctx.stroke();}
-  const skin='#66896d';ctx.fillStyle=skin;
+  const skin='#526c5e';ctx.fillStyle=skin;
   ctx.beginPath();ctx.ellipse(0,-54,20,24,0,0,TAU);ctx.fill();
   ctx.beginPath();ctx.moveTo(-35,-13);ctx.quadraticCurveTo(-80,-44,-93,-20);ctx.quadraticCurveTo(-68,0,-32,12);ctx.fill();
   ctx.beginPath();ctx.moveTo(35,-13);ctx.quadraticCurveTo(80,-44,93,-20);ctx.quadraticCurveTo(68,0,32,12);ctx.fill();
@@ -451,7 +495,7 @@ function drawDolphin(x,y,scale,phase,time,dir=1,alpha=1) {
   ctx.save();ctx.translate(x,y+Math.sin(time*0.0018+phase)*13*scale);ctx.rotate(Math.sin(time*0.0014+phase)*0.1);
   ctx.scale(dir*scale,scale);ctx.globalAlpha=alpha;
   const body=ctx.createLinearGradient(0,-27,0,28);
-  body.addColorStop(0,'#24475f');body.addColorStop(0.35,'#7197aa');body.addColorStop(0.7,'#d3e2dc');body.addColorStop(1,'#526b7a');
+  body.addColorStop(0,'#203b4d');body.addColorStop(0.35,'#627e8b');body.addColorStop(0.7,'#bcc8c1');body.addColorStop(1,'#435b68');
   ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(-105,0);
   ctx.bezierCurveTo(-70,-30,-6,-34,42,-17);ctx.quadraticCurveTo(79,-7,105,-2);
   ctx.quadraticCurveTo(82,11,55,15);ctx.bezierCurveTo(8,31,-60,24,-105,0);ctx.fill();
@@ -493,6 +537,57 @@ function drawWhaleSide(x,y,scale,phase,time,alpha=1,whaleShark=false) {
   ctx.fillStyle='#071c29';ctx.beginPath();ctx.arc(231,-10,5,0,TAU);ctx.fill();
   ctx.strokeStyle='rgba(228,248,242,0.35)';ctx.lineWidth=3;
   ctx.beginPath();ctx.moveTo(-170,-34);ctx.quadraticCurveTo(-5,-86,164,-37);ctx.stroke();
+  ctx.restore();
+}
+
+function drawSharkPass(x,y,scale,variant,phase,time,direction=1,jaw=0,alpha=1) {
+  const sp=SHARKS[variant%SHARKS.length];
+  ctx.save();ctx.translate(x,y);ctx.scale(direction*scale,scale);ctx.globalAlpha=alpha;
+
+  // Tail and fins are silhouettes first; body shading supplies the volume.
+  const fin=ctx.createLinearGradient(-80,-100,90,100);
+  fin.addColorStop(0,'#172b39');fin.addColorStop(0.55,sp.top);fin.addColorStop(1,'#132737');
+  ctx.fillStyle=fin;
+  ctx.beginPath();ctx.moveTo(-194,0);ctx.quadraticCurveTo(-242,-58,-286,-78);
+  ctx.quadraticCurveTo(-268,-18,-224,0);ctx.quadraticCurveTo(-268,18,-286,78);
+  ctx.quadraticCurveTo(-236,57,-194,0);ctx.fill();
+  ctx.beginPath();ctx.moveTo(-78,-35);ctx.quadraticCurveTo(-45,-95,-8,-118);
+  ctx.quadraticCurveTo(5,-72,18,-34);ctx.closePath();ctx.fill();
+  ctx.beginPath();ctx.moveTo(-18,17);ctx.quadraticCurveTo(40,23,100,104);
+  ctx.quadraticCurveTo(36,74,-4,48);ctx.closePath();ctx.fill();
+
+  const body=ctx.createLinearGradient(0,-58,0,52);
+  body.addColorStop(0,'#172e3d');body.addColorStop(0.2,sp.top);
+  body.addColorStop(0.48,sp.side);body.addColorStop(0.72,sp.belly);body.addColorStop(1,'#405765');
+  ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(-220,0);
+  ctx.bezierCurveTo(-183,-43,-86,-57,12,-43);
+  ctx.quadraticCurveTo(112,-31,192,-8);
+  ctx.quadraticCurveTo(222,-2,230,5);
+  ctx.quadraticCurveTo(202,19,158,26);
+  ctx.bezierCurveTo(54,54,-127,47,-220,0);ctx.closePath();ctx.fill();
+
+  // Gill slits and a small eye establish the animal's anatomy without caricature.
+  ctx.strokeStyle='rgba(10,26,36,0.62)';ctx.lineWidth=2;
+  for(let i=0;i<5;i++){
+    const gx=87+i*9;
+    ctx.beginPath();ctx.moveTo(gx,-25);ctx.quadraticCurveTo(gx+6,-2,gx+1,15);ctx.stroke();
+  }
+  ctx.fillStyle='#071621';ctx.beginPath();ctx.arc(181,-15,3.1,0,TAU);ctx.fill();
+  ctx.fillStyle='rgba(227,239,230,0.8)';ctx.beginPath();ctx.arc(181.8,-15.7,0.9,0,TAU);ctx.fill();
+
+  // Slightly opening jaw is only visible at the closest part of the pass.
+  ctx.fillStyle='rgba(8,12,17,0.9)';ctx.beginPath();
+  ctx.moveTo(188,5);ctx.quadraticCurveTo(210,8+jaw*15,228,7+jaw*22);
+  ctx.quadraticCurveTo(213,19+jaw*27,190,12);ctx.closePath();ctx.fill();
+  if(jaw>0.12){
+    ctx.fillStyle='rgba(222,221,202,0.78)';
+    for(let i=0;i<5;i++){
+      const tx=194+i*5;
+      ctx.beginPath();ctx.moveTo(tx,7+jaw*4);ctx.lineTo(tx+2.5,12+jaw*11);ctx.lineTo(tx+4.5,8+jaw*4);ctx.fill();
+    }
+  }
+  ctx.strokeStyle='rgba(224,237,229,0.18)';ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.moveTo(-140,-24);ctx.quadraticCurveTo(-18,-66,139,-28);ctx.stroke();
   ctx.restore();
 }
 
@@ -572,7 +667,7 @@ function drawFrontShark(x,y,scale,variant,jaw,time,alpha=1) {
 function drawOctopus(x,y,scale,phase,time,alpha=1) {
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.globalAlpha=alpha;
   const mantle=ctx.createRadialGradient(-20,-35,5,0,0,75);
-  mantle.addColorStop(0,'#e9a1a2');mantle.addColorStop(0.4,'#a65373');mantle.addColorStop(1,'#412b54');
+  mantle.addColorStop(0,'#a77b70');mantle.addColorStop(0.4,'#73515a');mantle.addColorStop(1,'#302b36');
   ctx.fillStyle=mantle;ctx.beginPath();ctx.ellipse(0,-38,48,62,-0.1,0,TAU);ctx.fill();
   for(let arm=0;arm<8;arm++){
     const a=arm/8*TAU, startX=Math.cos(a)*24,startY=Math.sin(a)*22+4;
@@ -601,33 +696,32 @@ function drawEvent(w,h,time,still) {
   const x=w*(0.5+e.lane), y=h*0.43;
 
   if(e.kind==='shark'||e.kind==='barracuda'||e.kind==='reef_shark'){
-    // The shark starts as a small silhouette in the distant water and rushes straight at the diver.
-    const scale=mix(0.025,Math.min(w/300,4.9)*e.scale,approach);
-    const jaw=smooth((p-0.2)/0.34);
-    ctx.save();
-    const shadow=ctx.createRadialGradient(x,y,4,x,y,Math.max(w,h)*(0.12+approach*0.68));
-    shadow.addColorStop(0,'rgba(1,8,19,'+(0.12+approach*0.22)+')');
-    shadow.addColorStop(1,'rgba(1,8,19,0)');
+    // A large predator sweeps out of the dark and passes close across the camera.
+    const scale=mix(0.045,Math.min(w/980,1.42)*e.scale,approach);
+    const direction=e.direction;
+    const x=direction>0?mix(-350,w+350,p):mix(w+350,-350,p);
+    const y=h*(0.42+e.lane*0.45)+Math.sin(time*0.0007+e.seed)*h*0.018;
+    const jaw=smooth((p-0.68)/0.16);
+    const shadow=ctx.createRadialGradient(x,y,8,x,y,Math.max(w,h)*(0.18+approach*0.43));
+    shadow.addColorStop(0,'rgba(0,5,13,'+(0.14+approach*0.28)+')');
+    shadow.addColorStop(1,'rgba(0,5,13,0)');
     ctx.fillStyle=shadow;ctx.fillRect(0,0,w,h);
-    drawFrontShark(x,y,scale,e.variant,jaw,time,fade);
-    ctx.restore();
-    if(p>0.72){
-      const burst=(p-0.72)/0.28;
-      for(let i=0;i<55;i++){
-        const a=i/55*TAU, r=22+burst*(130+(i%4)*28);
-        drawBubble(x+Math.cos(a)*r,y+Math.sin(a)*r*0.58,3+(i%4)*1.3,0.8*(1-burst*0.3));
+    drawSharkPass(x,y,scale,e.variant,e.seed,time,direction,jaw,fade);
+    if(p>0.82){
+      const burst=(p-0.82)/0.18;
+      for(let i=0;i<30;i++){
+        const a=i/30*TAU, r=18+burst*(95+(i%4)*18);
+        drawBubble(x+Math.cos(a)*r,y+Math.sin(a)*r*0.55,2.4+(i%3)*0.8,0.42*(1-burst*0.35));
       }
-    }
-    if(p>0.79){
-      const flash=(p-0.79)/0.21;
-      const vignette=ctx.createRadialGradient(w/2,h/2,20,w/2,h/2,Math.max(w,h)*0.72);
-      vignette.addColorStop(0,'rgba(0,0,0,'+(flash*0.4)+')');vignette.addColorStop(1,'rgba(0,0,0,0)');
-      ctx.fillStyle=vignette;ctx.fillRect(0,0,w,h);
+      const edge=ctx.createRadialGradient(w/2,h/2,Math.min(w,h)*0.18,w/2,h/2,Math.max(w,h)*0.78);
+      edge.addColorStop(0,'rgba(0,0,0,0)');
+      edge.addColorStop(1,'rgba(0,2,8,'+(0.4*burst)+')');
+      ctx.fillStyle=edge;ctx.fillRect(0,0,w,h);
     }
     return;
   }
 
-  // Rare answers cause different peaceful or spectacular wildlife encounters.
+    // Rare answers cause different peaceful or spectacular wildlife encounters.
   if(e.kind==='manta'||e.kind==='ray_school'||e.kind==='giant_ray'||e.kind==='manta_migration'){
     const s=mix(0.08,Math.min(w/440,2.65)*e.scale,approach);
     const travel=e.direction*(p*0.32);
@@ -654,11 +748,11 @@ function drawEvent(w,h,time,still) {
     return;
   }
   if(e.kind==='reef_sharks'){
-    const s=mix(0.04,Math.min(w/1150,1.15),approach);
+    const s=mix(0.08,Math.min(w/1320,0.92)*e.scale,approach);
     for(let i=0;i<3;i++){
-      const xx=w*(0.22+i*0.28)+Math.sin(time*0.0008+i)*20;
-      const yy=y+(i-1)*82+Math.sin(time*0.001+i*2)*12;
-      drawFrontShark(xx,yy,s*(1-i*0.08),e.variant,0,time,fade*0.82);
+      const xx=(e.direction>0?-260:w+260)+e.direction*p*(w+520)+(i-1)*w*0.13;
+      const yy=y+(i-1)*h*0.105+Math.sin(time*0.00075+i*1.7)*18;
+      drawSharkPass(xx,yy,s*(1-i*0.1),e.variant,e.seed+i,time,e.direction,0,fade*0.72);
     }
     return;
   }
@@ -779,43 +873,76 @@ function drawDiver(w,h,time,still,depth) {
 
 function drawForegroundBubbles(w,h,time,still) {
   if(still)return;
-  // Large soft bubbles close to the lens add depth and lens-space movement.
-  for(let i=0;i<12;i++){
-    const phase=(time*0.00008+i/12)%1;
-    const x=(i*113.7+Math.sin(time*0.0004+i)*30)%w;
+  // Sparse, soft lens bubbles only at the very edge of the camera.
+  for(let i=0;i<5;i++){
+    const phase=(time*0.000055+i/5)%1;
+    const x=(i*313.7+Math.sin(time*0.0004+i)*24)%w;
     const y=h*(1-phase);
-    const r=2+phase*14;
-    drawBubble(x,y,r,0.08+phase*0.15);
+    const r=1.5+phase*8;
+    drawBubble(x,y,r,0.035+phase*0.075);
   }
 }
 
 function drawEventBackdrop(w,h,time) {
   if(!eventScene)return;
   const p=clamp((time-eventScene.start)/eventScene.duration,0,1);
-  const alpha=eventScene.kind==='shark'||eventScene.kind==='barracuda'||eventScene.kind==='reef_shark'?0.24:0.12;
-  const glow=ctx.createRadialGradient(w*0.5,h*0.4,6,w*0.5,h*0.4,Math.max(w,h)*(0.12+p*0.42));
-  glow.addColorStop(0,'rgba(116,233,232,'+(alpha*(1-p*0.45))+')');
-  glow.addColorStop(1,'rgba(43,134,185,0)');
-  ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+  const predator=eventScene.kind==='shark'||eventScene.kind==='barracuda'||eventScene.kind==='reef_shark';
+  if(predator){
+    const pressure=ctx.createRadialGradient(w*0.5,h*0.44,Math.min(w,h)*0.12,w*0.5,h*0.44,Math.max(w,h)*0.78);
+    pressure.addColorStop(0,'rgba(0,4,11,'+(0.02+p*0.07)+')');
+    pressure.addColorStop(1,'rgba(0,3,10,'+(0.16+p*0.1)+')');
+    ctx.fillStyle=pressure;ctx.fillRect(0,0,w,h);
+  } else {
+    const ambient=ctx.createRadialGradient(w*0.52,h*0.42,6,w*0.52,h*0.42,Math.max(w,h)*0.52);
+    ambient.addColorStop(0,'rgba(150,190,179,'+(0.045*(1-p*0.55))+')');
+    ambient.addColorStop(1,'rgba(36,93,111,0)');
+    ctx.fillStyle=ambient;ctx.fillRect(0,0,w,h);
+  }
 }
 
 function frame(time) {
   if(!ctx||!canvas)return;
   const w=width||window.innerWidth,h=height||window.innerHeight;
-  const depth=clamp((Number(getDepth())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
+  const actualDepth=clamp((Number(getDepth())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
+  const promptProgress=clamp(Number(getProgress())||0,0,1);
+  // The scenery advances with every prompt, even on a miss; scoring remains separate.
+  const targetStage=clamp(Math.max(actualDepth,promptProgress*0.82),0,1);
   const still=Boolean(isStill());
   const delta=still?0:Math.min(42,previousTime?time-previousTime:16);
-  if(!still){previousTime=time;frozenTime=0;}
-  else if(!frozenTime) frozenTime=time;
+  if(!still){
+    previousTime=time;frozenTime=0;
+    const blend=1-Math.exp(-delta/1150);
+    visualStage+= (targetStage-visualStage)*blend;
+    visualDepth+= (targetStage-visualDepth)*(1-Math.exp(-delta/1550));
+  } else if(!frozenTime) frozenTime=time;
   const t=still?(frozenTime||time):time;
-  drawWater(w,h,depth,t);
-  drawReefAndKelp(w,h,t,depth,still);
+
+  drawWater(w,h,visualDepth,t);
+  // A gentle downward camera drift and current make the whole screen feel like one space.
+  const swayX=still?0:Math.sin(t*0.00016)*w*0.004;
+  const driftY=visualStage*h*0.035+(still?0:Math.sin(t*0.00019)*h*0.0025);
+  const predatorEvent=eventScene&&(eventScene.kind==='shark'||eventScene.kind==='barracuda'||eventScene.kind==='reef_shark');
+  const predatorT=predatorEvent?clamp((t-eventScene.start)/eventScene.duration,0,1):0;
+  const impact=predatorEvent?smooth((predatorT-0.79)/0.18):0;
+  const hitShake=still?0:Math.sin(t*0.082)*impact*10;
+  ctx.save();
+  ctx.translate(swayX+hitShake,-driftY+Math.cos(t*0.071)*impact*5);
+  drawReefAndKelp(w,h,t,visualDepth,still);
+  drawDepthWalls(w,h,visualDepth,t);
   drawEventBackdrop(w,h,t);
-  drawFishSchools(w,h,t,still,depth,delta);
-  drawParticles(w,h,t,still,depth);
-  drawDiver(w,h,t,still,depth);
-  // Creatures begin far behind the diver and grow into the foreground as they approach.
+  drawFishSchools(w,h,t,still,visualDepth,delta);
+  drawParticles(w,h,t,still,visualDepth);
+  // First-person camera: the diver is the viewer, not a small cartoon avatar on screen.
   drawEvent(w,h,t,still);
   drawForegroundBubbles(w,h,t,still);
+  ctx.restore();
+
+  // Pressure darkens the edge of the lens progressively with depth.
+  const pressure=0.12+visualDepth*0.34;
+  const edge=ctx.createRadialGradient(w*0.5,h*0.48,Math.min(w,h)*0.24,w*0.5,h*0.48,Math.max(w,h)*0.76);
+  edge.addColorStop(0,'rgba(0,3,9,0)');
+  edge.addColorStop(1,'rgba(0,2,8,'+pressure+')');
+  ctx.fillStyle=edge;ctx.fillRect(0,0,w,h);
+
   requestAnimationFrame(frame);
 }
