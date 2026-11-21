@@ -34,7 +34,7 @@ const seen = new Set();
 function add(cat, id, prompt, pattern, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
   seen.add(id);
-  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 3, limit: 2500, minPool: 20, ...o });
+  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 1, limit: 5000, minPool: 20, ...o });
 }
 function addTaxon(cat, id, prompt, parentQ, parentLabel, rankQ, rankLabel, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
