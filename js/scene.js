@@ -83,7 +83,7 @@ function resize() {
     speed: rand(0.18, 0.78), drift: rand(0.3, 1.6), phase: rand(0, Math.PI * 2),
     alpha: rand(0.16, 0.58),
   }));
-  fish = Array.from({ length: Math.min(24, Math.max(12, Math.floor(innerWidth / 65))) }, (_, i) => ({
+  fish = Array.from({ length: Math.min(34, Math.max(18, Math.floor(innerWidth / 48))) }, (_, i) => ({
     x: rand(-innerWidth, innerWidth * 1.5), y: rand(innerHeight * 0.12, innerHeight * 0.88),
     size: rand(0.22, 0.78), speed: rand(0.22, 0.8) * (i % 3 === 0 ? 1.4 : 1),
     direction: Math.random() < 0.5 ? -1 : 1, color: fishColors[i % fishColors.length],
@@ -274,7 +274,7 @@ function drawSmallFish(x, y, size, color, direction, phase, time, alpha = 0.9) {
 
 function drawFishSchools(w, h, time, still, depth) {
   for (const f of fish) {
-    const visible = f.depth < 0.25 + depth * 1.0;
+    const visible = true;
     if (!still) {
       f.x += f.speed * f.direction * (1 + depth * 0.3);
       f.y += Math.sin(time * 0.00025 + f.phase) * 0.16;
@@ -603,7 +603,7 @@ function drawAttack(w, h, time, still) {
   const progress = still ? 0.7 : clamp(elapsed / predator.duration, 0, 1);
   const creature = species[predator.species];
   const direction = predator.side === 'left' ? 1 : -1;
-  const size = mix(0.62, 1.18, Math.sin(progress * Math.PI));
+  const size = mix(0.8, clamp(w / 420, 1.1, 2.8), Math.sin(progress * Math.PI));
   const targetX = w * 0.52;
   const startX = predator.side === 'left' ? -360 : w + 360;
   const endX = targetX + (direction === 1 ? 72 : -72);
