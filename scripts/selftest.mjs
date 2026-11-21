@@ -29,6 +29,8 @@ const programmingEntry = CATALOG.find(e => e.id === 'programming-language');
 ok(programmingEntry?.pattern.includes('P279*'), 'programming language query includes subclasses');
 ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger pool');
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
+ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language pool has a 5,000-row query limit');
+
 ok(/P1843/.test(buildQuery(taxon)), 'taxon query uses common names');
 const rows = { results: { bindings: [
   { item: { value: 'http://www.wikidata.org/entity/Q1' }, itemLabel: { value: 'Alpha' }, sl: { value: '100' }, alts: { value: 'Alef|Alpha' } },
