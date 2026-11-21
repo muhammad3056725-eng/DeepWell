@@ -27,10 +27,8 @@ export function show(id) {
 
 export function updateDepthUI(depth) {
   const d = Math.round(depth);
-  const zone = d < 250 ? 'UPPER WATER' : d < 1000 ? 'REEF EDGE' : d < 2200 ? 'BLUE DEPTH' : d < 4000 ? 'TWILIGHT' : 'ABYSS';
   const readout = $('topDepth');
-  if (readout) readout.textContent = `${d.toLocaleString()} m · ${zone}`;
-  document.body.dataset.depth = zone.toLowerCase().replace(/\s+/g, '-');
+  if (readout) readout.textContent = `${d.toLocaleString()} m below`;
 }
 
 function untilReset() {
