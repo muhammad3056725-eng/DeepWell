@@ -98,3 +98,18 @@ body.colorsafe{--cyan:#6cb4ff;--pink:#ff9f43;--green:#e8d44d}
 @media(prefers-reduced-motion:reduce){
   .panel,.button,#scene{scroll-behavior:auto}
 }
+
+/* WebGL scene layers: world behind the interface, close-up attack above it. */
+#deepwell-3d-world,
+#deepwell-3d-attack{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
+}
+#deepwell-3d-world{z-index:0;pointer-events:none}
+#deepwell-3d-attack{z-index:3;pointer-events:none}
+@media(prefers-reduced-motion:reduce){
+  #deepwell-3d-world,#deepwell-3d-attack{scroll-behavior:auto}
+}
