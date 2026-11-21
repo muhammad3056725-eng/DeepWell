@@ -5,7 +5,7 @@ import { loadManifest } from './data.js';
 import { prepareDive, examples } from './game.js';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
-import { startScene } from './scene.js';
+import { startScene, triggerPredatorAttack } from './scene.js';
 import { wake, tone, buzz } from './audio.js';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
@@ -156,6 +156,8 @@ async function resolve(item, value) {
   $('feedback').textContent = message;
   $('live').textContent = message;
   updateDepthUI(mine.depth);
+  // Visual-only penalty animation. Scoring, answers and progression remain unchanged.
+  if (state !== 'hit' || points <= 20) triggerPredatorAttack();
   mine.index++;
   setTimeout(() => { if (run === mine) nextPrompt(); }, 1100);
 }
