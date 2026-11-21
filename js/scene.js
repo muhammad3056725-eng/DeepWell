@@ -4,7 +4,9 @@
 import { CONFIG } from './config.js';
 
 const canvas = document.getElementById('scene');
-const ctx = canvas?.getContext('2d', { alpha: false });
+let ctx = canvas?.getContext('2d', { alpha: false });
+let attackCanvas = null;
+let attackCtx = null;
 let getDepth = () => 0;
 let isStill = () => false;
 let bubbles = [];
