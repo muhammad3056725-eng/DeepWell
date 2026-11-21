@@ -65,7 +65,7 @@ function resize() {
   }));
   fish = Array.from({length:Math.min(74,Math.max(38,Math.floor(width/22)))},(_,i)=>({
     u:rand(-0.48,0.48),v:rand(-0.48,0.38),z:rand(0.015,0.9),
-    scale:rand(0.52,1.05),speed:rand(0.000045,0.00012),
+    scale:rand(0.78,1.26),speed:rand(0.00013,0.00028),
     dir:Math.random()<0.5?-1:1, phase:rand(0,TAU),
     palette:FISH_PALETTE[i%FISH_PALETTE.length],kind:i%5
   }));
@@ -209,9 +209,9 @@ function drawRock(x,y,scale,time) {
   ctx.shadowBlur=0;ctx.strokeStyle='rgba(176,224,216,0.18)';ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(-38,-15);ctx.quadraticCurveTo(-8,-38,19,-23);ctx.stroke();
   for(let i=0;i<9;i++){
-    const xx=-48+i*11, yy=rand(-10,30);
+    const xx=-48+i*11, yy=-10+((i*17)%41);
     ctx.fillStyle=i%2?'rgba(95,158,143,0.2)':'rgba(9,30,43,0.34)';
-    ctx.beginPath();ctx.ellipse(xx,yy,rand(2,5),rand(1,3),rand(-0.5,0.5),0,TAU);ctx.fill();
+    ctx.beginPath();ctx.ellipse(xx,yy,2+(i%4),1+(i%3)*0.55,((i%5)-2)*0.12,0,TAU);ctx.fill();
   }
   ctx.restore();
 }
@@ -367,7 +367,7 @@ function drawFishSchools(w,h,time,still,depth,delta) {
     const perspective=0.12+f.z*1.36;
     const x=w*0.5+f.u*w*perspective;
     const y=h*(0.34+f.v*perspective);
-    const size=(0.14+f.z*1.02)*f.scale;
+    const size=(0.2+f.z*2.05)*f.scale;
     const alpha=0.16+f.z*0.78;
     if(x>-170&&x<w+170&&y>-120&&y<h+100){
       drawFishSide(x,y,size,f.palette,f.phase,time,f.dir,alpha,f.z>0.34);
@@ -380,7 +380,7 @@ function drawFishSchools(w,h,time,still,depth,delta) {
     const phase=(sweep+i/3)%1;
     const x=mix(-180,w+180,phase);
     const y=h*(0.23+i*0.16)+Math.sin(time*0.0008+i)*22;
-    const scale=0.95+(i%2)*0.52;
+    const scale=1.25+(i%2)*0.72;
     drawFishSide(x,y,scale,FISH_PALETTE[(i+3)%FISH_PALETTE.length],i*3.1,time,x<w*0.5?1:-1,0.28,0);
   }
 }
@@ -794,16 +794,16 @@ function frame(time) {
   const depth=clamp((Number(getDepth())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
   const still=Boolean(isStill());
   const delta=still?0:Math.min(42,previousTime?time-previousTime:16);
-  previousTime=time;
-  const t=time;
+  if(!still) previousTime=time;
+  const t=still?(previousTime||time):time;
   drawWater(w,h,depth,t);
   drawReefAndKelp(w,h,t,depth,still);
   drawEventBackdrop(w,h,t);
   drawFishSchools(w,h,t,still,depth,delta);
-  // Background creatures and event travel behind the diver, then the diver anchors perspective.
-  drawEvent(w,h,t,still);
   drawParticles(w,h,t,still,depth);
   drawDiver(w,h,t,still,depth);
+  // Creatures begin far behind the diver and grow into the foreground as they approach.
+  drawEvent(w,h,t,still);
   drawForegroundBubbles(w,h,t,still);
   requestAnimationFrame(frame);
 }
