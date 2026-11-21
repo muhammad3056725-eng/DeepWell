@@ -22,6 +22,8 @@ jobs:
     timeout-minutes: 170
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -47,7 +49,31 @@ jobs:
           git add data
           if git diff --cached --quiet; then
             echo "No data changes."
-          else
-            git commit -m "Update question data $(date -u +%F)"
-            git push
+            exit 0
           fi
+
+          git commit -m "Update question data $(date -u +%F)"
+
+          # The data build can take a long time. main may advance while it runs.
+          # Rebase this data-only commit onto the latest main before pushing.
+          # Never force-push: if the same data files conflict, stop safely.
+          for attempt in 1 2 3; do
+            git fetch origin main
+
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::Could not rebase generated data onto main. No files were pushed; resolve the data conflict manually."
+              exit 1
+            fi
+
+            if git push origin HEAD:main; then
+              echo "Question data pushed successfully."
+              exit 0
+            fi
+
+            echo "Push attempt $attempt failed; refreshing main before retry."
+            sleep $((attempt * 3))
+          done
+
+          echo "::error::Push failed after 3 attempts. No force-push was attempted."
+          exit 1
