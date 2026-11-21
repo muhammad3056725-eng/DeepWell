@@ -85,7 +85,7 @@ async function main() {
     const prev = manifest.packs[entry.id];
     if (flag('resume') && prev && prev.built && (Date.parse(today) - Date.parse(prev.built)) < 6 * 864e5) { console.log(`${tag}: fresh, skipped`); continue; }
     try {
-      const json = await sparql(buildQuery(entry));
+      const json = await sparql(buildQuery(entry, flag('wide') ? { limit: 5000, minSL: 1 } : {}));
       const items = parseBindings(json, entry);
       const minimumItems = Math.min(entry.minPool || 20, 8);
       const previousCount = prev?.n || 0;
