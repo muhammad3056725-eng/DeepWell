@@ -46,20 +46,20 @@ export function parseBindings(json, entry) {
     const id = (row.item?.value || '').split('/').pop();
     const name = (entry.kind === 'taxon' ? row.name?.value : row.itemLabel?.value) || '';
     const s = Number(row.sl?.value || 0);
-    if (!id || !name || looksLikeId(name) || name.length > 70) continue;
+    if (!id || !name || looksLikeId(name) || name.length > 120) continue;
     const key = name.toLowerCase();
     if (seenName.has(key)) continue; // same label twice: the first (most linked) wins
     seenName.add(key);
     const aliases = [];
     const pushAlias = v => {
       v = String(v || '').trim();
-      if (!v || v.length > 70 || looksLikeId(v)) return;
+      if (!v || v.length > 120 || looksLikeId(v)) return;
       if (v.toLowerCase() === key || aliases.some(x => x.toLowerCase() === v.toLowerCase())) return;
       aliases.push(v);
     };
     (row.alts?.value || '').split('|').forEach(pushAlias);
     if (entry.kind === 'taxon') (row.cns?.value || '').split('|').forEach(pushAlias);
-    out.push({ id, n: name, s, a: aliases.slice(0, 8) });
+    out.push({ id, n: name, s, a: aliases.slice(0, 24) });
   }
   return out;
 }
