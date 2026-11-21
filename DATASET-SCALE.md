@@ -42,3 +42,6 @@ The theoretical maximum is 10 million answer records (10,000 × 1,000). At the c
 GitHub Actions runs a refresh **daily at 03:17 UTC**. Each scheduled run refreshes one 500-prompt slice; the batch index rotates across all 20 slices, so the full prompt catalog is revisited every 20 days. Scheduled runs do not chain extra batches.
 
 Each refresh merges newly discovered Wikidata entity IDs into saved pools rather than replacing them with a smaller query result. Existing valid answers and aliases are retained, popularity and labels are refreshed, and each pool stays under its configured answer limit (never above 1,000). Pools below 1,000 can grow when Wikidata adds valid records; a pool already at 1,000 remains capped.
+
+
+Daily refreshes rotate the Wikidata candidate offset: each 20-day sweep scans the next page of up to 5,000 candidates for that prompt family. Under-cap pools can discover valid entities beyond the most popular first page; duplicate IDs are merged rather than counted twice.
