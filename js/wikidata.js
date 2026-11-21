@@ -83,6 +83,35 @@ export function parseBindings(json, entry) {
   return out.slice(0, answerLimit);
 }
 
+/** Merge saved and new Wikidata answers while preserving data and respecting each prompt cap. */
+export function mergePools(existingItems = [], freshItems = [], entry = {}) {
+  const byId = new Map();
+  const upsert = item => {
+    if (!item?.id || !item?.n) return;
+    const name = String(item.n).trim();
+    if (!name || (entry.startsWith && !name.toLowerCase().startsWith(entry.startsWith.toLowerCase()))) return;
+    const previous = byId.get(item.id);
+    const aliases = [];
+    const add = value => {
+      const alias = String(value || '').trim();
+      if (!alias || alias.length > 120 || alias.toLowerCase() === name.toLowerCase()) return;
+      if (!aliases.some(x => x.toLowerCase() === alias.toLowerCase())) aliases.push(alias);
+    };
+    for (const a of previous?.a || []) add(a);
+    for (const a of item.a || []) add(a);
+    byId.set(item.id, { id:item.id, n:name, s:Math.max(Number(previous?.s)||0,Number(item.s)||0), a:aliases.slice(0,24) });
+  };
+  for (const item of existingItems) upsert(item);
+  for (const item of freshItems) upsert(item);
+  const cap = Math.max(1,Math.min(Number(entry.answerLimit)||1000,1000));
+  const names = new Set();
+  return [...byId.values()].sort((a,b)=>b.s-a.s||a.n.localeCompare(b.n)).filter(item=>{
+    const key=item.n.trim().toLowerCase();
+    if(names.has(key)) return false;
+    names.add(key); return true;
+  }).slice(0,cap);
+}
+
 export function queryUrl(endpoint, sparql) {
   return `${endpoint}?format=json&origin=*&query=${encodeURIComponent(sparql)}`;
 }
