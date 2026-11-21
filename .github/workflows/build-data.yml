@@ -1,6 +1,10 @@
 name: Build question data
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-data.yml'
   workflow_dispatch:
     inputs:
       only:
@@ -23,6 +27,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: build-data
@@ -55,9 +60,15 @@ jobs:
           if [ -n "$ONLY" ]; then ARGS+=(--only "$ONLY"); fi
           if [ "$WIDE" != "false" ]; then ARGS+=(--wide); fi
           if [ -z "$BATCH" ]; then
-            # Scheduled runs rotate through all 20 batches over 20 weeks.
-            BATCH=$(( ($(date -u +%s) / 604800) % 20 ))
+            if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+              # The first run is kicked off by merging this workflow change.
+              BATCH=0
+            else
+              # Scheduled runs pick a rotating starting batch.
+              BATCH=$(( ($(date -u +%s) / 604800) % 20 ))
+            fi
           fi
+          echo "BATCH=$BATCH" >> "$GITHUB_ENV"
           if [ "$BATCH" != "all" ]; then ARGS+=(--batch "$BATCH" --batch-size "${BATCH_SIZE:-500}"); fi
           node scripts/build-data.mjs "${ARGS[@]}"
 
@@ -96,3 +107,44 @@ jobs:
 
           echo "::error::Push failed after 3 attempts. No force-push was attempted."
           exit 1
+
+      - name: Queue next question-data batch
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ONLY: ${{ github.event.inputs.only }}
+          BATCH: ${{ github.event.inputs.batch }}
+          BATCH_SIZE: ${{ github.event.inputs.batch_size }}
+        run: |
+          if [ -n "$ONLY" ]; then
+            echo "Targeted build requested; automatic batch chaining is disabled."
+            exit 0
+          fi
+          if [ -z "$BATCH" ]; then
+            if [ "$GITHUB_EVENT_NAME" = "push" ]; then
+              BATCH=0
+            else
+              BATCH=$(( ($(date -u +%s) / 604800) % 20 ))
+            fi
+          fi
+          if [ "$BATCH" = "all" ]; then
+            echo "All-at-once build requested; automatic chaining is disabled."
+            exit 0
+          fi
+          if ! [[ "$BATCH" =~ ^[0-9]+$ ]]; then
+            echo "::error::Invalid batch index: $BATCH"
+            exit 1
+          fi
+          NEXT_BATCH=$((BATCH + 1))
+          if [ "$NEXT_BATCH" -ge 20 ]; then
+            echo "Completed the final batch (19)."
+            exit 0
+          fi
+          echo "Queueing batch $NEXT_BATCH of 19."
+          gh api --method POST \
+            -H "Accept: application/vnd.github+json" \
+            "/repos/$GITHUB_REPOSITORY/actions/workflows/build-data.yml/dispatches" \
+            -f ref=main \
+            -f 'inputs[wide]=true' \
+            -f "inputs[batch]=$NEXT_BATCH" \
+            -f "inputs[batch_size]=${BATCH_SIZE:-500}"
