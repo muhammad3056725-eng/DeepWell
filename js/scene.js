@@ -921,8 +921,12 @@ function frame(time) {
   // A gentle downward camera drift and current make the whole screen feel like one space.
   const swayX=still?0:Math.sin(t*0.00016)*w*0.004;
   const driftY=visualStage*h*0.035+(still?0:Math.sin(t*0.00019)*h*0.0025);
+  const predatorEvent=eventScene&&(eventScene.kind==='shark'||eventScene.kind==='barracuda'||eventScene.kind==='reef_shark');
+  const predatorT=predatorEvent?clamp((t-eventScene.start)/eventScene.duration,0,1):0;
+  const impact=predatorEvent?smooth((predatorT-0.79)/0.18):0;
+  const hitShake=still?0:Math.sin(t*0.082)*impact*10;
   ctx.save();
-  ctx.translate(swayX,-driftY);
+  ctx.translate(swayX+hitShake,-driftY+Math.cos(t*0.071)*impact*5);
   drawReefAndKelp(w,h,t,visualDepth,still);
   drawDepthWalls(w,h,visualDepth,t);
   drawEventBackdrop(w,h,t);
