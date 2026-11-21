@@ -15,6 +15,7 @@ let reef = [];
 let eventScene = null;
 let lastSharkVariant = -1;
 let previousTime = 0;
+let frozenTime = 0;
 let width = 0;
 let height = 0;
 let dpr = 1;
@@ -804,8 +805,9 @@ function frame(time) {
   const depth=clamp((Number(getDepth())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
   const still=Boolean(isStill());
   const delta=still?0:Math.min(42,previousTime?time-previousTime:16);
-  if(!still) previousTime=time;
-  const t=still?(previousTime||time):time;
+  if(!still){previousTime=time;frozenTime=0;}
+  else if(!frozenTime) frozenTime=time;
+  const t=still?(frozenTime||time):time;
   drawWater(w,h,depth,t);
   drawReefAndKelp(w,h,t,depth,still);
   drawEventBackdrop(w,h,t);
