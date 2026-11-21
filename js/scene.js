@@ -597,8 +597,8 @@ function drawPredator(x, y, scale, direction, creature, jaw, time) {
 function drawAttack(w, h, time, still) {
   if (!predator) return;
   const elapsed = time - predator.start;
+  if (elapsed >= predator.duration) { predator = null; return; }
   const progress = still ? 0.7 : clamp(elapsed / predator.duration, 0, 1);
-  if (progress >= 1) { predator = null; return; }
   const creature = species[predator.species];
   const direction = predator.side === 'left' ? 1 : -1;
   const size = mix(0.62, 1.18, Math.sin(progress * Math.PI));
