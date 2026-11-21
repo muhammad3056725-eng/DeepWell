@@ -18,6 +18,7 @@ const MANIFEST = path.resolve(opt('manifest', 'data/manifest.json'));
 const ONLY = opt('only') ? new Set(opt('only').split(',')) : null;
 const BATCH = opt('batch');
 const BATCH_SIZE = Math.max(1, Number.parseInt(opt('batch-size', '500'), 10) || 500);
+const CANDIDATE_OFFSET = Math.max(0, Number.parseInt(opt('candidate-offset', '0'), 10) || 0);
 const ENDPOINT = 'https://query.wikidata.org/sparql';
 const UA = 'DeepwellBuild/2.0 (https://deepwell.games; static trivia game data build)';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -100,7 +101,7 @@ async function main() {
     const prev = manifest.packs[entry.id];
     if (flag('resume') && prev && prev.built && (Date.parse(today) - Date.parse(prev.built)) < 6 * 864e5) { console.log(`${tag}: fresh, skipped`); continue; }
     try {
-      const json = await sparql(buildQuery(entry, flag('wide') ? { limit: 5000, minSL: 1 } : {}));
+      const json = await sparql(buildQuery(entry, flag('wide') ? { limit: 5000, minSL: 1, offset: CANDIDATE_OFFSET } : { offset: CANDIDATE_OFFSET }));
       const freshItems = parseBindings(json, entry);
       const packPath = path.join(OUT, entry.id + '.json');
       let existingItems = [];
