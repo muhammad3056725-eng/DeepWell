@@ -13,7 +13,8 @@ async function ready(pick, allowLive) {
     const raw = await loadRawPool(entry, { allowLive });
     const opts = { people: Boolean(entry.people) };
     let pool = buildPool(raw.items, opts);
-    if (pool.size < 8) return null;
+    const minimumItems = Math.min(entry.minPool || 20, 8);
+    if (pool.size < minimumItems) return null;
     const letter = chooseVariant(pick, pool, { minPool: CONFIG.MIN_POOL_FOR_LETTER });
     if (letter) {
       const sub = deriveLetterPool(pool, letter, opts);
