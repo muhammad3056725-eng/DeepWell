@@ -70,8 +70,11 @@ jobs:
               BATCH=0
               CANDIDATE_OFFSET=0
             else
-              # Each 20-day sweep scans the next 5,000-result page.
-              DAY_INDEX=$(( $(date -u +%s) / 86400 ))
+              # Rotate 500-prompt slices; advance candidate page every 20 days.
+              TODAY_INDEX=$(( $(date -u +%s) / 86400 ))
+              ANCHOR_INDEX=$(( $(date -u -d '2026-11-21' +%s) / 86400 ))
+              DAY_INDEX=$(( TODAY_INDEX - ANCHOR_INDEX ))
+              if [ "$DAY_INDEX" -lt 0 ]; then DAY_INDEX=0; fi
               BATCH=$(( DAY_INDEX % 20 ))
               CANDIDATE_OFFSET=$(( (DAY_INDEX / 20) * 5000 ))
             fi
