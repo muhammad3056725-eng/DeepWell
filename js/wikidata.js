@@ -6,34 +6,43 @@ const Q = s => String(s).replace(/"/g, '');
 /** Build the SPARQL query for one catalog entry. */
 export function buildQuery(entry, overrides = {}) {
   const minSL = overrides.minSL ?? entry.minSL ?? 1;
-  // Search a wider candidate set, then enforce a hard answer-pool ceiling.
+  // Search broadly, then enforce a separate hard answer-pool ceiling.
   const limit = Math.max(1, Math.min(Number(overrides.limit ?? entry.limit ?? 5000), 5000));
   const answerLimit = Math.max(1, Math.min(Number(overrides.answerLimit ?? entry.answerLimit ?? 1000), 1000));
   const rawLetter = overrides.startsWith ?? entry.startsWith ?? null;
   const letter = /^[a-z]$/i.test(String(rawLetter || '')) ? String(rawLetter).toLowerCase() : null;
   if (entry.kind === 'taxon') {
-    const prefixFilter = letter ? `FILTER(STRSTARTS(LCASE(STR(?cn)), "${letter}"))` : '';
+    const candidateFilter = letter
+      ? `FILTER(STRSTARTS(LCASE(STR(?filterName)), "${letter}"))`
+      : '';
+    const answerFilter = letter
+      ? `FILTER(STRSTARTS(LCASE(STR(?cn)), "${letter}"))`
+      : '';
     return `SELECT ?item (MIN(?cn) AS ?name) ?sl
   (GROUP_CONCAT(DISTINCT ?cn; separator="|") AS ?cns)
   (GROUP_CONCAT(DISTINCT ?latin; separator="|") AS ?alts) WHERE {
-  { SELECT ?item ?sl WHERE {
-      ?item wdt:P31 wd:Q16521; ${entry.pattern}; wikibase:sitelinks ?sl.
+  { SELECT DISTINCT ?item ?sl WHERE {
+      ?item wdt:P31 wd:Q16521; ${entry.pattern}; wikibase:sitelinks ?sl; wdt:P1843 ?filterName.
       FILTER(?sl >= ${minSL})
+      FILTER(LANG(?filterName) = "en")
+      ${candidateFilter}
     } ORDER BY DESC(?sl) LIMIT ${limit} }
   ?item wdt:P1843 ?cn. FILTER(LANG(?cn) = "en")
-  ${prefixFilter}
+  ${answerFilter}
   OPTIONAL { ?item wdt:P225 ?latin }
 } GROUP BY ?item ?sl ORDER BY DESC(?sl) LIMIT ${answerLimit}`;
   }
-  const prefixFilter = letter ? `FILTER(STRSTARTS(LCASE(STR(?itemLabel)), "${letter}"))` : '';
+  const candidateFilter = letter
+    ? `FILTER(STRSTARTS(LCASE(STR(?itemLabel)), "${letter}"))`
+    : '';
   return `SELECT ?item ?itemLabel ?sl (GROUP_CONCAT(DISTINCT ?alt; separator="|") AS ?alts) WHERE {
-  { SELECT ?item ?sl WHERE {
+  { SELECT ?item ?itemLabel ?sl WHERE {
       ?item ${entry.pattern}; wikibase:sitelinks ?sl.
       FILTER(?sl >= ${minSL})
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+      ${candidateFilter}
     } ORDER BY DESC(?sl) LIMIT ${limit} }
   OPTIONAL { ?item skos:altLabel ?alt. FILTER(LANG(?alt) = "en") }
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-  ${prefixFilter}
 } GROUP BY ?item ?itemLabel ?sl ORDER BY DESC(?sl) LIMIT ${answerLimit}`;
 }
 
