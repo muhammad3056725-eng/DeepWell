@@ -15,7 +15,7 @@ export const CONFIG = {
 
   // Live Wikidata (used in Endless mode when a prompt has no pre-built pack)
   WIKIDATA_ENDPOINT: 'https://query.wikidata.org/sparql',
-  LIVE_TIMEOUT_MS: 9000,
+  LIVE_TIMEOUT_MS: 20000,
 
   // Letter variants ("Name a river starting with M") need a pool at least this big
   MIN_POOL_FOR_LETTER: 14,
