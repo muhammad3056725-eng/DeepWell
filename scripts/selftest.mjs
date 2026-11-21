@@ -125,6 +125,9 @@ const pick = () => pickEntries(CATALOG, 7, mulberry32(seedA)).map(p => p.entry.i
 eq(pick(), pick(), 'same seed gives same prompts');
 ok(pick() !== pickEntries(CATALOG, 7, mulberry32(hashString('x'))).map(p => p.entry.id).join(), 'different seed differs');
 eq(new Set(pickEntries(CATALOG, 7, mulberry32(5)).map(p => p.entry.cat)).size, 7, 'seven prompts span seven categories');
+const recentIds = new Set(pickEntries(CATALOG, 80, mulberry32(23)).map(p => p.entry.id));
+const freshPicks = pickEntries(CATALOG, 7, mulberry32(24), { avoid: recentIds });
+ok(freshPicks.every(p => !recentIds.has(p.entry.id)), 'fresh dive avoids recently used question IDs when enough remain');
 eq(previousUtcDate('2026-03-01'), '2026-02-28', 'previous UTC date');
 
 // ---- seed lists
