@@ -748,11 +748,11 @@ function drawEvent(w,h,time,still) {
     return;
   }
   if(e.kind==='reef_sharks'){
-    const s=mix(0.04,Math.min(w/1150,1.15),approach);
+    const s=mix(0.08,Math.min(w/1320,0.92)*e.scale,approach);
     for(let i=0;i<3;i++){
-      const xx=w*(0.22+i*0.28)+Math.sin(time*0.0008+i)*20;
-      const yy=y+(i-1)*82+Math.sin(time*0.001+i*2)*12;
-      drawFrontShark(xx,yy,s*(1-i*0.08),e.variant,0,time,fade*0.82);
+      const xx=(e.direction>0?-260:w+260)+e.direction*p*(w+520)+(i-1)*w*0.13;
+      const yy=y+(i-1)*h*0.105+Math.sin(time*0.00075+i*1.7)*18;
+      drawSharkPass(xx,yy,s*(1-i*0.1),e.variant,e.seed+i,time,e.direction,0,fade*0.72);
     }
     return;
   }
