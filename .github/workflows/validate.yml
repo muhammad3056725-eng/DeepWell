@@ -1,0 +1,21 @@
+name: Validate DEEPWELL
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'js/**'
+      - 'scripts/**'
+      - '.github/workflows/**'
+
+jobs:
+  self-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate engine, catalog and seed data
+        run: node scripts/selftest.mjs
