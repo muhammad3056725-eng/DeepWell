@@ -42,7 +42,7 @@ export function buildQuery(entry, overrides = {}) {
       FILTER(?sl >= ${minSL})
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       ${candidateFilter}
-    } ORDER BY DESC(?sl) LIMIT ${limit} }
+    } ORDER BY DESC(?sl) LIMIT ${limit} OFFSET ${offset} }
   OPTIONAL { ?item skos:altLabel ?alt. FILTER(LANG(?alt) = "en") }
 } GROUP BY ?item ?itemLabel ?sl ORDER BY DESC(?sl) LIMIT ${answerLimit}`;
 }
