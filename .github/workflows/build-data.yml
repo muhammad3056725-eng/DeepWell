@@ -43,7 +43,7 @@ jobs:
         run: |
           ARGS=()
           if [ -n "$ONLY" ]; then ARGS+=(--only "$ONLY"); fi
-          if [ "$WIDE" = "true" ]; then ARGS+=(--wide); fi
+          if [ "$WIDE" != "false" ]; then ARGS+=(--wide); fi
           node scripts/build-data.mjs "${ARGS[@]}"
 
       - name: Commit updated data
