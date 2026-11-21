@@ -103,6 +103,10 @@ export function startScene(depthFn, stillFn, progressFn) {
 }
 
 // Visual-only signal from the existing answer resolution. It never changes score or progression.
+export function resetDiveVisual() {
+  visualDepth=0;visualStage=0;eventScene=null;previousTime=0;frozenTime=0;
+}
+
 export function triggerAnswerVisual(points, state) {
   const failed = state !== 'hit';
   let pool;
@@ -882,11 +886,18 @@ function drawForegroundBubbles(w,h,time,still) {
 function drawEventBackdrop(w,h,time) {
   if(!eventScene)return;
   const p=clamp((time-eventScene.start)/eventScene.duration,0,1);
-  const alpha=eventScene.kind==='shark'||eventScene.kind==='barracuda'||eventScene.kind==='reef_shark'?0.24:0.12;
-  const glow=ctx.createRadialGradient(w*0.5,h*0.4,6,w*0.5,h*0.4,Math.max(w,h)*(0.12+p*0.42));
-  glow.addColorStop(0,'rgba(116,233,232,'+(alpha*(1-p*0.45))+')');
-  glow.addColorStop(1,'rgba(43,134,185,0)');
-  ctx.fillStyle=glow;ctx.fillRect(0,0,w,h);
+  const predator=eventScene.kind==='shark'||eventScene.kind==='barracuda'||eventScene.kind==='reef_shark';
+  if(predator){
+    const pressure=ctx.createRadialGradient(w*0.5,h*0.44,Math.min(w,h)*0.12,w*0.5,h*0.44,Math.max(w,h)*0.78);
+    pressure.addColorStop(0,'rgba(0,4,11,'+(0.02+p*0.07)+')');
+    pressure.addColorStop(1,'rgba(0,3,10,'+(0.16+p*0.1)+')');
+    ctx.fillStyle=pressure;ctx.fillRect(0,0,w,h);
+  } else {
+    const ambient=ctx.createRadialGradient(w*0.52,h*0.42,6,w*0.52,h*0.42,Math.max(w,h)*0.52);
+    ambient.addColorStop(0,'rgba(150,190,179,'+(0.045*(1-p*0.55))+')');
+    ambient.addColorStop(1,'rgba(36,93,111,0)');
+    ctx.fillStyle=ambient;ctx.fillRect(0,0,w,h);
+  }
 }
 
 function frame(time) {
