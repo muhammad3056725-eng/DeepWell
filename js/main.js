@@ -2,7 +2,7 @@
 import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
 import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=ten-thousand-prompts-20261121';
 import { loadManifest } from './data.js?v=ten-thousand-prompts-20261121';
-import { prepareDive, examples } from './game.js?v=ten-thousand-prompts-20261121';
+import { prepareDive, examples } from './game.js?v=stable-first-loading-20261121';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
 import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=immersive-descent-20261121';
