@@ -1,8 +1,8 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js';
-import { matchAnswer, tier, blendPoints, utcDate } from './engine.js';
-import { loadManifest } from './data.js';
-import { prepareDive, examples } from './game.js';
+import { CONFIG } from './config.js?v=answer-expansion-20261121';
+import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=answer-expansion-20261121';
+import { loadManifest } from './data.js?v=answer-expansion-20261121';
+import { prepareDive, examples } from './game.js?v=answer-expansion-20261121';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
 import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=immersive-descent-20261121';
@@ -10,7 +10,7 @@ import { wake, tone, buzz } from './audio.js';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js';
+} from './ui.js?v=answer-expansion-20261121';
 
 let run = null; // the dive in progress
 let runId = 0;  // guards against a stale async load finishing after the player left
