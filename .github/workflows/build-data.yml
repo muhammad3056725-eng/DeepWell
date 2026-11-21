@@ -23,7 +23,7 @@ on:
         required: false
         default: '500'
   schedule:
-    - cron: '17 3 * * 1'
+    - cron: '17 3 * * *'
 
 permissions:
   contents: write
@@ -64,8 +64,8 @@ jobs:
               # The first run is kicked off by merging this workflow change.
               BATCH=0
             else
-              # Scheduled runs pick a rotating starting batch.
-              BATCH=$(( ($(date -u +%s) / 604800) % 20 ))
+              # Daily refresh rotates through all 20 batches every 20 days.
+              BATCH=$(( ($(date -u +%s) / 86400) % 20 ))
             fi
           fi
           echo "BATCH=$BATCH" >> "$GITHUB_ENV"
@@ -109,7 +109,7 @@ jobs:
           exit 1
 
       - name: Queue next question-data batch
-        if: success()
+        if: success() && github.event_name != 'schedule'
         env:
           GH_TOKEN: ${{ github.token }}
           ONLY: ${{ github.event.inputs.only }}
