@@ -6,6 +6,10 @@ on:
       only:
         description: 'Optional: comma-separated prompt ids to rebuild (blank = all)'
         required: false
+      wide:
+        description: 'Use broader queries (up to 5,000 candidates per prompt)'
+        required: false
+        default: 'true'
   schedule:
     - cron: '17 3 * * 1'
 
@@ -35,12 +39,12 @@ jobs:
       - name: Build packs from Wikidata
         env:
           ONLY: ${{ github.event.inputs.only }}
+          WIDE: ${{ github.event.inputs.wide }}
         run: |
-          if [ -n "$ONLY" ]; then
-            node scripts/build-data.mjs --only "$ONLY"
-          else
-            node scripts/build-data.mjs
-          fi
+          ARGS=()
+          if [ -n "$ONLY" ]; then ARGS+=(--only "$ONLY"); fi
+          if [ "$WIDE" != "false" ]; then ARGS+=(--wide); fi
+          node scripts/build-data.mjs "${ARGS[@]}"
 
       - name: Commit updated data
         run: |

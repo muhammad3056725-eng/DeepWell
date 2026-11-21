@@ -2,11 +2,11 @@
 //   1. pre-built pack   data/packs/<id>.json  (built from Wikidata by scripts/build-data.mjs)
 //   2. offline seed     js/seed.js            (small hand-curated fallback bundled with the site)
 //   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Dive)
-import { CONFIG } from './config.js';
-import { CATALOG, CATALOG_BY_ID } from './catalog.js';
+import { CONFIG } from './config.js?v=answer-expansion-20261121';
+import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=answer-expansion-20261121';
 import { SEED } from './seed.js';
-import { fetchLive, fromPack } from './wikidata.js';
-import { normalize } from './engine.js';
+import { fetchLive, fromPack } from './wikidata.js?v=answer-expansion-20261121';
+import { normalize } from './engine.js?v=answer-expansion-20261121';
 
 let manifest = { version: 0, built: null, packs: {} };
 const rawCache = new Map(); // entry id -> {items, source}

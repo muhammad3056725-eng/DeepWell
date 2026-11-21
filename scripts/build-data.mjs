@@ -85,12 +85,17 @@ async function main() {
     const prev = manifest.packs[entry.id];
     if (flag('resume') && prev && prev.built && (Date.parse(today) - Date.parse(prev.built)) < 6 * 864e5) { console.log(`${tag}: fresh, skipped`); continue; }
     try {
-      const json = await sparql(buildQuery(entry));
+      const json = await sparql(buildQuery(entry, flag('wide') ? { limit: 5000, minSL: 1 } : {}));
       const items = parseBindings(json, entry);
-      if (items.length < (entry.minPool || 20)) {
-        report.skipped.push(`${entry.id} (only ${items.length} answers)`);
-        console.log(`${tag}: only ${items.length} answers, not enough`);
-        delete manifest.packs[entry.id];
+      const minimumItems = Math.min(entry.minPool || 20, 8);
+      const previousCount = prev?.n || 0;
+      if (items.length < minimumItems) {
+        report.skipped.push(`${entry.id} (only ${items.length} answers; needs ${minimumItems})`);
+        console.log(`${tag}: only ${items.length} answers; keeping previous pack if one exists`);
+        // A thin refresh must never remove a previously working answer pool.
+      } else if (previousCount > items.length) {
+        report.skipped.push(`${entry.id} (new pool ${items.length} smaller than existing ${previousCount})`);
+        console.log(`${tag}: new pool smaller than existing; keeping ${previousCount}-answer pack`);
       } else {
         await writeFile(path.join(OUT, entry.id + '.json'), JSON.stringify(toPack(entry, items)));
         manifest.packs[entry.id] = { n: items.length, built: today };

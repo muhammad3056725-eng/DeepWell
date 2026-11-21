@@ -25,7 +25,12 @@ ok(CATALOG.length >= 400, 'catalog has 400+ entries, has ' + CATALOG.length);
 
 // ---- queries
 const item = CATALOG.find(e => e.kind === 'item'), taxon = CATALOG.find(e => e.kind === 'taxon');
+const programmingEntry = CATALOG.find(e => e.id === 'programming-language');
+ok(programmingEntry?.pattern.includes('P279*'), 'programming language query includes subclasses');
+ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger pool');
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
+ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language pool has a 5,000-row query limit');
+
 ok(/P1843/.test(buildQuery(taxon)), 'taxon query uses common names');
 const rows = { results: { bindings: [
   { item: { value: 'http://www.wikidata.org/entity/Q1' }, itemLabel: { value: 'Alpha' }, sl: { value: '100' }, alts: { value: 'Alef|Alpha' } },
@@ -43,6 +48,19 @@ eq(normalize('  The Café-Au-Lait! '), 'cafe au lait', 'normalize accents, artic
 eq(normalize('Ørsted & Søn'), 'orsted and son', 'normalize ø and &');
 const raw = ['Vistula', 'Danube', 'Rhine', 'Elbe', 'Oder', 'Seine', 'Loire', 'Thames', 'Tiber', 'Po'].map((n, i) => ({ id: 'Q' + i, n, s: 100 - i * 9, a: n === 'Danube' ? ['Donau'] : [] }));
 const pool = buildPool(raw);
+const languages = buildPool([
+  { id: 'Q1', n: 'C', s: 100, a: [] },
+  { id: 'Q2', n: 'C++', s: 90, a: ['C plus plus'] },
+  { id: 'Q3', n: 'C#', s: 80, a: ['C sharp'] },
+  { id: 'Q4', n: 'F#', s: 70, a: ['F sharp'] },
+]);
+eq(normalize('C++'), 'c++', 'normalise C++ without losing plus signs');
+eq(normalize('C#'), 'c#', 'normalise C# without losing hash');
+eq(matchAnswer('C', languages)?.item.n, 'C', 'C matches only C');
+eq(matchAnswer('C++', languages)?.item.n, 'C++', 'C++ remains distinct from C');
+eq(matchAnswer('C#', languages)?.item.n, 'C#', 'C# remains distinct from C');
+eq(matchAnswer('C plus plus', languages)?.item.n, 'C++', 'spoken C plus plus alias matches C++');
+eq(matchAnswer('C sharp', languages)?.item.n, 'C#', 'spoken C sharp alias matches C#');
 ok(matchAnswer('rhine', pool)?.exact, 'exact match ignores case');
 eq(matchAnswer('Donau', pool)?.item.n, 'Danube', 'alias match');
 ok(matchAnswer('Vistla', pool)?.near, 'one-letter typo is a near match');

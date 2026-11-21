@@ -1,8 +1,8 @@
 // DOM helpers and screen renderers. No game rules live here.
-import { CONFIG } from './config.js';
-import { CATEGORIES } from './catalog.js';
-import { libraryStats } from './data.js';
-import { tierClass, utcDate } from './engine.js';
+import { CONFIG } from './config.js?v=answer-expansion-20261121';
+import { CATEGORIES } from './catalog.js?v=answer-expansion-20261121';
+import { libraryStats } from './data.js?v=answer-expansion-20261121';
+import { tierClass, utcDate } from './engine.js?v=answer-expansion-20261121';
 import * as S from './state.js';
 import { setVolume } from './audio.js';
 
