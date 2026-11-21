@@ -5,7 +5,7 @@ import { loadManifest } from './data.js';
 import { prepareDive, examples } from './game.js';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
-import { startScene, triggerAnswerVisual } from './scene.js?v=cinematic-2d-20261121';
+import { startScene, triggerAnswerVisual } from './scene.js?v=immersive-descent-20261121';
 import { wake, tone, buzz } from './audio.js';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
@@ -211,7 +211,7 @@ async function boot() {
   applySettings();
   buildPackButtons(cat => startDive('pack', cat));
   bind();
-  startScene(() => run?.depth || 0, () => S.store.settings.motion);
+  startScene(() => run?.depth || 0, () => S.store.settings.motion, () => run ? run.index / CONFIG.PROMPTS_PER_DIVE : 0);
   updateDepthUI(0);
   renderHome();
   await loadManifest();
