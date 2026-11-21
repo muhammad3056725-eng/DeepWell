@@ -22,6 +22,10 @@ on:
         description: 'Number of prompts to build in this run'
         required: false
         default: '500'
+      candidate_offset:
+        description: 'Wikidata candidate page offset; advances every 20-day cycle'
+        required: false
+        default: '0'
   schedule:
     - cron: '17 3 * * *'
 
@@ -35,6 +39,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name != 'push' || contains(github.event.head_commit.message, 'Bootstrap DeepWell batches')
     runs-on: ubuntu-latest
     timeout-minutes: 170
     steps:
@@ -55,21 +60,27 @@ jobs:
           WIDE: ${{ github.event.inputs.wide }}
           BATCH: ${{ github.event.inputs.batch }}
           BATCH_SIZE: ${{ github.event.inputs.batch_size }}
+          CANDIDATE_OFFSET: ${{ github.event.inputs.candidate_offset }}
         run: |
           ARGS=()
           if [ -n "$ONLY" ]; then ARGS+=(--only "$ONLY"); fi
           if [ "$WIDE" != "false" ]; then ARGS+=(--wide); fi
           if [ -z "$BATCH" ]; then
             if [ "$GITHUB_EVENT_NAME" = "push" ]; then
-              # The first run is kicked off by merging this workflow change.
               BATCH=0
+              CANDIDATE_OFFSET=0
             else
-              # Daily refresh rotates through all 20 batches every 20 days.
-              BATCH=$(( ($(date -u +%s) / 86400) % 20 ))
+              # Each 20-day sweep scans the next 5,000-result page.
+              DAY_INDEX=$(( $(date -u +%s) / 86400 ))
+              BATCH=$(( DAY_INDEX % 20 ))
+              CANDIDATE_OFFSET=$(( (DAY_INDEX / 20) * 5000 ))
             fi
           fi
+          CANDIDATE_OFFSET=${CANDIDATE_OFFSET:-0}
           echo "BATCH=$BATCH" >> "$GITHUB_ENV"
+          echo "CANDIDATE_OFFSET=$CANDIDATE_OFFSET" >> "$GITHUB_ENV"
           if [ "$BATCH" != "all" ]; then ARGS+=(--batch "$BATCH" --batch-size "${BATCH_SIZE:-500}"); fi
+          ARGS+=(--candidate-offset "$CANDIDATE_OFFSET")
           node scripts/build-data.mjs "${ARGS[@]}"
 
       - name: Commit updated data
@@ -147,4 +158,5 @@ jobs:
             -f ref=main \
             -f 'inputs[wide]=true' \
             -f "inputs[batch]=$NEXT_BATCH" \
-            -f "inputs[batch_size]=${BATCH_SIZE:-500}"
+            -f "inputs[batch_size]=${BATCH_SIZE:-500}" \\
+            -f "inputs[candidate_offset]=${CANDIDATE_OFFSET:-0}"
