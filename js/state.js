@@ -7,7 +7,7 @@ let memory = null;
 const DEFAULTS = () => ({
   games: 0, total: 0, best: 0, streak: 0, bestStreak: 0,
   dailyLog: {}, // 'YYYY-MM-DD' -> {depth, answers}
-  recentPrompts: [], // prompt ids seen lately (Endless avoids repeats)
+  recentPrompts: [], // question IDs and text used across all dive modes
   misses: 0,
   settings: { sound: 0.45, haptics: true, motion: false, color: false, timer: 20, text: 1 },
 });
@@ -21,7 +21,7 @@ export function load() {
     const d = DEFAULTS();
     Object.assign(store, d, saved, { settings: { ...d.settings, ...(saved.settings || {}) } });
   }
-  store.recentPrompts = Array.isArray(store.recentPrompts) ? store.recentPrompts.slice(-400) : [];
+  store.recentPrompts = Array.isArray(store.recentPrompts) ? store.recentPrompts.slice(-20000) : [];
   return store;
 }
 
@@ -54,7 +54,6 @@ export function liveStreak() {
 }
 
 export function rememberPrompts(ids) {
-  store.recentPrompts.push(...ids);
-  store.recentPrompts = store.recentPrompts.slice(-400);
+  store.recentPrompts = [...new Set([...store.recentPrompts, ...ids])].slice(-20000);
   save();
 }
