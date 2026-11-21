@@ -60,7 +60,7 @@ export function triggerPredatorAttack() {
     species: pick,
     side: Math.random() < 0.5 ? 'left' : 'right',
     start: performance.now(),
-    duration: 1080,
+    duration: 1380,
   };
 }
 
@@ -83,11 +83,11 @@ function resize() {
     speed: rand(0.18, 0.78), drift: rand(0.3, 1.6), phase: rand(0, Math.PI * 2),
     alpha: rand(0.16, 0.58),
   }));
-  fish = Array.from({ length: Math.min(34, Math.max(18, Math.floor(innerWidth / 48))) }, (_, i) => ({
-    x: rand(-innerWidth, innerWidth * 1.5), y: rand(innerHeight * 0.12, innerHeight * 0.88),
-    size: rand(0.22, 0.78), speed: rand(0.22, 0.8) * (i % 3 === 0 ? 1.4 : 1),
-    direction: Math.random() < 0.5 ? -1 : 1, color: fishColors[i % fishColors.length],
-    phase: rand(0, Math.PI * 2), depth: rand(0.15, 1),
+  fish = Array.from({ length: Math.min(30, Math.max(18, Math.floor(innerWidth / 52))) }, (_, i) => ({
+    // Normalized lane coordinates and a near/far depth value for perspective projection.
+    x: rand(-0.43, 0.43), y: rand(-0.24, 0.28), z: rand(0.02, 0.84),
+    size: rand(0.92, 1.48), speed: rand(0.000035, 0.000085),
+    color: fishColors[i % fishColors.length], phase: rand(0, Math.PI * 2),
   }));
   kelp = Array.from({ length: 14 }, (_, i) => ({
     x: (i / 13) * innerWidth + rand(-22, 22), height: rand(50, 145),
@@ -272,23 +272,109 @@ function drawSmallFish(x, y, size, color, direction, phase, time, alpha = 0.9) {
   ctx.restore();
 }
 
-function drawFishSchools(w, h, time, still, depth) {
-  for (const f of fish) {
-    const visible = true;
-    if (!still) {
-      f.x += f.speed * f.direction * (1 + depth * 0.3);
-      f.y += Math.sin(time * 0.00025 + f.phase) * 0.16;
-      if (f.direction > 0 && f.x > w + 100) f.x = -100;
-      if (f.direction < 0 && f.x < -100) f.x = w + 100;
-    }
-    if (visible) drawSmallFish(f.x, f.y, f.size, f.color, f.direction, f.phase, time, 0.28 + (1 - depth) * 0.5);
+function drawApproachingFish(x, y, scale, color, phase, time, alpha = 0.9) {
+  // Front-on fish silhouette: nose, eyes and mouth face the player.
+  ctx.save();
+  ctx.translate(x, y + Math.sin(time * 0.002 + phase) * 2.8 * scale);
+  ctx.rotate(Math.sin(time * 0.0008 + phase) * 0.045);
+  ctx.scale(scale, scale);
+  ctx.globalAlpha = alpha;
+  ctx.shadowColor = color;
+  ctx.shadowBlur = 13;
+
+  // Tail and dorsal fin sit behind the body, reinforcing the forward-swimming perspective.
+  ctx.fillStyle = '#164b62';
+  ctx.beginPath();
+  ctx.moveTo(0, -58); ctx.lineTo(-23, -98); ctx.lineTo(-5, -88);
+  ctx.lineTo(0, -112); ctx.lineTo(8, -88); ctx.lineTo(25, -98);
+  ctx.lineTo(14, -58); ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(-10, -35); ctx.lineTo(0, -65); ctx.lineTo(13, -34); ctx.closePath(); ctx.fill();
+
+  // Pectoral fins angle back and outward as if pushing water behind the fish.
+  ctx.fillStyle = color;
+  ctx.beginPath();
+  ctx.moveTo(-22, -8); ctx.quadraticCurveTo(-62, -30, -82, -53);
+  ctx.quadraticCurveTo(-72, -4, -38, 24); ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(22, -8); ctx.quadraticCurveTo(62, -30, 82, -53);
+  ctx.quadraticCurveTo(72, -4, 38, 24); ctx.closePath(); ctx.fill();
+
+  const body = ctx.createLinearGradient(-48, -20, 48, 32);
+  body.addColorStop(0, '#174d65');
+  body.addColorStop(0.28, color);
+  body.addColorStop(0.52, '#e5ffff');
+  body.addColorStop(0.75, color);
+  body.addColorStop(1, '#103b56');
+  ctx.fillStyle = body;
+  ctx.beginPath();
+  ctx.moveTo(0, -77);
+  ctx.bezierCurveTo(-28, -54, -47, -28, -43, 7);
+  ctx.quadraticCurveTo(-39, 44, 0, 56);
+  ctx.quadraticCurveTo(39, 44, 43, 7);
+  ctx.bezierCurveTo(47, -28, 28, -54, 0, -77);
+  ctx.closePath(); ctx.fill();
+
+  // Face details and highlights.
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = 'rgba(4,24,39,0.78)';
+  ctx.beginPath(); ctx.ellipse(-23, -4, 9, 7, -0.18, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(23, -4, 9, 7, 0.18, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#f5ffff';
+  ctx.beginPath(); ctx.arc(-23, -4, 3.4, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(23, -4, 3.4, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#061724';
+  ctx.beginPath(); ctx.arc(-23, -4, 1.8, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.arc(23, -4, 1.8, 0, Math.PI * 2); ctx.fill();
+
+  ctx.strokeStyle = 'rgba(5,36,51,0.72)';
+  ctx.lineWidth = 2;
+  for (let i = 0; i < 3; i++) {
+    ctx.beginPath();
+    ctx.arc(-31 + i * 3, 15, 10 + i * 2, -0.48, 0.52);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(31 - i * 3, 15, 10 + i * 2, Math.PI - 0.52, Math.PI + 0.48);
+    ctx.stroke();
   }
-  // A close school makes the reef feel populated rather than like a flat wallpaper.
-  if (depth < 0.62) {
-    for (let i = 0; i < 9; i++) {
-      const x = (w * 0.18 + i * 19 + Math.sin(time * 0.0004) * 34 + w) % (w + 30);
-      const y = h * 0.27 + Math.sin(time * 0.001 + i * 0.75) * 21;
-      drawSmallFish(x, y, 0.32 + (i % 3) * 0.08, fishColors[(i + 2) % fishColors.length], 1, i, time, 0.66);
+  ctx.fillStyle = '#102638';
+  ctx.beginPath(); ctx.ellipse(0, 33, 15, 5, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = 'rgba(226,255,249,0.62)';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath(); ctx.arc(0, 32, 16, 0.15, Math.PI - 0.15); ctx.stroke();
+  ctx.restore();
+}
+
+function drawFishSchools(w, h, time, still, depth, delta) {
+  for (const f of fish) {
+    if (!still) {
+      f.z += f.speed * delta;
+      f.phase += delta * 0.00045;
+      if (f.z > 1.02) {
+        f.z = rand(0.005, 0.06);
+        f.x = rand(-0.43, 0.43);
+        f.y = rand(-0.24, 0.28);
+      }
+    }
+
+    // Perspective makes each fish grow and spread outward as it swims out of the distant water.
+    const perspective = 0.18 + f.z * 1.08;
+    const px = w * 0.5 + f.x * w * perspective;
+    const py = h * 0.34 + f.y * h * perspective;
+    const scale = (0.36 + f.z * 1.5) * f.size;
+    const alpha = 0.32 + f.z * 0.52;
+    if (px > -190 && px < w + 190 && py > -180 && py < h + 180) {
+      drawApproachingFish(px, py, scale, f.color, f.phase, time, alpha);
+    }
+  }
+
+  // A closer foreground school gives the water column a strong sense of scale.
+  if (depth < 0.78) {
+    for (let i = 0; i < 5; i++) {
+      const x = w * (0.17 + i * 0.16) + Math.sin(time * 0.00055 + i * 1.4) * 45;
+      const y = h * (0.2 + (i % 3) * 0.085);
+      const scale = 0.72 + (i % 3) * 0.18;
+      drawApproachingFish(x, y, scale, fishColors[(i + 3) % fishColors.length], i * 2.3, time, 0.72);
     }
   }
 }
@@ -465,133 +551,197 @@ function drawDiver(w, h, time, still, depth) {
   ctx.restore();
 }
 
-function drawPredator(x, y, scale, direction, creature, jaw, time) {
-  const len = creature.shape === 'long' || creature.shape === 'saw' ? 310 : creature.shape === 'round' ? 245 : 280;
-  const ht = creature.shape === 'round' ? 94 : creature.shape === 'eel' ? 54 : 78;
+function drawFrontPredator(x, y, scale, creature, jaw, time) {
   ctx.save();
   ctx.translate(x, y);
-  ctx.scale(direction * scale, scale);
+  ctx.scale(scale, scale);
   ctx.shadowColor = creature.color;
-  ctx.shadowBlur = 28;
-  ctx.globalAlpha = 0.98;
+  ctx.shadowBlur = 34;
 
-  // Tail and rear fins.
+  // Rear tail fin: seen over the back of the animal as it charges toward the camera.
   ctx.fillStyle = creature.fin;
   ctx.beginPath();
-  ctx.moveTo(-len * 0.36, 0);
-  ctx.quadraticCurveTo(-len * 0.48, -ht * 0.18, -len * 0.59, -ht * 0.62);
-  ctx.lineTo(-len * 0.52, 0);
-  ctx.lineTo(-len * 0.59, ht * 0.62);
-  ctx.quadraticCurveTo(-len * 0.48, ht * 0.18, -len * 0.36, 0);
-  ctx.fill();
-  // Main body silhouette.
-  const body = ctx.createLinearGradient(0, -ht * 0.55, 0, ht * 0.55);
-  body.addColorStop(0, '#d7e9df');
-  body.addColorStop(0.16, creature.color);
-  body.addColorStop(1, creature.fin);
+  ctx.moveTo(0, -154); ctx.lineTo(-34, -242); ctx.lineTo(-8, -213);
+  ctx.lineTo(0, -268); ctx.lineTo(12, -212); ctx.lineTo(39, -242);
+  ctx.lineTo(22, -150); ctx.closePath(); ctx.fill();
+
+  // Pectoral fins, spread wide, with separate lit leading edges.
+  ctx.beginPath();
+  ctx.moveTo(-55, -30);
+  ctx.bezierCurveTo(-111, -50, -171, -92, -226, -105);
+  ctx.quadraticCurveTo(-197, -20, -130, 43);
+  ctx.quadraticCurveTo(-86, 61, -48, 47);
+  ctx.closePath(); ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(55, -30);
+  ctx.bezierCurveTo(111, -50, 171, -92, 226, -105);
+  ctx.quadraticCurveTo(197, -20, 130, 43);
+  ctx.quadraticCurveTo(86, 61, 48, 47);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(226,248,242,0.52)';
+  ctx.lineWidth = 4;
+  ctx.beginPath(); ctx.moveTo(-60, -26); ctx.quadraticCurveTo(-147, -81, -214, -99); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(60, -26); ctx.quadraticCurveTo(147, -81, 214, -99); ctx.stroke();
+
+  // Main head and shoulders, shaded to give the flat Canvas drawing a rounded 3D form.
+  const body = ctx.createLinearGradient(-128, -35, 128, 75);
+  body.addColorStop(0, '#233d55');
+  body.addColorStop(0.18, creature.fin);
+  body.addColorStop(0.38, creature.color);
+  body.addColorStop(0.5, '#e1eee8');
+  body.addColorStop(0.64, creature.color);
+  body.addColorStop(0.84, creature.fin);
+  body.addColorStop(1, '#172e45');
   ctx.fillStyle = body;
   ctx.beginPath();
-  if (creature.shape === 'eel') {
-    ctx.moveTo(-len * 0.44, -ht * 0.12);
-    ctx.bezierCurveTo(-len * 0.15, -ht * 0.55, len * 0.2, -ht * 0.5, len * 0.46, -ht * 0.18);
-    ctx.quadraticCurveTo(len * 0.57, 0, len * 0.46, ht * 0.18);
-    ctx.bezierCurveTo(len * 0.12, ht * 0.53, -len * 0.18, ht * 0.43, -len * 0.44, ht * 0.12);
-  } else {
-    ctx.moveTo(-len * 0.44, 0);
-    ctx.quadraticCurveTo(-len * 0.29, -ht * 0.63, len * 0.1, -ht * 0.46);
-    ctx.quadraticCurveTo(len * 0.37, -ht * 0.38, len * 0.49, -ht * 0.08);
-    ctx.quadraticCurveTo(len * 0.56, 0, len * 0.49, ht * 0.08);
-    ctx.quadraticCurveTo(len * 0.35, ht * 0.4, len * 0.08, ht * 0.43);
-    ctx.quadraticCurveTo(-len * 0.3, ht * 0.58, -len * 0.44, 0);
-  }
-  ctx.closePath();
-  ctx.fill();
+  ctx.moveTo(0, -205);
+  ctx.bezierCurveTo(-72, -157, -121, -85, -117, -12);
+  ctx.bezierCurveTo(-115, 50, -83, 105, -37, 126);
+  ctx.quadraticCurveTo(0, 145, 37, 126);
+  ctx.bezierCurveTo(83, 105, 115, 50, 117, -12);
+  ctx.bezierCurveTo(121, -85, 72, -157, 0, -205);
+  ctx.closePath(); ctx.fill();
 
-  // Species-specific silhouettes.
+  // Back ridge and dorsal fin silhouette.
+  ctx.fillStyle = creature.fin;
+  ctx.beginPath();
+  ctx.moveTo(-36, -135); ctx.quadraticCurveTo(-12, -185, 0, -224);
+  ctx.quadraticCurveTo(17, -185, 37, -135); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(224,246,238,0.34)';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.moveTo(0, -202); ctx.quadraticCurveTo(-18, -158, -21, -111); ctx.stroke();
+
+  // Species details: hammerhead brow, tiger marks, eel-like side ridges or a glowing lure.
   if (creature.shape === 'hammer') {
     ctx.fillStyle = creature.color;
-    ctx.beginPath();
-    ctx.roundRect(len * 0.24, -ht * 0.36, len * 0.26, ht * 0.72, 18);
-    ctx.fill();
-    ctx.fillStyle = creature.eye;
-    ctx.beginPath(); ctx.arc(len * 0.27, -ht * 0.15, 5, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(len * 0.48, -ht * 0.15, 5, 0, Math.PI * 2); ctx.fill();
-  } else if (creature.shape === 'saw') {
-    ctx.fillStyle = creature.color;
-    ctx.beginPath();
-    ctx.moveTo(len * 0.38, -ht * 0.08);
-    ctx.lineTo(len * 0.72, -ht * 0.025);
-    for (let i = 0; i < 8; i++) {
-      const xx = len * (0.70 - i * 0.04);
-      ctx.lineTo(xx, (i % 2 ? -1 : 1) * ht * 0.13);
-      ctx.lineTo(xx - len * 0.025, -ht * 0.02);
-    }
-    ctx.closePath(); ctx.fill();
-  } else if (creature.shape !== 'eel') {
+    ctx.beginPath(); ctx.roundRect(-130, -39, 260, 58, 27); ctx.fill();
     ctx.fillStyle = creature.fin;
-    ctx.beginPath();
-    ctx.moveTo(-len * 0.14, -ht * 0.34);
-    ctx.lineTo(len * 0.02, -ht * (creature.shape === 'angler' ? 0.92 : 0.95));
-    ctx.lineTo(len * 0.18, -ht * 0.34);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(-len * 0.1, ht * 0.34);
-    ctx.lineTo(len * 0.12, ht * 0.77);
-    ctx.lineTo(len * 0.27, ht * 0.27);
-    ctx.closePath(); ctx.fill();
-  }
-
-  // Open jaws, dark mouth cavity and individually drawn teeth.
-  const mouthX = len * 0.43;
-  ctx.shadowBlur = 0;
-  ctx.fillStyle = '#170f1b';
-  ctx.beginPath();
-  ctx.moveTo(mouthX - 26, -ht * 0.08);
-  ctx.quadraticCurveTo(mouthX + 17, -ht * (0.12 + jaw * 0.38), mouthX + 17, 0);
-  ctx.quadraticCurveTo(mouthX + 8, ht * (0.05 + jaw * 0.47), mouthX - 25, ht * 0.08);
-  ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#fff3d8';
-  for (let i = 0; i < 6; i++) {
-    const tx = mouthX - 17 + i * 5;
-    ctx.beginPath();
-    ctx.moveTo(tx, -ht * 0.06);
-    ctx.lineTo(tx + 2.5, -ht * (0.1 + jaw * 0.28));
-    ctx.lineTo(tx + 5, -ht * 0.045);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(tx, ht * 0.06);
-    ctx.lineTo(tx + 2.5, ht * (0.1 + jaw * 0.25));
-    ctx.lineTo(tx + 5, ht * 0.045);
-    ctx.fill();
-  }
-  // Eye, gill slits and tiger stripes.
-  ctx.fillStyle = creature.eye;
-  ctx.beginPath(); ctx.arc(len * 0.32, -ht * 0.18, 5.5, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#f5ffff';
-  ctx.beginPath(); ctx.arc(len * 0.335, -ht * 0.2, 1.5, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = 'rgba(8,29,39,0.58)';
-  ctx.lineWidth = 2.2;
-  for (let i = 0; i < 4; i++) {
-    ctx.beginPath();
-    ctx.moveTo(len * (0.17 + i * 0.045), -ht * 0.12);
-    ctx.quadraticCurveTo(len * (0.14 + i * 0.045), 0, len * (0.17 + i * 0.045), ht * 0.18);
-    ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(-120, -8, 15, 23, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(120, -8, 15, 23, 0, 0, Math.PI * 2); ctx.fill();
   }
   if (creature.shape === 'tiger') {
-    ctx.strokeStyle = 'rgba(15,34,45,0.55)'; ctx.lineWidth = 4;
-    for (let i = 0; i < 6; i++) {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(12,31,45,0.58)';
+    ctx.lineWidth = 9;
+    for (let i = 0; i < 7; i++) {
+      const xx = -82 + i * 27;
       ctx.beginPath();
-      ctx.moveTo(-len * 0.2 + i * 19, -ht * 0.31);
-      ctx.lineTo(-len * 0.14 + i * 19, ht * 0.29);
+      ctx.moveTo(xx, -92); ctx.quadraticCurveTo(xx - 16, -18, xx + 1, 43);
       ctx.stroke();
     }
+    ctx.restore();
   }
   if (creature.shape === 'angler') {
-    ctx.strokeStyle = '#a9f76f'; ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.moveTo(len * 0.12, -ht * 0.34); ctx.quadraticCurveTo(len * 0.26, -ht * 1.18, len * 0.39, -ht * 0.9); ctx.stroke();
-    const lure = ctx.createRadialGradient(len * 0.39, -ht * 0.9, 1, len * 0.39, -ht * 0.9, 20);
-    lure.addColorStop(0, 'rgba(228,255,138,0.95)'); lure.addColorStop(1, 'rgba(157,255,103,0)');
-    ctx.fillStyle = lure; ctx.beginPath(); ctx.arc(len * 0.39, -ht * 0.9, 20, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#b4ff79'; ctx.lineWidth = 8;
+    ctx.beginPath(); ctx.moveTo(0, -136); ctx.quadraticCurveTo(35, -230, 66, -218); ctx.stroke();
+    const lure = ctx.createRadialGradient(66, -218, 2, 66, -218, 36);
+    lure.addColorStop(0, 'rgba(239,255,174,1)');
+    lure.addColorStop(0.32, 'rgba(154,255,113,0.78)');
+    lure.addColorStop(1, 'rgba(118,255,107,0)');
+    ctx.fillStyle = lure; ctx.beginPath(); ctx.arc(66, -218, 36, 0, Math.PI * 2); ctx.fill();
+  }
+  if (creature.shape === 'saw') {
+    ctx.fillStyle = creature.color;
+    ctx.beginPath(); ctx.moveTo(-18, 80); ctx.lineTo(-11, 174);
+    for (let i = 0; i < 11; i++) {
+      const yy = 82 + i * 8;
+      ctx.lineTo(i % 2 ? 13 : -13, yy);
+    }
+    ctx.lineTo(18, 80); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#f5fff0';
+    for (let i = 0; i < 10; i++) {
+      const yy = 91 + i * 8;
+      ctx.fillRect(-16, yy, 8, 4); ctx.fillRect(8, yy, 8, 4);
+    }
+  }
+
+  // Gill slits on both sides of the face.
+  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(13,34,48,0.66)';
+  ctx.lineWidth = 4;
+  for (let i = 0; i < 5; i++) {
+    const yy = -22 + i * 13;
+    ctx.beginPath(); ctx.moveTo(-77 - i * 2, yy - 10); ctx.quadraticCurveTo(-92 - i * 2, yy, -77 - i * 2, yy + 11); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(77 + i * 2, yy - 10); ctx.quadraticCurveTo(92 + i * 2, yy, 77 + i * 2, yy + 11); ctx.stroke();
+  }
+
+  // Eye sockets, pupils and hard highlights look directly at the player.
+  for (const side of [-1, 1]) {
+    ctx.fillStyle = 'rgba(3,16,28,0.78)';
+    ctx.beginPath(); ctx.ellipse(side * 69, -48, 18, 15, side * 0.12, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = creature.eye;
+    ctx.beginPath(); ctx.arc(side * 69, -48, 9.5, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#f4ffff';
+    ctx.beginPath(); ctx.arc(side * 72, -52, 3.3, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#0a1721';
+    ctx.beginPath(); ctx.ellipse(side * 69, -48, 2.4, 7.1, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  // Nose pores / nostrils.
+  ctx.fillStyle = 'rgba(9,28,40,0.72)';
+  ctx.beginPath(); ctx.ellipse(-24, 13, 7, 3.5, -0.18, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(24, 13, 7, 3.5, 0.18, 0, Math.PI * 2); ctx.fill();
+
+  // Lower jaw moves down as the predator opens its mouth.
+  ctx.save();
+  ctx.translate(0, jaw * 38);
+  const jawShade = ctx.createLinearGradient(0, 54, 0, 142);
+  jawShade.addColorStop(0, '#b8ccd0');
+  jawShade.addColorStop(0.5, creature.color);
+  jawShade.addColorStop(1, creature.fin);
+  ctx.fillStyle = jawShade;
+  ctx.beginPath();
+  ctx.moveTo(-75, 53);
+  ctx.quadraticCurveTo(0, 90, 75, 53);
+  ctx.quadraticCurveTo(59, 135, 0, 144);
+  ctx.quadraticCurveTo(-59, 135, -75, 53);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+
+  // Wide black mouth cavity, gum line and two rows of individually drawn teeth.
+  ctx.fillStyle = '#180c17';
+  ctx.beginPath();
+  ctx.moveTo(-78, 43);
+  ctx.quadraticCurveTo(0, 30 - jaw * 20, 78, 43);
+  ctx.quadraticCurveTo(60, 72 + jaw * 39, 0, 76 + jaw * 42);
+  ctx.quadraticCurveTo(-60, 72 + jaw * 39, -78, 43);
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = '#8f4550'; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(-76, 45); ctx.quadraticCurveTo(0, 29 - jaw * 20, 76, 45); ctx.stroke();
+  ctx.fillStyle = '#fff3da';
+  for (let i = 0; i < 11; i++) {
+    const tx = -67 + i * 13.4;
+    const ty = 42 + Math.abs(tx) * 0.05;
+    ctx.beginPath(); ctx.moveTo(tx, ty); ctx.lineTo(tx + 6, ty + 7 + jaw * 10); ctx.lineTo(tx + 12, ty + 1); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(tx, 75 + jaw * 39); ctx.lineTo(tx + 6, 65 + jaw * 28); ctx.lineTo(tx + 12, 76 + jaw * 39); ctx.closePath(); ctx.fill();
+  }
+
+  // Bright wet highlights on the snout and chin.
+  ctx.strokeStyle = 'rgba(235,255,249,0.38)';
+  ctx.lineWidth = 3;
+  ctx.beginPath(); ctx.arc(0, 32, 92, 0.18, Math.PI - 0.18); ctx.stroke();
+  ctx.restore();
+}
+
+function drawAttackWake(w, h, cx, cy, progress) {
+  // Perspective streaks and pressure rings radiate from the approaching animal.
+  ctx.save();
+  ctx.globalAlpha = 0.08 + progress * 0.13;
+  ctx.strokeStyle = '#b6fff6';
+  ctx.lineWidth = 1.4;
+  for (let i = 0; i < 30; i++) {
+    const angle = i * Math.PI * 2 / 30;
+    const inner = 26 + progress * 54;
+    const outer = Math.max(w, h) * (0.35 + progress * 0.45);
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(angle) * inner, cy + Math.sin(angle) * inner);
+    ctx.lineTo(cx + Math.cos(angle) * outer, cy + Math.sin(angle) * outer);
+    ctx.stroke();
+  }
+  for (let i = 0; i < 3; i++) {
+    const radius = 38 + progress * (70 + i * 42);
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, radius * 1.2, radius * 0.54, 0, 0, Math.PI * 2);
+    ctx.stroke();
   }
   ctx.restore();
 }
@@ -600,33 +750,39 @@ function drawAttack(w, h, time, still) {
   if (!predator) return;
   const elapsed = time - predator.start;
   if (elapsed >= predator.duration) { predator = null; return; }
-  const progress = still ? 0.7 : clamp(elapsed / predator.duration, 0, 1);
+  const progress = still ? 0.72 : clamp(elapsed / predator.duration, 0, 1);
   const creature = species[predator.species];
-  const direction = predator.side === 'left' ? 1 : -1;
-  const size = mix(0.8, clamp(w / 420, 1.1, 2.8), Math.sin(progress * Math.PI));
-  const targetX = w * 0.52;
-  const startX = predator.side === 'left' ? -360 : w + 360;
-  const endX = targetX + (direction === 1 ? 72 : -72);
-  const eased = 1 - Math.pow(1 - progress, 2.3);
-  const x = mix(startX, endX, eased);
-  const y = h * 0.7 + Math.sin(progress * Math.PI * 1.4) * 14;
-  const jaw = clamp((progress - 0.42) / 0.23, 0, 1);
-  const fade = progress > 0.84 ? (1 - progress) / 0.16 : 1;
+  const approach = clamp(progress / 0.88, 0, 1);
+  const eased = 1 - Math.pow(1 - approach, 2.35);
+  const maxScale = clamp(w / 190, 2.05, 6.8);
+  const scale = mix(0.055, maxScale, eased);
+  const x = w * 0.5 + Math.sin(time * 0.004) * (1 - eased) * w * 0.018;
+  const y = mix(h * 0.37, h * 0.51, eased);
+  const jaw = clamp((progress - 0.2) / 0.32, 0, 1);
+  const fade = progress > 0.94 ? (1 - progress) / 0.06 : 1;
+
+  drawAttackWake(w, h, x, y, progress);
+  const glow = ctx.createRadialGradient(x, y, 4, x, y, Math.max(w, h) * (0.12 + eased * 0.65));
+  glow.addColorStop(0, 'rgba(187,255,242,' + (0.08 + eased * 0.14) + ')');
+  glow.addColorStop(0.45, 'rgba(83,220,236,' + (0.035 + eased * 0.045) + ')');
+  glow.addColorStop(1, 'rgba(40,115,180,0)');
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, w, h);
 
   ctx.save();
   ctx.globalAlpha = clamp(fade, 0, 1);
-  drawPredator(x, y, size, direction, creature, jaw, time);
+  drawFrontPredator(x, y, scale, creature, jaw, time);
   ctx.restore();
 
-  // A ring of hand-drawn bubbles marks the swallow; it is not a video overlay.
+  // The last instant is a wall of bubbles rushing past the diver.
   if (progress > 0.72) {
     const burst = clamp((progress - 0.72) / 0.28, 0, 1);
     ctx.save();
-    ctx.globalAlpha = 1 - burst * 0.5;
-    for (let i = 0; i < 24; i++) {
-      const angle = i * Math.PI * 2 / 24;
-      const radius = 16 + burst * (95 + (i % 4) * 14);
-      drawBubble(targetX + Math.cos(angle) * radius, y + Math.sin(angle) * radius * 0.55, 2 + (i % 4), 0.72 * (1 - burst * 0.35));
+    ctx.globalAlpha = 1 - burst * 0.36;
+    for (let i = 0; i < 48; i++) {
+      const angle = i * Math.PI * 2 / 48;
+      const radius = 22 + burst * (125 + (i % 5) * 24);
+      drawBubble(x + Math.cos(angle) * radius, y + Math.sin(angle) * radius * 0.62,
+        2.5 + (i % 5) * 1.1, 0.72 * (1 - burst * 0.25));
     }
     ctx.restore();
   }
@@ -637,12 +793,13 @@ function frame(time) {
   const w = innerWidth, h = innerHeight;
   const depth = clamp((Number(getDepth()) || 0) / CONFIG.MAX_DEPTH_VISUAL, 0, 1);
   const still = Boolean(isStill());
+  const delta = still ? 0 : Math.min(40, lastFrame ? time - lastFrame : 16);
   const t = still ? (lastFrame || time) : time;
   lastFrame = t;
 
   drawWater(w, h, depth, t);
   drawKelpAndReef(w, h, t, still, depth);
-  drawFishSchools(w, h, t, still, depth);
+  drawFishSchools(w, h, t, still, depth, delta);
   drawDeepLife(w, h, t, still, depth);
   drawAmbient(w, h, t, still, depth);
   drawDiver(w, h, t, still, depth);
