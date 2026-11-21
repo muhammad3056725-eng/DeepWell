@@ -34,7 +34,7 @@ const seen = new Set();
 function add(cat, id, prompt, pattern, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
   seen.add(id);
-  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 3, limit: 1200, minPool: 20, ...o });
+  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 3, limit: 2500, minPool: 20, ...o });
 }
 function addTaxon(cat, id, prompt, parentQ, parentLabel, rankQ, rankLabel, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
@@ -43,7 +43,7 @@ function addTaxon(cat, id, prompt, parentQ, parentLabel, rankQ, rankLabel, o = {
   CATALOG.push({
     id, cat, prompt, kind: 'taxon', parent: parentQ, rank: rankQ,
     pattern: `wdt:P171+ wd:${parentQ}; wdt:P105 wd:${rankQ}`,
-    minSL: 5, limit: 1000, minPool: 20, ...o,
+    minSL: 5, limit: 2000, minPool: 20, ...o,
   });
 }
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -96,8 +96,8 @@ const GEO = [
   ['glacier', 'Name a glacier', inst('Q35666', 'glacier')],
   ['canyon', 'Name a canyon', inst('Q150784', 'canyon'), { minPool: 15 }],
   ['archipelago', 'Name an archipelago', inst('Q33837', 'archipelago')],
-  ['us-state', 'Name a US state', inst('Q35657', 'state of the united states'), { minPool: 40 }],
-  ['indian-state', 'Name a state of India', inst('Q131541', 'state of india'), { minPool: 20 }],
+  ['us-state', 'Name a US state', inst('Q35657', 'u.s. state'), { minPool: 40 }],
+  ['indian-state', 'Name a state of India', inst('Q12443800', 'state of india'), { minPool: 20 }],
   ['world-heritage', 'Name a World Heritage Site', `wdt:P1435 wd:${reg('Q9259', 'world heritage')}`],
   ['museum', 'Name a museum', inst('Q33506', 'museum')],
   ['airport', 'Name an airport', inst('Q1248784', 'airport')],
@@ -165,12 +165,12 @@ const SPACE = [
   ['galaxy', 'Name a galaxy', inst('Q318', 'galaxy'), { minSL: 6 }],
   ['asteroid', 'Name an asteroid', inst('Q3863', 'asteroid'), { minSL: 8 }],
   ['comet', 'Name a comet', inst('Q3559', 'comet'), { minSL: 4 }],
-  ['dwarf-planet', 'Name a dwarf planet', inst('Q2514253', 'dwarf planet'), { minPool: 5 }],
+  ['dwarf-planet', 'Name a dwarf planet', inst('Q2199', 'dwarf planet'), { minPool: 5 }],
   ['space-probe', 'Name a space probe', inst('Q26529', 'space probe'), { minSL: 4 }],
   ['spacecraft', 'Name a spacecraft', inst('Q40218', 'spacecraft'), { minSL: 4 }],
   ['space-telescope', 'Name a space telescope', inst('Q148578', 'space telescope'), { minPool: 15 }],
   ['exoplanet', 'Name an exoplanet', inst('Q44559', 'exoplanet'), { minSL: 3 }],
-  ['nebula', 'Name a nebula', inst('Q9348', 'nebula'), { minSL: 4 }],
+  ['nebula', 'Name a nebula', inst('Q42372', 'nebula'), { minSL: 4 }],
   ['astronaut', 'Name an astronaut', occ('Q11631', 'astronaut'), { minSL: 10, people: true }],
   ['observatory', 'Name an astronomical observatory', inst('Q62832', 'observatory'), { minSL: 4 }],
 ];
@@ -188,7 +188,7 @@ const SCIENCE = [
   ['enzyme', 'Name an enzyme', inst('Q8047', 'enzyme'), { minSL: 4 }],
   ['vitamin', 'Name a vitamin', inst('Q34956', 'vitamin'), { minPool: 10 }],
   ['theory', 'Name a scientific theory', inst('Q17737', 'theory'), { minSL: 6, minPool: 15 }],
-  ['scientific-instrument', 'Name a scientific instrument', inst('Q1349', 'measuring instrument'), { minSL: 5, minPool: 15 }],
+  ['scientific-instrument', 'Name a scientific instrument', inst('Q2041172', 'measuring instrument'), { minSL: 5, minPool: 15 }],
   ['unit-of-time', 'Name a unit of time', inst('Q1790144', 'unit of time'), { minPool: 8 }],
 ];
 for (const [id, prompt, pattern, o] of SCIENCE) add('Science', id, prompt, pattern, o);
@@ -199,7 +199,7 @@ addTaxon('Nature', 'bird', 'Name a bird', 'Q5113', 'bird', 'Q7432', 'species');
 addTaxon('Nature', 'reptile', 'Name a reptile', 'Q10811', 'reptile', 'Q7432', 'species');
 addTaxon('Nature', 'amphibian', 'Name an amphibian', 'Q10908', 'amphibian', 'Q7432', 'species', { minSL: 3 });
 addTaxon('Nature', 'insect', 'Name an insect', 'Q1390', 'insect', 'Q7432', 'species', { minSL: 4 });
-addTaxon('Nature', 'flowering-plant', 'Name a flowering plant', 'Q25314', 'flowering plant', 'Q7432', 'species', { minSL: 8 });
+addTaxon('Nature', 'flowering-plant', 'Name a flowering plant', 'Q886167', 'flowering plant', 'Q7432', 'species', { minSL: 8 });
 addTaxon('Nature', 'dinosaur', 'Name a dinosaur', 'Q430', 'dinosaur', 'Q34740', 'genus', { minSL: 3 });
 addTaxon('Nature', 'shark', 'Name a shark', 'Q7372', 'shark', 'Q7432', 'species', { minSL: 3, minPool: 15 });
 const NATURE = [
@@ -215,14 +215,14 @@ const FOOD = [
   ['cocktail', 'Name a cocktail', inst('Q134768', 'cocktail'), { minSL: 3, minPool: 15 }],
   ['bread', 'Name a type of bread', sub('Q7802', 'bread'), { minSL: 3 }],
   ['pasta', 'Name a type of pasta', sub('Q178', 'pasta'), { minSL: 3, minPool: 15 }],
-  ['sauce', 'Name a sauce', inst('Q56404383', 'sauce'), { minSL: 3, minPool: 15 }],
+  ['sauce', 'Name a sauce', inst('Q178359', 'sauce'), { minSL: 3, minPool: 15 }],
   ['cuisine', 'Name a national cuisine', inst('Q1778821', 'cuisine'), { minSL: 5, minPool: 20 }],
   ['fruit', 'Name a fruit', sub('Q3314483', 'fruit'), { minSL: 8 }],
   ['vegetable', 'Name a vegetable', sub('Q11004', 'vegetable'), { minSL: 8 }],
   ['spice', 'Name a spice', inst('Q42527', 'spice'), { minSL: 4, minPool: 15 }],
-  ['dessert', 'Name a dessert', sub('Q182818', 'dessert'), { minSL: 5 }],
-  ['beer-style', 'Name a style of beer', inst('Q43518', 'beer style'), { minSL: 3, minPool: 15 }],
-  ['soft-drink', 'Name a soft drink', inst('Q47770', 'soft drink'), { minSL: 5, minPool: 15 }],
+  ['dessert', 'Name a dessert', sub('Q182940', 'dessert'), { minSL: 5 }],
+  ['beer-style', 'Name a style of beer', inst('Q1998962', 'beer style'), { minSL: 3, minPool: 15 }],
+  ['soft-drink', 'Name a soft drink', inst('Q147538', 'soft drink'), { minSL: 5, minPool: 15 }],
 ];
 for (const [id, prompt, pattern, o] of FOOD) add('Food', id, prompt, pattern, o);
 
@@ -237,7 +237,7 @@ const MUSIC = [
   ['opera', 'Name an opera', inst('Q1344', 'opera'), { minSL: 8 }],
   ['symphony', 'Name a symphony', inst('Q9734', 'symphony'), { minSL: 4, minPool: 15 }],
   ['record-label', 'Name a record label', inst('Q18127', 'record label'), { minSL: 8 }],
-  ['music-festival', 'Name a music festival', inst('Q1010', 'music festival'), { minSL: 4, minPool: 15 }],
+  ['music-festival', 'Name a music festival', inst('Q868557', 'music festival'), { minSL: 4, minPool: 15 }],
   ['singer', 'Name a singer', occ('Q177220', 'singer'), { minSL: 35, people: true, limit: 1500 }],
   ['rapper', 'Name a rapper', occ('Q2252262', 'rapper'), { minSL: 20, people: true }],
   ['composer', 'Name a composer', occ('Q36834', 'composer'), { minSL: 30, people: true, limit: 1500 }],
@@ -259,7 +259,7 @@ const FILM = [
   ['actor', 'Name an actor', occ('Q33999', 'actor'), { minSL: 45, people: true, limit: 1500 }],
   ['comedian', 'Name a comedian', occ('Q245068', 'comedian'), { minSL: 20, people: true }],
   ['film-studio', 'Name a film studio', inst('Q1762059', 'film production company'), { minSL: 8 }],
-  ['tv-network', 'Name a television network', inst('Q141683', 'television network'), { minSL: 6 }],
+  ['tv-network', 'Name a television network', inst('Q1254874', 'television network'), { minSL: 6 }],
   ['superhero', 'Name a superhero', inst('Q188784', 'superhero'), { minSL: 6 }],
 ];
 for (const [id, prompt, pattern, o] of FILM) add('Film & TV', id, prompt, pattern, o);
@@ -330,7 +330,7 @@ const SPORTS = [
   ['tennis-player', 'Name a tennis player', occ('Q10833314', 'tennis player'), { minSL: 25, people: true }],
   ['cricketer', 'Name a cricketer', occ('Q12299841', 'cricketer'), { minSL: 8, people: true, limit: 1500 }],
   ['basketball-player', 'Name a basketball player', occ('Q3665646', 'basketball player'), { minSL: 20, people: true }],
-  ['f1-driver', 'Name a Formula One driver', occ('Q10841764', 'racing driver'), { minSL: 10, people: true }],
+  ['f1-driver', 'Name a Formula One driver', occ('Q10841764', 'formula one driver'), { minSL: 10, people: true }],
   ['chess-player', 'Name a chess player', occ('Q10873124', 'chess player'), { minSL: 12, people: true }],
   ['boxer', 'Name a boxer', occ('Q11338576', 'boxer'), { minSL: 12, people: true }],
   ['golfer', 'Name a golfer', occ('Q11303721', 'golfer'), { minSL: 10, people: true }],
@@ -397,7 +397,7 @@ for (const [id, prompt, pattern, o] of LANG) add('Language', id, prompt, pattern
 /* ---------------------------------------------------------------- mythology */
 const MYTH = [
   ['deity', 'Name a deity', inst('Q178885', 'deity'), { minSL: 10 }],
-  ['legendary-creature', 'Name a legendary creature', inst('Q2239243', 'legendary creature'), { minSL: 6 }],
+  ['legendary-creature', 'Name a legendary creature', inst('Q2239243', 'mythical creature'), { minSL: 6 }],
   ['mythological-character', 'Name a mythological figure', inst('Q4271324', 'mythical character'), { minSL: 10 }],
   ['prophet', 'Name a prophet', occ('Q42857', 'prophet'), { minSL: 8, minPool: 20, people: true }],
   ['saint', 'Name a saint', occ('Q43115', 'saint'), { minSL: 25, minPool: 20, people: true, limit: 1000 }],
@@ -431,7 +431,7 @@ for (const [id, prompt, pattern, o] of GAMES) add('Games', id, prompt, pattern, 
 
 /* -------------------------------------------------------------- technology */
 const TECH = [
-  ['programming-language', 'Name a programming language', inst('Q9143', 'programming language'), { minSL: 6 }],
+  ['programming-language', 'Name a programming language', sub('Q9143', 'programming language'), { minSL: 2, limit: 5000 }],
   ['operating-system', 'Name an operating system', inst('Q9135', 'operating system'), { minSL: 5 }],
   ['file-format', 'Name a file format', inst('Q235557', 'file format'), { minSL: 8 }],
   ['website', 'Name a website', inst('Q35127', 'website'), { minSL: 20 }],
@@ -440,7 +440,7 @@ const TECH = [
   ['programming-paradigm', 'Name a programming paradigm', inst('Q188267', 'programming paradigm'), { minSL: 3, minPool: 12 }],
   ['software-company', 'Name a software company', inst('Q1058914', 'software company'), { minSL: 10 }],
   ['search-engine', 'Name a search engine', inst('Q4182287', 'search engine'), { minSL: 4, minPool: 15 }],
-  ['invention', 'Name an invention', inst('Q14208553', 'invention'), { minSL: 10, minPool: 20 }],
+  ['invention', 'Name an invention', inst('Q12579633', 'invention'), { minSL: 10, minPool: 20 }],
 ];
 for (const [id, prompt, pattern, o] of TECH) add('Technology', id, prompt, pattern, o);
 
@@ -449,9 +449,9 @@ const BRANDS = [
   ['brand', 'Name a brand', inst('Q431289', 'brand'), { minSL: 20, limit: 1500 }],
   ['company', 'Name a company', inst('Q4830453', 'business'), { minSL: 40, limit: 1500 }],
   ['bank', 'Name a bank', inst('Q22687', 'bank'), { minSL: 10 }],
-  ['car-manufacturer', 'Name a car manufacturer', inst('Q786803', 'automobile manufacturer'), { minSL: 8 }],
-  ['car-model', 'Name a car model', inst('Q3231690', 'automobile model'), { minSL: 15, limit: 1500 }],
-  ['fashion-brand', 'Name a fashion brand', inst('Q1070990', 'fashion house'), { minSL: 6, minPool: 20 }],
+  ['car-manufacturer', 'Name a car manufacturer', inst('Q786820', 'automobile manufacturer'), { minSL: 8 }],
+  ['car-model', 'Name a car model', inst('Q3231690', 'car model'), { minSL: 15, limit: 1500 }],
+  ['fashion-brand', 'Name a fashion brand', inst('Q3661311', 'fashion house'), { minSL: 6, minPool: 20 }],
   ['restaurant-chain', 'Name a restaurant chain', inst('Q18534542', 'restaurant chain'), { minSL: 6, minPool: 20 }],
   ['supermarket-chain', 'Name a supermarket chain', inst('Q18043413', 'supermarket chain'), { minSL: 4, minPool: 20 }],
 ];
@@ -462,7 +462,7 @@ const TRANSPORT = [
   ['airline', 'Name an airline', inst('Q46970', 'airline'), { minSL: 8 }],
   ['aircraft-model', 'Name an aircraft model', inst('Q15056993', 'aircraft family'), { minSL: 6, minPool: 20 }],
   ['ship-type', 'Name a type of ship', sub('Q11446', 'ship'), { minSL: 6, minPool: 20, limit: 800 }],
-  ['motorcycle-manufacturer', 'Name a motorcycle manufacturer', inst('Q1148062', 'motorcycle manufacturer'), { minSL: 4, minPool: 15 }],
+  ['motorcycle-manufacturer', 'Name a motorcycle manufacturer', inst('Q15081030', 'motorcycle manufacturer'), { minSL: 4, minPool: 15 }],
 ];
 for (const [id, prompt, pattern, o] of TRANSPORT) add('Transport', id, prompt, pattern, o);
 
