@@ -1,6 +1,6 @@
 // Offline self-test: node scripts/selftest.mjs
 // Checks the catalog, query builder, matching, rarity and seeded picking. No network needed.
-import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
+import { CATALOG, ENTITY_LABELS, entityIdsOf, QUESTION_TARGET } from '../js/catalog.js';
 import { buildQuery, parseBindings, toPack, fromPack } from '../js/wikidata.js';
 import {
   normalize, matchAnswer, buildPool, assignRarity, pickEntries, mulberry32, hashString,
@@ -21,7 +21,15 @@ for (const e of CATALOG) {
   ok(/^[a-z0-9-]+$/.test(e.id), 'bad id chars ' + e.id);
   ok(entityIdsOf(e).every(q => ENTITY_LABELS.has(q)), 'unregistered Q-id in ' + e.id);
 }
-ok(CATALOG.length >= 400, 'catalog has 400+ entries, has ' + CATALOG.length);
+eq(CATALOG.length, QUESTION_TARGET, 'catalog reaches configured question target');
+eq(CATALOG.length, 10000, 'catalog has exactly 10,000 unique prompts');
+eq(new Set(CATALOG.map(e => e.prompt)).size, CATALOG.length, 'all prompt texts are unique');
+ok(CATALOG.every(e => (e.answerLimit || 1000) <= 1000), 'no prompt allows more than 1,000 answers');
+const foodF = CATALOG.find(e => e.id === 'food-starts-f');
+eq(foodF?.prompt, 'Name a food starting with F', 'food starting with F is included');
+eq(foodF?.answerLimit, 1000, 'food F can use up to 1,000 answers');
+const elementEntry = CATALOG.find(e => e.id === 'chemical-element');
+eq(elementEntry?.answerLimit, 118, 'chemical elements keep their natural 118-answer ceiling');
 
 // ---- queries
 const item = CATALOG.find(e => e.kind === 'item'), taxon = CATALOG.find(e => e.kind === 'taxon');
@@ -29,7 +37,17 @@ const programmingEntry = CATALOG.find(e => e.id === 'programming-language');
 ok(programmingEntry?.pattern.includes('P279*'), 'programming language query includes subclasses');
 ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger pool');
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
-ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language pool has a 5,000-row query limit');
+ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language candidate search has a 5,000-row limit');
+ok(/LIMIT 1000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
+ok(buildQuery(foodF, { limit: 5000, minSL: 1 }).includes('STRSTARTS(LCASE(STR(?itemLabel)), "f")'), 'food F query filters labels by F');
+const foodFQuery = buildQuery(foodF, { limit: 5000, minSL: 1 });
+ok(foodFQuery.indexOf('STRSTARTS') < foodFQuery.indexOf('LIMIT 5000'), 'food F prefix is applied before candidate truncation');
+const insectA = { ...taxon, startsWith: 'A' };
+const insectAQuery = buildQuery(insectA, { limit: 5000, minSL: 1 });
+ok(insectAQuery.includes('STRSTARTS(LCASE(STR(?filterName)), "a")'), 'taxon letter filtering is applied to common names before candidate limit');
+ok(insectAQuery.indexOf('STRSTARTS') < insectAQuery.indexOf('LIMIT 5000'), 'taxon prefix is applied before candidate truncation');
+ok(/LIMIT 1000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than 1,000 answers');
+ok(/LIMIT 118$/.test(buildQuery(elementEntry)), 'chemical-element query respects its 118-answer limit');
 
 ok(/P1843/.test(buildQuery(taxon)), 'taxon query uses common names');
 const rows = { results: { bindings: [
@@ -42,6 +60,11 @@ const parsed = parseBindings(rows, item);
 eq(parsed.length, 2, 'parse drops unlabeled and duplicate names');
 eq(parsed[0].a.join(), 'Alef', 'alias deduped against the label');
 eq(fromPack(toPack(item, parsed))[1].n, 'Beta', 'pack round trip');
+const manyRows = { results: { bindings: Array.from({ length: 1100 }, (_, i) => ({
+  item: { value: `http://www.wikidata.org/entity/Q${10000 + i}` },
+  itemLabel: { value: `Answer ${i}` }, sl: { value: String(1100 - i) }, alts: { value: '' },
+})) } };
+eq(parseBindings(manyRows, item).length, 1000, 'parser hard-caps answer pools at 1,000');
 
 // ---- normalising and matching
 eq(normalize('  The Café-Au-Lait! '), 'cafe au lait', 'normalize accents, article, punctuation');

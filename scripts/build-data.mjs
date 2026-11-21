@@ -16,6 +16,8 @@ const opt = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i
 const OUT = path.resolve(opt('out', 'data/packs'));
 const MANIFEST = path.resolve(opt('manifest', 'data/manifest.json'));
 const ONLY = opt('only') ? new Set(opt('only').split(',')) : null;
+const BATCH = opt('batch');
+const BATCH_SIZE = Math.max(1, Number.parseInt(opt('batch-size', '500'), 10) || 500);
 const ENDPOINT = 'https://query.wikidata.org/sparql';
 const UA = 'DeepwellBuild/2.0 (https://deepwell.games; static trivia game data build)';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -76,7 +78,20 @@ async function main() {
   const report = { skipped: [], failed: [], built: 0 };
   const today = new Date().toISOString().slice(0, 10);
 
-  const todo = CATALOG.filter(e => !ONLY || ONLY.has(e.id));
+  const allTodo = CATALOG.filter(e => !ONLY || ONLY.has(e.id));
+  let todo = allTodo;
+  if (BATCH !== undefined && BATCH !== 'all') {
+    const batchIndex = Number.parseInt(BATCH, 10);
+    if (!Number.isInteger(batchIndex) || batchIndex < 0) throw new Error('Invalid --batch index: ' + BATCH);
+    todo = allTodo.slice(batchIndex * BATCH_SIZE, (batchIndex + 1) * BATCH_SIZE);
+    console.log(`Building batch ${batchIndex} (items ${batchIndex * BATCH_SIZE + 1}-${Math.min((batchIndex + 1) * BATCH_SIZE, allTodo.length)} of ${allTodo.length}; batch size ${BATCH_SIZE}).`);
+  } else if (BATCH === 'all') {
+    console.warn('Building the entire catalog in one run; this may exceed the workflow time limit.');
+  }
+  if (!todo.length) {
+    console.log('No prompts in this batch. Nothing to build.');
+    return;
+  }
   let n = 0;
   for (const entry of todo) {
     n++;
@@ -93,7 +108,7 @@ async function main() {
         report.skipped.push(`${entry.id} (only ${items.length} answers; needs ${minimumItems})`);
         console.log(`${tag}: only ${items.length} answers; keeping previous pack if one exists`);
         // A thin refresh must never remove a previously working answer pool.
-      } else if (previousCount > items.length) {
+      } else if (previousCount > items.length && previousCount <= Math.min(Number(entry.answerLimit) || 1000, 1000)) {
         report.skipped.push(`${entry.id} (new pool ${items.length} smaller than existing ${previousCount})`);
         console.log(`${tag}: new pool smaller than existing; keeping ${previousCount}-answer pack`);
       } else {

@@ -34,7 +34,7 @@ const seen = new Set();
 function add(cat, id, prompt, pattern, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
   seen.add(id);
-  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 1, limit: 5000, minPool: 20, ...o });
+  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 1, limit: 5000, answerLimit: 1000, minPool: 20, ...o });
 }
 function addTaxon(cat, id, prompt, parentQ, parentLabel, rankQ, rankLabel, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
@@ -43,7 +43,7 @@ function addTaxon(cat, id, prompt, parentQ, parentLabel, rankQ, rankLabel, o = {
   CATALOG.push({
     id, cat, prompt, kind: 'taxon', parent: parentQ, rank: rankQ,
     pattern: `wdt:P171+ wd:${parentQ}; wdt:P105 wd:${rankQ}`,
-    minSL: 5, limit: 2000, minPool: 20, ...o,
+    minSL: 5, limit: 2000, answerLimit: 1000, minPool: 20, ...o,
   });
 }
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -178,7 +178,7 @@ for (const [id, prompt, pattern, o] of SPACE) add('Space', id, prompt, pattern, 
 
 /* ----------------------------------------------------------------- science */
 const SCIENCE = [
-  ['chemical-element', 'Name a chemical element', inst('Q11344', 'chemical element'), { minPool: 100 }],
+  ['chemical-element', 'Name a chemical element', inst('Q11344', 'chemical element'), { minPool: 100, answerLimit: 118 }],
   ['mineral', 'Name a mineral', inst('Q12089225', 'mineral species'), { minSL: 4 }],
   ['rock', 'Name a type of rock', sub('Q8063', 'rock'), { minPool: 15 }],
   ['chemical-compound', 'Name a chemical compound', inst('Q11173', 'chemical compound'), { minSL: 20 }],
@@ -210,6 +210,7 @@ for (const [id, prompt, pattern, o] of NATURE) add('Nature', id, prompt, pattern
 
 /* -------------------------------------------------------------------- food */
 const FOOD = [
+  ['food', 'Name a food', sub('Q2095', 'food'), { minSL: 1, limit: 5000 }],
   ['dish', 'Name a dish', inst('Q746549', 'dish'), { minSL: 8 }],
   ['cheese', 'Name a cheese', inst('Q10943', 'cheese'), { minSL: 3 }],
   ['cocktail', 'Name a cocktail', inst('Q134768', 'cocktail'), { minSL: 3, minPool: 15 }],
@@ -465,6 +466,42 @@ const TRANSPORT = [
   ['motorcycle-manufacturer', 'Name a motorcycle manufacturer', inst('Q15081030', 'motorcycle manufacturer'), { minSL: 4, minPool: 15 }],
 ];
 for (const [id, prompt, pattern, o] of TRANSPORT) add('Transport', id, prompt, pattern, o);
+
+/* --------------------------------------------------------- 10,000 prompt library */
+// Keep the original broad prompts and add letter-constrained forms such as
+// "Name a food starting with F". Each is a distinct prompt with its own query.
+// The hash order distributes omitted letters evenly across categories.
+export const QUESTION_TARGET = 10000;
+export const BASE_CATALOG_COUNT = CATALOG.length;
+const BASE_CATALOG = CATALOG.slice();
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+function stableHash(value) {
+  let h = 2166136261;
+  for (let i = 0; i < value.length; i++) { h ^= value.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+const letterVariants = BASE_CATALOG.flatMap(entry =>
+  LETTERS.map(letter => ({ entry, letter, id: `${entry.id}-starts-${letter.toLowerCase()}` }))
+);
+letterVariants.sort((a, b) => stableHash(a.id) - stableHash(b.id) || a.id.localeCompare(b.id));
+const foodF = letterVariants.find(v => v.entry.id === 'food' && v.letter === 'F');
+const orderedVariants = foodF
+  ? [foodF, ...letterVariants.filter(v => v !== foodF)]
+  : letterVariants;
+const variantsNeeded = QUESTION_TARGET - CATALOG.length;
+for (const variant of orderedVariants.slice(0, variantsNeeded)) {
+  if (seen.has(variant.id)) throw new Error('duplicate generated catalog id ' + variant.id);
+  seen.add(variant.id);
+  CATALOG.push({
+    ...variant.entry,
+    id: variant.id,
+    prompt: `${variant.entry.prompt} starting with ${variant.letter}`,
+    startsWith: variant.letter,
+  });
+}
+if (CATALOG.length !== QUESTION_TARGET) {
+  throw new Error(`Expected ${QUESTION_TARGET} prompts, generated ${CATALOG.length}`);
+}
 
 /* ------------------------------------------------------------------ helpers */
 export const CATALOG_BY_ID = new Map(CATALOG.map(e => [e.id, e]));

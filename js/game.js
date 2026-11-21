@@ -1,10 +1,10 @@
 // Dive preparation: choose prompts, load their answer pools, apply letter variants.
-import { CONFIG } from './config.js?v=answer-expansion-20261121';
-import { CATALOG, loadRawPool, stableEntries } from './data.js?v=answer-expansion-20261121';
+import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
+import { CATALOG, loadRawPool, stableEntries } from './data.js?v=ten-thousand-prompts-20261121';
 import {
   pickEntries, mulberry32, hashString, buildPool, deriveLetterPool, chooseVariant,
   promptKey, promptText, utcDate,
-} from './engine.js?v=answer-expansion-20261121';
+} from './engine.js?v=ten-thousand-prompts-20261121';
 
 /** Load one pick into a ready prompt, or null if its data is unusable. */
 async function ready(pick, allowLive) {
@@ -15,7 +15,7 @@ async function ready(pick, allowLive) {
     let pool = buildPool(raw.items, opts);
     const minimumItems = Math.min(entry.minPool || 20, 8);
     if (pool.size < minimumItems) return null;
-    const letter = chooseVariant(pick, pool, { minPool: CONFIG.MIN_POOL_FOR_LETTER });
+    const letter = entry.startsWith ? null : chooseVariant(pick, pool, { minPool: CONFIG.MIN_POOL_FOR_LETTER });
     if (letter) {
       const sub = deriveLetterPool(pool, letter, opts);
       if (sub.size >= 8) pool = sub;
@@ -47,15 +47,16 @@ export async function prepareDive({ mode, category = null, recent = [] }) {
     avoid = new Set();
   } else {
     const inCat = list => (category ? list.filter(e => e.cat === category) : list);
-    const stableHere = inCat(stable);
-    allowLive = stableHere.length < count + 3;
-    entries = allowLive ? inCat(CATALOG) : stableHere;
+    // Endless and category packs draw from the full 10k library. Missing offline
+    // packs are fetched live only for the small number of prompts selected.
+    entries = inCat(CATALOG);
+    allowLive = true;
     rnd = mulberry32(hashString(`${Date.now()}-${Math.random()}`));
     avoid = new Set(recent);
   }
   if (entries.length < count) throw new Error('Not enough questions available yet.');
 
-  const candidates = pickEntries(entries, count + 10, rnd, { avoid, category: mode === 'pack' ? category : null });
+  const candidates = pickEntries(entries, count + 80, rnd, { avoid, category: mode === 'pack' ? category : null });
   const results = new Array(candidates.length).fill(undefined);
   let next = 0, have = 0;
   while (have < count && next < candidates.length) {
