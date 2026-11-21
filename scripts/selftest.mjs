@@ -38,6 +38,7 @@ ok(programmingEntry?.pattern.includes('P279*'), 'programming language query incl
 ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger pool');
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
 ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language candidate search has a 5,000-row limit');
+ok(/LIMIT 5000 OFFSET 5000/.test(buildQuery(programmingEntry,{limit:5000,minSL:1,offset:5000})), 'scheduled candidate pages advance by 5,000 records');
 ok(/LIMIT 1000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
 ok(buildQuery(foodF, { limit: 5000, minSL: 1 }).includes('STRSTARTS(LCASE(STR(?itemLabel)), "f")'), 'food F query filters labels by F');
 const foodFQuery = buildQuery(foodF, { limit: 5000, minSL: 1 });
