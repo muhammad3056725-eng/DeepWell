@@ -626,7 +626,7 @@ function drawEvent(w,h,time,still) {
   }
 
   // Rare answers cause different peaceful or spectacular wildlife encounters.
-  if(e.kind==='manta'||e.kind==='ray_school'||e.kind==='manta_migration'){
+  if(e.kind==='manta'||e.kind==='ray_school'||e.kind==='giant_ray'||e.kind==='manta_migration'){
     const s=mix(0.08,Math.min(w/440,2.65)*e.scale,approach);
     const travel=e.direction*(p*0.32);
     for(let i=0;i<(e.kind==='ray_school'?4: e.kind==='manta_migration'?5:1);i++){
