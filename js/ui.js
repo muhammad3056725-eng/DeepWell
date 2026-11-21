@@ -33,7 +33,7 @@ export function updateDepthUI(depth) {
   document.body.dataset.depth = zone.toLowerCase().replace(/\s+/g, '-');
 }
 
-function untilReset() {function untilReset() {
+function untilReset() {
   const now = new Date();
   const next = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
   const mins = Math.max(1, Math.round((next - now.getTime()) / 60000));
