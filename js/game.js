@@ -1,10 +1,10 @@
 // Dive preparation: choose prompts, load their answer pools, apply letter variants.
-import { CONFIG } from './config.js';
-import { CATALOG, loadRawPool, stableEntries } from './data.js';
+import { CONFIG } from './config.js?v=answer-expansion-20261121';
+import { CATALOG, loadRawPool, stableEntries } from './data.js?v=answer-expansion-20261121';
 import {
   pickEntries, mulberry32, hashString, buildPool, deriveLetterPool, chooseVariant,
   promptKey, promptText, utcDate,
-} from './engine.js';
+} from './engine.js?v=answer-expansion-20261121';
 
 /** Load one pick into a ready prompt, or null if its data is unusable. */
 async function ready(pick, allowLive) {
