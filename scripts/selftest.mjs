@@ -1,7 +1,7 @@
 // Offline self-test: node scripts/selftest.mjs
 // Checks the catalog, query builder, matching, rarity and seeded picking. No network needed.
 import { CATALOG, ENTITY_LABELS, entityIdsOf, QUESTION_TARGET } from '../js/catalog.js';
-import { buildQuery, parseBindings, toPack, fromPack } from '../js/wikidata.js';
+import { buildQuery, parseBindings, toPack, fromPack, mergePools } from '../js/wikidata.js';
 import {
   normalize, matchAnswer, buildPool, assignRarity, pickEntries, mulberry32, hashString,
   letterOptions, deriveLetterPool, blendPoints, tier, previousUtcDate,
@@ -38,6 +38,7 @@ ok(programmingEntry?.pattern.includes('P279*'), 'programming language query incl
 ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger pool');
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
 ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language candidate search has a 5,000-row limit');
+ok(/LIMIT 5000 OFFSET 5000/.test(buildQuery(programmingEntry,{limit:5000,minSL:1,offset:5000})), 'scheduled candidate pages advance by 5,000 records');
 ok(/LIMIT 1000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
 ok(buildQuery(foodF, { limit: 5000, minSL: 1 }).includes('STRSTARTS(LCASE(STR(?itemLabel)), "f")'), 'food F query filters labels by F');
 const foodFQuery = buildQuery(foodF, { limit: 5000, minSL: 1 });
@@ -65,6 +66,18 @@ const manyRows = { results: { bindings: Array.from({ length: 1100 }, (_, i) => (
   itemLabel: { value: `Answer ${i}` }, sl: { value: String(1100 - i) }, alts: { value: '' },
 })) } };
 eq(parseBindings(manyRows, item).length, 1000, 'parser hard-caps answer pools at 1,000');
+const accumulated = mergePools(
+  [{id:'Q101',n:'Old answer',s:80,a:['Old alias']},{id:'Q102',n:'Shared answer',s:70,a:[]}],
+  [{id:'Q102',n:'Shared answer',s:75,a:['New alias']},{id:'Q103',n:'New answer',s:90,a:[]}],
+  {answerLimit:1000},
+);
+eq(accumulated.length,3,'scheduled refresh accumulates saved and new records');
+eq(accumulated.find(x=>x.id==='Q102')?.s,75,'refresh updates popularity metadata');
+ok(accumulated.find(x=>x.id==='Q102')?.a.includes('New alias'),'refresh adds aliases');
+const capped=mergePools(Array.from({length:1000},(_,i)=>({id:'Q'+(2000+i),n:'Entry '+i,s:2000-i,a:[]})),[{id:'Q9999',n:'New entry',s:9999,a:[]}],{answerLimit:1000});
+eq(capped.length,1000,'cumulative merge never exceeds 1,000 answers');
+const filtered=mergePools([{id:'Q1',n:'Apple pie',s:20,a:[]}],[{id:'Q2',n:'Falafel',s:10,a:[]}],{startsWith:'F'});
+eq(filtered.length,1,'letter-prompt merge excludes labels outside requested letter');
 
 // ---- normalising and matching
 eq(normalize('  The Café-Au-Lait! '), 'cafe au lait', 'normalize accents, article, punctuation');

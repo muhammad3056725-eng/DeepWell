@@ -8,7 +8,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
-import { buildQuery, buildLabelQuery, parseBindings, queryUrl, toPack } from '../js/wikidata.js';
+import { buildQuery, buildLabelQuery, parseBindings, queryUrl, toPack, fromPack, mergePools } from '../js/wikidata.js';
 
 const args = process.argv.slice(2);
 const flag = n => args.includes('--' + n);
@@ -18,6 +18,7 @@ const MANIFEST = path.resolve(opt('manifest', 'data/manifest.json'));
 const ONLY = opt('only') ? new Set(opt('only').split(',')) : null;
 const BATCH = opt('batch');
 const BATCH_SIZE = Math.max(1, Number.parseInt(opt('batch-size', '500'), 10) || 500);
+const CANDIDATE_OFFSET = Math.max(0, Number.parseInt(opt('candidate-offset', '0'), 10) || 0);
 const ENDPOINT = 'https://query.wikidata.org/sparql';
 const UA = 'DeepwellBuild/2.0 (https://deepwell.games; static trivia game data build)';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -100,22 +101,24 @@ async function main() {
     const prev = manifest.packs[entry.id];
     if (flag('resume') && prev && prev.built && (Date.parse(today) - Date.parse(prev.built)) < 6 * 864e5) { console.log(`${tag}: fresh, skipped`); continue; }
     try {
-      const json = await sparql(buildQuery(entry, flag('wide') ? { limit: 5000, minSL: 1 } : {}));
-      const items = parseBindings(json, entry);
+      const json = await sparql(buildQuery(entry, flag('wide') ? { limit: 5000, minSL: 1, offset: CANDIDATE_OFFSET } : { offset: CANDIDATE_OFFSET }));
+      const freshItems = parseBindings(json, entry);
+      const packPath = path.join(OUT, entry.id + '.json');
+      let existingItems = [];
+      try {
+        const savedPack = JSON.parse(await readFile(packPath, 'utf8'));
+        existingItems = fromPack(savedPack);
+      } catch { /* no previous pack yet */ }
+      const items = mergePools(existingItems, freshItems, entry);
       const minimumItems = Math.min(entry.minPool || 20, 8);
-      const previousCount = prev?.n || 0;
       if (items.length < minimumItems) {
-        report.skipped.push(`${entry.id} (only ${items.length} answers; needs ${minimumItems})`);
-        console.log(`${tag}: only ${items.length} answers; keeping previous pack if one exists`);
-        // A thin refresh must never remove a previously working answer pool.
-      } else if (previousCount > items.length && previousCount <= Math.min(Number(entry.answerLimit) || 1000, 1000)) {
-        report.skipped.push(`${entry.id} (new pool ${items.length} smaller than existing ${previousCount})`);
-        console.log(`${tag}: new pool smaller than existing; keeping ${previousCount}-answer pack`);
+        report.skipped.push(`${entry.id} (only ${items.length} cumulative answers; needs ${minimumItems})`);
+        console.log(`${tag}: only ${items.length} cumulative answers; keeping previous pack if one exists`);
       } else {
-        await writeFile(path.join(OUT, entry.id + '.json'), JSON.stringify(toPack(entry, items)));
+        await writeFile(packPath, JSON.stringify(toPack(entry, items)));
         manifest.packs[entry.id] = { n: items.length, built: today };
         report.built++;
-        console.log(`${tag}: ${items.length} answers`);
+        console.log(`${tag}: ${items.length} answers (${Math.max(0,items.length-existingItems.length)} net new)`);
       }
     } catch (e) {
       report.failed.push(`${entry.id}: ${e.message}`);

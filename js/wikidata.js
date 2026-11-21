@@ -8,6 +8,7 @@ export function buildQuery(entry, overrides = {}) {
   const minSL = overrides.minSL ?? entry.minSL ?? 1;
   // Search broadly, then enforce a separate hard answer-pool ceiling.
   const limit = Math.max(1, Math.min(Number(overrides.limit ?? entry.limit ?? 5000), 5000));
+  const offset = Math.max(0, Math.floor(Number(overrides.offset) || 0));
   const answerLimit = Math.max(1, Math.min(Number(overrides.answerLimit ?? entry.answerLimit ?? 1000), 1000));
   const rawLetter = overrides.startsWith ?? entry.startsWith ?? null;
   const letter = /^[a-z]$/i.test(String(rawLetter || '')) ? String(rawLetter).toLowerCase() : null;
@@ -26,7 +27,7 @@ export function buildQuery(entry, overrides = {}) {
       FILTER(?sl >= ${minSL})
       FILTER(LANG(?filterName) = "en")
       ${candidateFilter}
-    } ORDER BY DESC(?sl) LIMIT ${limit} }
+    } ORDER BY DESC(?sl) LIMIT ${limit} OFFSET ${offset} }
   ?item wdt:P1843 ?cn. FILTER(LANG(?cn) = "en")
   ${answerFilter}
   OPTIONAL { ?item wdt:P225 ?latin }
@@ -41,7 +42,7 @@ export function buildQuery(entry, overrides = {}) {
       FILTER(?sl >= ${minSL})
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       ${candidateFilter}
-    } ORDER BY DESC(?sl) LIMIT ${limit} }
+    } ORDER BY DESC(?sl) LIMIT ${limit} OFFSET ${offset} }
   OPTIONAL { ?item skos:altLabel ?alt. FILTER(LANG(?alt) = "en") }
 } GROUP BY ?item ?itemLabel ?sl ORDER BY DESC(?sl) LIMIT ${answerLimit}`;
 }
@@ -81,6 +82,35 @@ export function parseBindings(json, entry) {
   }
   const answerLimit = Math.max(1, Math.min(Number(entry.answerLimit) || 1000, 1000));
   return out.slice(0, answerLimit);
+}
+
+/** Merge saved and new Wikidata answers while preserving data and respecting each prompt cap. */
+export function mergePools(existingItems = [], freshItems = [], entry = {}) {
+  const byId = new Map();
+  const upsert = item => {
+    if (!item?.id || !item?.n) return;
+    const name = String(item.n).trim();
+    if (!name || (entry.startsWith && !name.toLowerCase().startsWith(entry.startsWith.toLowerCase()))) return;
+    const previous = byId.get(item.id);
+    const aliases = [];
+    const add = value => {
+      const alias = String(value || '').trim();
+      if (!alias || alias.length > 120 || alias.toLowerCase() === name.toLowerCase()) return;
+      if (!aliases.some(x => x.toLowerCase() === alias.toLowerCase())) aliases.push(alias);
+    };
+    for (const a of previous?.a || []) add(a);
+    for (const a of item.a || []) add(a);
+    byId.set(item.id, { id:item.id, n:name, s:Math.max(Number(previous?.s)||0,Number(item.s)||0), a:aliases.slice(0,24) });
+  };
+  for (const item of existingItems) upsert(item);
+  for (const item of freshItems) upsert(item);
+  const cap = Math.max(1,Math.min(Number(entry.answerLimit)||1000,1000));
+  const names = new Set();
+  return [...byId.values()].sort((a,b)=>b.s-a.s||a.n.localeCompare(b.n)).filter(item=>{
+    const key=item.n.trim().toLowerCase();
+    if(names.has(key)) return false;
+    names.add(key); return true;
+  }).slice(0,cap);
 }
 
 export function queryUrl(endpoint, sparql) {
