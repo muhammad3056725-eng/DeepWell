@@ -111,3 +111,92 @@ body.colorsafe{--cyan:#6cb4ff;--pink:#ff9f43;--green:#e8d44d}
 @media(prefers-reduced-motion:reduce){
   #scene{scroll-behavior:auto}
 }
+
+
+/* ---- Immersive full-screen descent redesign ---- */
+#scene{filter:saturate(.78) contrast(1.09) brightness(.9)}
+#vignette{
+  background:
+    radial-gradient(ellipse at 50% 44%,transparent 24%,rgba(0,5,13,.2) 67%,rgba(0,2,8,.72) 100%),
+    linear-gradient(180deg,rgba(4,19,30,.02),transparent 35%,rgba(0,4,10,.28));
+}
+body:has(#game.active) .app{
+  width:100%;max-width:none;min-height:100svh;padding:0;margin:0;
+}
+body:has(#game.active) .topbar{
+  position:fixed;z-index:5;top:max(18px,env(safe-area-inset-top));left:clamp(18px,3vw,48px);right:clamp(18px,3vw,48px);
+  max-width:none;pointer-events:none;
+}
+body:has(#game.active) .brand{
+  color:rgba(225,244,241,.78);font-size:12px;letter-spacing:.3em;text-shadow:0 1px 12px rgba(0,0,0,.55);
+}
+body:has(#game.active) .depth-chip{
+  color:rgba(231,246,240,.88);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 12px;border-radius:4px;border:1px solid rgba(194,224,220,.22);
+  background:rgba(2,14,23,.35);box-shadow:none;backdrop-filter:blur(10px);
+}
+#game.active{
+  display:block;position:fixed;inset:0;width:100vw;height:100svh;min-height:100svh;
+  z-index:3;overflow:hidden;animation:none;
+}
+#game .game-grid{
+  position:relative;width:100%;height:100%;min-height:100svh;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding:92px clamp(16px,4vw,56px) max(26px,5vh);gap:0;
+}
+#game .prompt-panel{
+  width:min(760px,100%);min-height:0;flex:0 1 760px;
+  padding:clamp(18px,2.7vw,30px) clamp(18px,3.2vw,38px);
+  border-radius:14px;
+  border:1px solid rgba(191,222,224,.2);
+  background:linear-gradient(180deg,rgba(3,17,28,.54),rgba(2,13,24,.76));
+  box-shadow:0 22px 80px rgba(0,4,10,.3),inset 0 1px 0 rgba(230,248,242,.07);
+  backdrop-filter:blur(18px) saturate(.76);
+}
+#game .progress-row{
+  color:rgba(194,222,221,.78);font-size:10px;letter-spacing:.16em;
+}
+#game .src-badge{
+  font-size:9px;color:rgba(208,230,224,.65);background:rgba(2,13,23,.28);
+  border-color:rgba(180,218,216,.2);
+}
+#game .prompt{
+  font-size:clamp(27px,4.1vw,48px);line-height:1.07;letter-spacing:-.035em;
+  margin:clamp(22px,4vh,42px) 0 clamp(18px,3vh,30px);
+  text-shadow:0 2px 16px rgba(0,0,0,.25);
+}
+#game .timer{height:3px;background:rgba(175,212,213,.18)}
+#game .timer>i{background:linear-gradient(90deg,#b8d9d3,#83b7c1);box-shadow:0 0 9px rgba(148,210,207,.28)}
+#game .answer-row{margin-top:16px;gap:9px}
+#game .answer-row input{
+  min-height:54px;border-radius:7px;border:1px solid rgba(182,216,215,.28);
+  background:rgba(0,9,17,.58);box-shadow:inset 0 1px 8px rgba(0,0,0,.14);
+  font-size:16px;color:#f0f7f3;
+}
+#game .answer-row input:focus{
+  border-color:rgba(166,219,215,.7);box-shadow:0 0 0 2px rgba(145,202,199,.12);
+}
+#game .button.primary{
+  min-height:54px;background:linear-gradient(135deg,#b7d9d0,#87bec4);
+  border:1px solid rgba(226,246,239,.58);color:#0a2934;box-shadow:0 7px 20px rgba(0,0,0,.18);
+}
+#game .button.primary:hover{background:linear-gradient(135deg,#c5e3d9,#9acbd0)}
+#game .feedback{color:#d8d4b4;text-shadow:none;font-size:12px}
+#game .confirm{
+  border-color:rgba(177,213,206,.34);background:rgba(4,21,31,.8);
+}
+#game .confirm b{color:#d5eee4}
+@media(max-width:700px){
+  body:has(#game.active) .topbar{top:12px;left:14px;right:14px}
+  #game .game-grid{padding:78px 13px 20px;align-items:flex-end}
+  #game .prompt-panel{padding:19px 17px;border-radius:12px}
+  #game .prompt{margin:24px 0 20px;font-size:clamp(27px,7vw,38px)}
+  #game .answer-row{flex-direction:row}
+  #game .answer-row input{min-width:0;min-height:50px}
+  #game .button.primary{min-height:50px}
+  #game .submit{width:94px}
+}
+@media(max-width:390px){
+  #game .answer-row{flex-direction:column}
+  #game .submit{width:100%}
+}
