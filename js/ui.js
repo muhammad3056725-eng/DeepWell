@@ -1,8 +1,8 @@
 // DOM helpers and screen renderers. No game rules live here.
-import { CONFIG } from './config.js?v=answer-expansion-20261121';
-import { CATEGORIES } from './catalog.js?v=answer-expansion-20261121';
-import { libraryStats } from './data.js?v=answer-expansion-20261121';
-import { tierClass, utcDate } from './engine.js?v=answer-expansion-20261121';
+import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
+import { CATEGORIES } from './catalog.js?v=ten-thousand-prompts-20261121';
+import { libraryStats } from './data.js?v=ten-thousand-prompts-20261121';
+import { tierClass, utcDate } from './engine.js?v=ten-thousand-prompts-20261121';
 import * as S from './state.js';
 import { setVolume } from './audio.js';
 
@@ -44,8 +44,8 @@ export function renderHome() {
   $('countdown').textContent = `Next daily in ${untilReset()} · ${today ? 'come back tomorrow' : 'a fresh descent awaits'}`;
   const st = libraryStats();
   $('library').textContent = st.packs
-    ? `${st.answers.toLocaleString()} answers from Wikidata · ${st.prompts} question types · updated ${st.built}`
-    : `Starter set: ${st.stable} question types ready. Full Wikidata library loads after the first data build.`;
+    ? `${st.answers.toLocaleString()} saved answers · ${st.packs.toLocaleString()} offline packs · ${st.prompts.toLocaleString()} question prompts · updated ${st.built}`
+    : `Starter set: ${st.stable} offline-ready prompts · ${st.prompts.toLocaleString()} question prompts available for live Endless play.`;
 }
 
 export function renderStats() {
