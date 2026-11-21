@@ -6,18 +6,31 @@ import {
   promptKey, promptText, utcDate,
 } from './engine.js?v=ten-thousand-prompts-20261121';
 
-/** Load candidates in small parallel batches and keep only usable prompts. */
+const historyKey = text => `question:${String(text || '').toLowerCase().replace(/\s+/g, ' ').trim()}`;
+
+function rememberInSet(set, prompt) {
+  set.add(prompt.entry.id);
+  set.add(prompt.key);
+  set.add(historyKey(prompt.text));
+}
+
+/** Load candidates in small parallel batches, skipping questions used in earlier dives. */
 async function loadCandidates(candidates, count, allowLive, seen = new Set()) {
   const prompts = [];
   let next = 0;
   while (prompts.length < count && next < candidates.length) {
-    const size = Math.min(count - prompts.length, candidates.length - next);
-    const batch = candidates.slice(next, next + size);
-    next += batch.length;
+    const batch = [];
+    while (next < candidates.length && batch.length < count - prompts.length) {
+      const pick = candidates[next++];
+      if (!seen.has(pick.entry.id)) batch.push(pick);
+    }
+    if (!batch.length) continue;
     const loaded = await Promise.all(batch.map(pick => ready(pick, allowLive)));
     for (const prompt of loaded) {
-      if (!prompt || seen.has(prompt.entry.id)) continue;
-      seen.add(prompt.entry.id);
+      if (!prompt) continue;
+      const key = historyKey(prompt.text);
+      if (seen.has(prompt.entry.id) || seen.has(prompt.key) || seen.has(key)) continue;
+      rememberInSet(seen, prompt);
       prompts.push(prompt);
     }
   }
@@ -41,7 +54,6 @@ async function ready(pick, allowLive) {
     }
     return buildPrompt(entry, letter, pool, raw.source);
   } catch (error) {
-    // Keep the game playable, but preserve a useful diagnostic in DevTools.
     console.warn('[DEEPWELL] Could not load prompt data for ' + entry.id, error);
     return null;
   }
@@ -52,60 +64,73 @@ function buildPrompt(entry, letter, pool, source) {
 }
 
 /**
- * mode: 'daily' | 'endless' | 'pack'. Returns exactly PROMPTS_PER_DIVE prompts,
- * or throws when the available answer pools cannot supply enough.
- *
- * Until the 10,000-prompt data build is complete, Endless prefers downloaded
- * packs. It only asks Wikidata for prompts when the local packs cannot fill a dive.
+ * Each dive gets a new random set. Recent question IDs and question text are
+ * avoided across Daily, Endless and themed dives. Previously used questions
+ * are reused only when there are not enough unused prompts/data to fill a dive.
  */
 export async function prepareDive({ mode, category = null, recent = [] }) {
   const count = CONFIG.PROMPTS_PER_DIVE;
   const stable = stableEntries();
   const inCategory = list => category ? list.filter(e => e.cat === category) : list;
-  let rnd, avoid;
+  const rnd = mulberry32(hashString(`${mode}-${utcDate()}-${Date.now()}-${Math.random()}`));
+  const history = new Set(recent);
+  const selectedHistory = new Set();
 
   if (mode === 'daily') {
     const entries = stable;
     if (entries.length < count) throw new Error('Not enough offline questions are available yet.');
-    rnd = mulberry32(hashString('deepwell-daily-' + utcDate()));
-    avoid = new Set();
-    const candidates = pickEntries(entries, count + 80, rnd, { avoid });
-    const prompts = await loadCandidates(candidates, count, false);
+
+    // Daily remains offline and once-per-UTC-day, but each player gets a fresh,
+    // personalized selection instead of a globally fixed seven-question set.
+    const fresh = entries.filter(e => !history.has(e.id));
+    const candidates = pickEntries(fresh, fresh.length, rnd);
+    const prompts = await loadCandidates(candidates, count, false, history);
+    if (prompts.length < count) {
+      for (const prompt of prompts) rememberInSet(selectedHistory, prompt);
+      const replayCandidates = pickEntries(entries, entries.length, rnd);
+      const replay = await loadCandidates(replayCandidates, count - prompts.length, false, selectedHistory);
+      prompts.push(...replay);
+    }
     if (prompts.length < count) throw new Error('Not enough offline questions could be loaded. Please try again.');
     return prompts.slice(0, count);
   }
 
-  rnd = mulberry32(hashString(`${Date.now()}-${Math.random()}`));
-  avoid = new Set(recent);
   const allEntries = inCategory(CATALOG);
   if (allEntries.length < count) throw new Error('Not enough questions are available in this category yet.');
 
-  // Prefer the offline packs already on the site. Randomly choosing from all
-  // 10,000 prompts while only a small fraction have packs causes most dives to
-  // wait on multiple slow browser-side Wikidata queries.
+  // Prefer unused offline packs. Once these are exhausted, draw unseen prompts
+  // from the full catalog and try live Wikidata only for that small selection.
   const localEntries = inCategory(stable);
-  const localCandidates = pickEntries(
-    localEntries,
-    Math.min(localEntries.length, count + 24),
-    rnd,
-    { avoid },
-  );
-  const prompts = await loadCandidates(localCandidates, count, false);
+  const freshLocal = localEntries.filter(e => !history.has(e.id));
+  const localCandidates = pickEntries(freshLocal, freshLocal.length, rnd);
+  const prompts = await loadCandidates(localCandidates, count, false, history);
+  for (const prompt of prompts) rememberInSet(selectedHistory, prompt);
   if (prompts.length >= count) return prompts.slice(0, count);
 
-  // Some themed categories may not have seven downloaded packs yet. In that
-  // case, supplement the local prompts with a small, bounded live-query fallback.
-  const loadedIds = new Set(prompts.map(p => p.entry.id));
-  const remaining = allEntries.filter(e => !loadedIds.has(e.id));
+  const remaining = allEntries.filter(e =>
+    !history.has(e.id) && !selectedHistory.has(e.id)
+  );
   const needed = count - prompts.length;
   const fallbackCandidates = pickEntries(
     remaining,
-    Math.min(remaining.length, needed + 7),
+    Math.min(remaining.length, needed + 80),
     rnd,
-    { avoid: new Set([...avoid, ...loadedIds]) },
   );
-  const fallback = await loadCandidates(fallbackCandidates, needed, true, loadedIds);
+  const fallback = await loadCandidates(
+    fallbackCandidates,
+    needed,
+    true,
+    new Set([...history, ...selectedHistory]),
+  );
   prompts.push(...fallback);
+  for (const prompt of fallback) rememberInSet(selectedHistory, prompt);
+  if (prompts.length >= count) return prompts.slice(0, count);
+
+  // Last resort: reuse a local pack, but still avoid duplicate prompts within
+  // this particular dive. This prevents a depleted offline pool blocking play.
+  const replayCandidates = pickEntries(localEntries, localEntries.length, rnd);
+  const replay = await loadCandidates(replayCandidates, count - prompts.length, false, selectedHistory);
+  prompts.push(...replay);
 
   if (prompts.length < count) {
     throw new Error('Not enough questions could be loaded. Check your connection and try again.');

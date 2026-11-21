@@ -9,7 +9,7 @@ Static site for **deepwell.games**, served by GitHub Pages. No server and no bui
 - **Answers:** `scripts/build-data.mjs` queries Wikidata and writes `data/packs/<id>.json` (name, aliases, Wikipedia language count). A GitHub Action refreshes them every Monday.
 - **Rarity:** an answer's score is its percentile rank by Wikipedia language count inside its pool: best known is about 3 points, rarest is 100. Depth = points x 10 m.
 - **Crowd data (optional):** set `CROWD_ENDPOINT` in `js/config.js` (see `docs/crowd-backend.md`) and real player answer shares are blended into the score once a prompt has enough samples.
-- **Daily Dive:** seeded by the UTC date, so everyone gets the same seven prompts. Resets 00:00 UTC.
+- **Daily Dive:** one personalized seven-prompt challenge per player each UTC day. Daily, Endless and themed dives share question history to avoid repeats until the unused pool is exhausted. Daily resets 00:00 UTC.
 - **Fallbacks:** pre-built pack, then bundled seed lists (`js/seed/`), then live Wikidata (Endless and packs only).
 
 ## Run locally

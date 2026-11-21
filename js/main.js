@@ -2,7 +2,7 @@
 import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
 import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=ten-thousand-prompts-20261121';
 import { loadManifest } from './data.js?v=ten-thousand-prompts-20261121';
-import { prepareDive, examples } from './game.js?v=stable-first-loading-20261121';
+import { prepareDive, examples } from './game.js?v=random-no-repeat-questions-20261121';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
 import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=immersive-descent-20261121';
@@ -45,7 +45,7 @@ async function startDive(mode, category = null) {
     return;
   }
   if (id !== runId) return;
-  if (mode !== 'daily') S.rememberPrompts(prompts.map(p => p.key));
+  S.rememberPrompts(prompts.flatMap(p => [p.entry.id, `question:${p.text.toLowerCase().replace(/\\s+/g, ' ').trim()}`]));
   run = { mode, category, prompts, index: 0, depth: 0, answers: [], used: new Set(), remaining: 0, locked: false, paused: false, timer: null, pending: null, id };
   $('answerInput').disabled = false; $('submitBtn').disabled = false;
   nextPrompt();
