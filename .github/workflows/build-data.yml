@@ -1,0 +1,53 @@
+name: Build question data
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Optional: comma-separated prompt ids to rebuild (blank = all)'
+        required: false
+  schedule:
+    - cron: '17 3 * * 1'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-data
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Self-test (engine + catalog)
+        run: node scripts/selftest.mjs
+
+      - name: Build packs from Wikidata
+        env:
+          ONLY: ${{ github.event.inputs.only }}
+        run: |
+          if [ -n "$ONLY" ]; then
+            node scripts/build-data.mjs --only "$ONLY"
+          else
+            node scripts/build-data.mjs
+          fi
+
+      - name: Commit updated data
+        run: |
+          git config user.name "deepwell-bot"
+          git config user.email "deepwell-bot@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "Update question data $(date -u +%F)"
+            git push
+          fi
