@@ -5,7 +5,7 @@ import { loadManifest } from './data.js';
 import { prepareDive, examples } from './game.js';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
-import { startScene, triggerPredatorAttack } from './scene.js?v=deepwell-3d-20261121';
+import { startScene, triggerAnswerVisual } from './scene.js?v=cinematic-2d-20261121';
 import { wake, tone, buzz } from './audio.js';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
@@ -156,8 +156,8 @@ async function resolve(item, value) {
   $('feedback').textContent = message;
   $('live').textContent = message;
   updateDepthUI(mine.depth);
-  // Visual-only penalty animation. Scoring, answers and progression remain unchanged.
-  if (state !== 'hit' || points <= 20) triggerPredatorAttack();
+  // Visual-only rarity encounter. Answer points/state are read; scoring and progression are untouched.
+  triggerAnswerVisual(points, state);
   mine.index++;
   setTimeout(() => { if (run === mine) nextPrompt(); }, 1100);
 }
