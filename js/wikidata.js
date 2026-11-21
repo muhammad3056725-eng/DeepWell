@@ -8,6 +8,7 @@ export function buildQuery(entry, overrides = {}) {
   const minSL = overrides.minSL ?? entry.minSL ?? 1;
   // Search broadly, then enforce a separate hard answer-pool ceiling.
   const limit = Math.max(1, Math.min(Number(overrides.limit ?? entry.limit ?? 5000), 5000));
+  const offset = Math.max(0, Math.floor(Number(overrides.offset) || 0));
   const answerLimit = Math.max(1, Math.min(Number(overrides.answerLimit ?? entry.answerLimit ?? 1000), 1000));
   const rawLetter = overrides.startsWith ?? entry.startsWith ?? null;
   const letter = /^[a-z]$/i.test(String(rawLetter || '')) ? String(rawLetter).toLowerCase() : null;
@@ -26,7 +27,7 @@ export function buildQuery(entry, overrides = {}) {
       FILTER(?sl >= ${minSL})
       FILTER(LANG(?filterName) = "en")
       ${candidateFilter}
-    } ORDER BY DESC(?sl) LIMIT ${limit} }
+    } ORDER BY DESC(?sl) LIMIT ${limit} OFFSET ${offset} }
   ?item wdt:P1843 ?cn. FILTER(LANG(?cn) = "en")
   ${answerFilter}
   OPTIONAL { ?item wdt:P225 ?latin }
