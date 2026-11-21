@@ -13,6 +13,7 @@ let fish = [];
 let kelp = [];
 let reef = [];
 let eventScene = null;
+let lastSharkVariant = -1;
 let previousTime = 0;
 let width = 0;
 let height = 0;
@@ -120,7 +121,7 @@ export function triggerAnswerVisual(points, state) {
     start:performance.now(),
     duration:kind==='shark'||kind==='barracuda'||kind==='reef_shark'?2450:3000,
     seed:rand(0,TAU),
-    variant:Math.floor(rand(0,SHARKS.length)),
+    variant:(()=>{let v=Math.floor(rand(0,SHARKS.length));if(SHARKS.length>1&&v===lastSharkVariant)v=(v+1+Math.floor(rand(0,SHARKS.length-1)))%SHARKS.length;lastSharkVariant=v;return v;})(),
     lane:rand(-0.16,0.16),
     direction:Math.random()<0.5?-1:1,
     scale:rand(0.88,1.18)
@@ -642,12 +643,21 @@ function drawEvent(w,h,time,still) {
     drawTurtle(xx,y+65,s,e.seed,time,fade);
     return;
   }
-  if(e.kind==='dolphins'||e.kind==='reef_sharks'){
+  if(e.kind==='dolphins'){
     const s=mix(0.15,Math.min(w/600,1.65),approach);
     for(let i=0;i<4;i++){
       const xx=w*(0.12+i*0.23)+Math.sin(time*0.001+i*1.3)*25;
       const yy=y+(i%2)*90+Math.sin(time*0.0017+i*2)*24;
       drawDolphin(xx,yy,s*(1-i*0.09),e.seed+i*1.7,time,e.direction,fade);
+    }
+    return;
+  }
+  if(e.kind==='reef_sharks'){
+    const s=mix(0.04,Math.min(w/1150,1.15),approach);
+    for(let i=0;i<3;i++){
+      const xx=w*(0.22+i*0.28)+Math.sin(time*0.0008+i)*20;
+      const yy=y+(i-1)*82+Math.sin(time*0.001+i*2)*12;
+      drawFrontShark(xx,yy,s*(1-i*0.08),e.variant,0,time,fade*0.82);
     }
     return;
   }
