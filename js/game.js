@@ -56,7 +56,7 @@ export async function prepareDive({ mode, category = null, recent = [] }) {
   }
   if (entries.length < count) throw new Error('Not enough questions available yet.');
 
-  const candidates = pickEntries(entries, count + 10, rnd, { avoid, category: mode === 'pack' ? category : null });
+  const candidates = pickEntries(entries, count + 80, rnd, { avoid, category: mode === 'pack' ? category : null });
   const results = new Array(candidates.length).fill(undefined);
   let next = 0, have = 0;
   while (have < count && next < candidates.length) {
