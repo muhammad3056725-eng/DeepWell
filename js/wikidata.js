@@ -74,7 +74,7 @@ export async function fetchLive(entry, { endpoint, timeoutMs = 9000, fetchImpl =
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
   try {
     // Live mode trades completeness for speed: a smaller, higher-signal pool.
-    const sparql = buildQuery(entry, { limit: Math.min(entry.limit || 1200, 600) });
+    const sparql = buildQuery(entry, { limit: Math.min(entry.limit || 5000, 5000), minSL: entry.minSL ?? 1 });
     const res = await fetchImpl(queryUrl(endpoint, sparql), {
       signal: ctrl.signal,
       headers: { Accept: 'application/sparql-results+json' },
