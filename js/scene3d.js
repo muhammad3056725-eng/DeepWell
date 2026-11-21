@@ -2,6 +2,7 @@
 // Every model, reef, bubble, light and motion effect is generated in JavaScript/WebGL.
 // The only external dependency is Three.js itself; no image/video/model assets are fetched.
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js';
+import { CONFIG } from './config.js';
 
 let worldRenderer, worldScene, worldCamera, attackRenderer, attackScene, attackCamera;
 let waterMaterial, fishActors = [], kelpActors = [], jellyActors = [], dust = null;
@@ -94,7 +95,7 @@ function makeWaterShader() {
         col += vec3(0.09,0.33,0.42) * rays * (1.0-d) * 0.32;
         float haze = smoothstep(0.0, 0.8, uv.y) * (0.07 + d * 0.18);
         col = mix(col, vec3(0.003,0.018,0.045), haze);
-        float vignette = smoothstep(0.9, 0.18, length((uv-0.5) * vec2(0.8,1.0)));
+        float vignette = 1.0 - smoothstep(0.18, 0.9, length((uv-0.5) * vec2(0.8,1.0)));
         col *= 0.76 + vignette * 0.24;
         gl_FragColor = vec4(col, 1.0);
       }
@@ -434,7 +435,7 @@ function addMarineSnow() {
 }
 
 function addFishSchools() {
-  const count=34;
+  const count=22;
   for(let i=0;i<count;i++){
     const color=PALETTES[i%PALETTES.length];
     const scale=rand(0.52,1.0);
@@ -548,7 +549,7 @@ function animate(now) {
   lastTime=now;
   const still=Boolean(stillReader());
   const t=still?lastTime*0.0002:now*0.001;
-  const depth=clamp((Number(depthReader())||0)/40000,0,1);
+  const depth=clamp((Number(depthReader())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
   waterMaterial.uniforms.uTime.value=t;
   waterMaterial.uniforms.uDepth.value=depth;
 
