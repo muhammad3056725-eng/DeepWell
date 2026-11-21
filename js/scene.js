@@ -35,6 +35,15 @@ const mix = (a, b, t) => a + (b - a) * t;
 export function startScene(depthFn, stillFn) {
   getDepth = typeof depthFn === 'function' ? depthFn : getDepth;
   isStill = typeof stillFn === 'function' ? stillFn : isStill;
+  // Separate transparent overlay lets the predator pass in front of the HUD without blocking input.
+  if (!attackCanvas) {
+    attackCanvas = document.createElement('canvas');
+    attackCanvas.id = 'predator-scene';
+    attackCanvas.setAttribute('aria-hidden', 'true');
+    attackCanvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:3';
+    document.body.appendChild(attackCanvas);
+    attackCtx = attackCanvas.getContext('2d');
+  }
   resize();
   addEventListener('resize', resize, { passive: true });
   requestAnimationFrame(frame);
@@ -49,7 +58,7 @@ export function triggerPredatorAttack() {
     species: pick,
     side: Math.random() < 0.5 ? 'left' : 'right',
     start: performance.now(),
-    duration: 1850,
+    duration: 1080,
   };
 }
 
@@ -57,6 +66,11 @@ function resize() {
   if (!canvas || !ctx) return;
   const dpr = Math.min(2, window.devicePixelRatio || 1);
   canvas.width = Math.floor(innerWidth * dpr);
+  attackCanvas.width = Math.floor(innerWidth * dpr);
+  attackCanvas.height = Math.floor(innerHeight * dpr);
+  attackCanvas.style.width = innerWidth + 'px';
+  attackCanvas.style.height = innerHeight + 'px';
+  attackCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
   canvas.height = Math.floor(innerHeight * dpr);
   canvas.style.width = innerWidth + 'px';
   canvas.style.height = innerHeight + 'px';
@@ -583,7 +597,7 @@ function drawPredator(x, y, scale, direction, creature, jaw, time) {
 function drawAttack(w, h, time, still) {
   if (!predator) return;
   const elapsed = time - predator.start;
-  const progress = clamp(elapsed / predator.duration, 0, 1);
+  const progress = still ? 0.7 : clamp(elapsed / predator.duration, 0, 1);
   if (progress >= 1) { predator = null; return; }
   const creature = species[predator.species];
   const direction = predator.side === 'left' ? 1 : -1;
@@ -594,7 +608,7 @@ function drawAttack(w, h, time, still) {
   const eased = 1 - Math.pow(1 - progress, 2.3);
   const x = mix(startX, endX, eased);
   const y = h * 0.7 + Math.sin(progress * Math.PI * 1.4) * 14;
-  const jaw = still ? 0.7 : clamp((progress - 0.42) / 0.23, 0, 1);
+  const jaw = clamp((progress - 0.42) / 0.23, 0, 1);
   const fade = progress > 0.84 ? (1 - progress) / 0.16 : 1;
 
   ctx.save();
@@ -630,7 +644,12 @@ function frame(time) {
   drawDeepLife(w, h, t, still, depth);
   drawAmbient(w, h, t, still, depth);
   drawDiver(w, h, t, still, depth);
+  // Clear and render the short predator sequence above the interface.
+  attackCtx.clearRect(0, 0, w, h);
+  const previousCtx = ctx;
+  ctx = attackCtx;
   drawAttack(w, h, time, still);
+  ctx = previousCtx;
 
   requestAnimationFrame(frame);
 }
