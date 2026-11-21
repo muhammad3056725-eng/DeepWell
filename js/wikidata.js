@@ -5,9 +5,14 @@ const Q = s => String(s).replace(/"/g, '');
 
 /** Build the SPARQL query for one catalog entry. */
 export function buildQuery(entry, overrides = {}) {
-  const minSL = overrides.minSL ?? entry.minSL ?? 3;
-  const limit = overrides.limit ?? entry.limit ?? 1200;
+  const minSL = overrides.minSL ?? entry.minSL ?? 1;
+  // Search a wider candidate set, then enforce a hard answer-pool ceiling.
+  const limit = Math.max(1, Math.min(Number(overrides.limit ?? entry.limit ?? 5000), 5000));
+  const answerLimit = Math.max(1, Math.min(Number(overrides.answerLimit ?? entry.answerLimit ?? 1000), 1000));
+  const rawLetter = overrides.startsWith ?? entry.startsWith ?? null;
+  const letter = /^[a-z]$/i.test(String(rawLetter || '')) ? String(rawLetter).toLowerCase() : null;
   if (entry.kind === 'taxon') {
+    const prefixFilter = letter ? `FILTER(STRSTARTS(LCASE(STR(?cn)), "${letter}"))` : '';
     return `SELECT ?item (MIN(?cn) AS ?name) ?sl
   (GROUP_CONCAT(DISTINCT ?cn; separator="|") AS ?cns)
   (GROUP_CONCAT(DISTINCT ?latin; separator="|") AS ?alts) WHERE {
@@ -16,9 +21,11 @@ export function buildQuery(entry, overrides = {}) {
       FILTER(?sl >= ${minSL})
     } ORDER BY DESC(?sl) LIMIT ${limit} }
   ?item wdt:P1843 ?cn. FILTER(LANG(?cn) = "en")
+  ${prefixFilter}
   OPTIONAL { ?item wdt:P225 ?latin }
-} GROUP BY ?item ?sl ORDER BY DESC(?sl)`;
+} GROUP BY ?item ?sl ORDER BY DESC(?sl) LIMIT ${answerLimit}`;
   }
+  const prefixFilter = letter ? `FILTER(STRSTARTS(LCASE(STR(?itemLabel)), "${letter}"))` : '';
   return `SELECT ?item ?itemLabel ?sl (GROUP_CONCAT(DISTINCT ?alt; separator="|") AS ?alts) WHERE {
   { SELECT ?item ?sl WHERE {
       ?item ${entry.pattern}; wikibase:sitelinks ?sl.
@@ -26,7 +33,8 @@ export function buildQuery(entry, overrides = {}) {
     } ORDER BY DESC(?sl) LIMIT ${limit} }
   OPTIONAL { ?item skos:altLabel ?alt. FILTER(LANG(?alt) = "en") }
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-} GROUP BY ?item ?itemLabel ?sl ORDER BY DESC(?sl)`;
+  ${prefixFilter}
+} GROUP BY ?item ?itemLabel ?sl ORDER BY DESC(?sl) LIMIT ${answerLimit}`;
 }
 
 /** Query that fetches the English label of every Q-id so the catalog can be verified. */
@@ -59,9 +67,11 @@ export function parseBindings(json, entry) {
     };
     (row.alts?.value || '').split('|').forEach(pushAlias);
     if (entry.kind === 'taxon') (row.cns?.value || '').split('|').forEach(pushAlias);
+    if (entry.startsWith && !name.toLowerCase().startsWith(entry.startsWith.toLowerCase())) continue;
     out.push({ id, n: name, s, a: aliases.slice(0, 24) });
   }
-  return out;
+  const answerLimit = Math.max(1, Math.min(Number(entry.answerLimit) || 1000, 1000));
+  return out.slice(0, answerLimit);
 }
 
 export function queryUrl(endpoint, sparql) {
@@ -92,7 +102,7 @@ export function toPack(entry, items) {
     v: 1,
     id: entry.id,
     built: new Date().toISOString().slice(0, 10),
-    items: items.map(i => [Number(i.id.slice(1)), i.n, i.s, i.a]),
+    items: items.slice(0, Math.max(1, Math.min(Number(entry.answerLimit) || 1000, 1000))).map(i => [Number(i.id.slice(1)), i.n, i.s, i.a]),
   };
 }
 export function fromPack(pack) {
