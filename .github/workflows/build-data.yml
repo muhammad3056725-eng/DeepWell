@@ -7,9 +7,17 @@ on:
         description: 'Optional: comma-separated prompt ids to rebuild (blank = all)'
         required: false
       wide:
-        description: 'Use broader queries (up to 5,000 candidates per prompt)'
+        description: 'Search up to 5,000 candidates; save at most 1,000 answers per prompt'
         required: false
         default: 'true'
+      batch:
+        description: '0-based batch index (0–19 at 500 each); use all to attempt every prompt'
+        required: false
+        default: '0'
+      batch_size:
+        description: 'Number of prompts to build in this run'
+        required: false
+        default: '500'
   schedule:
     - cron: '17 3 * * 1'
 
@@ -40,10 +48,17 @@ jobs:
         env:
           ONLY: ${{ github.event.inputs.only }}
           WIDE: ${{ github.event.inputs.wide }}
+          BATCH: ${{ github.event.inputs.batch }}
+          BATCH_SIZE: ${{ github.event.inputs.batch_size }}
         run: |
           ARGS=()
           if [ -n "$ONLY" ]; then ARGS+=(--only "$ONLY"); fi
           if [ "$WIDE" != "false" ]; then ARGS+=(--wide); fi
+          if [ -z "$BATCH" ]; then
+            # Scheduled runs rotate through all 20 batches over 20 weeks.
+            BATCH=$(( ($(date -u +%s) / 604800) % 20 ))
+          fi
+          if [ "$BATCH" != "all" ]; then ARGS+=(--batch "$BATCH" --batch-size "${BATCH_SIZE:-500}"); fi
           node scripts/build-data.mjs "${ARGS[@]}"
 
       - name: Commit updated data
