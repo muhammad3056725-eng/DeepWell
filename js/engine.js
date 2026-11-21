@@ -2,14 +2,18 @@
 
 /* ------------------------------------------------------------- normalising */
 export function normalize(value) {
-  return String(value ?? '')
-    .toLowerCase()
+  const source = String(value ?? '').trim().toLowerCase();
+  // These suffixes are semantic, not decorative punctuation: C, C++ and C#
+  // are three different languages. Keep this compact form distinct.
+  const compact = source.replace(/\\s+/g, '');
+  if (/^[a-z](?:\\+\\+|#)$/.test(compact)) return compact;
+  return source
     .replace(/&/g, ' and ')
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .normalize('NFD').replace(/[\\u0300-\\u036f]/g, '')
     .replace(/ß/g, 'ss').replace(/ø/g, 'o').replace(/æ/g, 'ae').replace(/œ/g, 'oe').replace(/ł/g, 'l').replace(/đ/g, 'd')
     .replace(/[^a-z0-9 ]/g, ' ')
-    .replace(/\b(the|a|an)\b/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/\\b(the|a|an)\\b/g, ' ')
+    .replace(/\\s+/g, ' ')
     .trim();
 }
 
