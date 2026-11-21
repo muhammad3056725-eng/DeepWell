@@ -5,7 +5,7 @@ import { loadManifest } from './data.js';
 import { prepareDive, examples } from './game.js';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
-import { startScene, triggerPredatorAttack } from './scene.js';
+import { startScene, triggerPredatorAttack } from './scene.js?v=deepwell-3d-20261121';
 import { wake, tone, buzz } from './audio.js';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
