@@ -78,7 +78,7 @@ const byName = n => COUNTRIES.find(c => c[2].replace(/^the /, '') === n);
 // Geography - whole-world classes
 const GEO = [
   ['country', 'Name a country', inst('Q3624078', 'sovereign state'), { minPool: 100 }],
-  ['capital', 'Name a capital city', `^wdt:P36 ?state; ?state wdt:P31/wdt:P279* wd:${reg('Q3624078', 'sovereign state')}`],
+  ['capital', 'Name a capital city', `^wdt:P36/wdt:P31/wdt:P279* wd:${reg('Q3624078', 'sovereign state')}`],
   ['city', 'Name a city', sub('Q515', 'city'), { minSL: 25 }],
   ['island', 'Name an island', sub('Q23442', 'island')],
   ['river', 'Name a river', inst('Q4022', 'river')],
