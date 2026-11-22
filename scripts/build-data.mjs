@@ -35,6 +35,7 @@ async function main(){
  await mkdir(OUT,{recursive:true});console.log(`Catalog ${CATALOG.length}; validating ${ENTITY_LABELS.size} registered Q-ids`);
  const bad=await verifyIds();if(flag('verify-only'))process.exit(bad.size?1:0);
  const manifest=await readJson(MANIFEST,{version:0,built:null,packs:{}}),overrides=await readJson('data/overrides.json',{}),blocklist=await readJson('data/blocklist.json',{qids:[],words:[]}),anchors=await readJson('data/anchors.json',{});
+ for(const meta of Object.values(manifest.packs))if(meta.quality){meta.quality.added=0;meta.quality.removed=0;meta.quality.fallback=false;meta.quality.querySplitFallback=false;}
  const report={skipped:[],failed:[],built:0,unchanged:0,fallback:[],previousRetained:[],rejected:{}},today=new Date().toISOString().slice(0,10);
  const all=CATALOG.filter(e=>!ONLY||ONLY.has(e.id));let todo=all;if(BATCH!==undefined&&BATCH!=='all'){const b=parseInt(BATCH,10);if(!Number.isInteger(b)||b<0)throw new Error('Invalid batch index');todo=all.slice(b*BATCH_SIZE,(b+1)*BATCH_SIZE);}
  if(!todo.length){console.log('No prompts in this batch.');return;}
