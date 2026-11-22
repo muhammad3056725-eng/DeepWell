@@ -1,6 +1,6 @@
 import { readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import { CATALOG } from '../js/catalog.js';
-const manifest=JSON.parse(await readFile('data/manifest.json','utf8')),byId=new Map(CATALOG.map(e=>[e.id,e])),packs=Object.entries(manifest.packs),categories=new Map(),small=[],rejects=[],fallback=[],changes=[];
+const manifest=JSON.parse(await readFile('data/manifest.json','utf8'));let buildRun={};try{buildRun=JSON.parse(await readFile('data/BUILD-REPORT.json','utf8'));}catch{};const byId=new Map(CATALOG.map(e=>[e.id,e])),packs=Object.entries(manifest.packs),categories=new Map(),small=[],rejects=[],fallback=[],changes=[];
 const median=a=>{if(!a.length)return 0;const x=[...a].sort((p,q)=>p-q),m=Math.floor(x.length/2);return x.length%2?x[m]:(x[m-1]+x[m])/2;};
 for(const [id,p] of packs){const cat=byId.get(id)?.cat||'Unknown';if(!categories.has(cat))categories.set(cat,{q:0,n:0,pools:[]});const c=categories.get(cat);c.q++;c.n+=p.n||0;c.pools.push(p.n||0);if((p.n||0)<20)small.push([id,p.n||0]);const r=p.quality?.rejected||{},count=Object.values(r).reduce((a,b)=>a+(+b||0),0);rejects.push([id,count/Math.max(1,(p.n||0)+count),count]);if(p.quality?.fallback)fallback.push(id);if(p.quality?.added||p.quality?.removed)changes.push([id,p.quality.added||0,p.quality.removed||0]);}
 let repoBytes=0;for(const f of await readdir('data/packs'))if(f.endsWith('.json'))repoBytes+=(await stat('data/packs/'+f)).size;
