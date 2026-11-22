@@ -284,7 +284,7 @@ function buildWaterCache() {
   waterCacheW = width;
   waterCacheH = height;
   if(graphicsTier !== 'high' || !width || !height) return;
-  const slices = 16;
+  const slices = 8;
   for(let i=0;i<slices;i++){
     const depth=i/(slices-1), colors=waterPalette(depth);
     const c=document.createElement('canvas');
@@ -313,7 +313,7 @@ function waterPalette(depth) {
   while(index<WATER_ZONES.length-2 && depth>WATER_ZONES[index+1].at) index++;
   const a=WATER_ZONES[index], b=WATER_ZONES[index+1];
   const t=smooth((depth-a.at)/Math.max(0.001,b.at-a.at));
-  return a.colors.map((color,i)=>mixHex(color,b.colors[i],t));
+  const colors=[];\n  for(let i=0;i<a.colors.length;i++) colors.push(mixHex(a.colors[i],b.colors[i],t));\n  return colors;
 }
 
 function drawWater(w,h,depth,time) {
@@ -468,7 +468,7 @@ function drawRock(x,y,scale,time) {
   ctx.beginPath();ctx.moveTo(-65,26);ctx.bezierCurveTo(-72,-8,-50,-48,-18,-42);
   ctx.bezierCurveTo(4,-70,35,-43,42,-20);ctx.bezierCurveTo(76,-8,70,23,54,36);
   ctx.quadraticCurveTo(0,52,-65,26);ctx.fill();
-  ctx.shadowBlur=0;ctx.strokeStyle='rgba(176,224,216,0.18)';ctx.lineWidth=2;
+  ctx.strokeStyle='rgba(176,224,216,0.18)';ctx.lineWidth=2;
   ctx.beginPath();ctx.moveTo(-38,-15);ctx.quadraticCurveTo(-8,-38,19,-23);ctx.stroke();
   for(let i=0;i<9;i++){
     const xx=-48+i*11, yy=-10+((i*17)%41);
