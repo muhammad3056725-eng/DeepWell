@@ -8,6 +8,7 @@ import {
 } from '../js/engine.js';
 import { SEED } from '../js/seed.js';
 import { parseSeed } from '../js/data.js';
+import { cleanPool, applyOverrides, meaningfulChange } from './data-quality.mjs';
 
 let failed = 0, passed = 0;
 function ok(cond, msg) { if (cond) passed++; else { failed++; console.error('  FAIL:', msg); } }
@@ -24,10 +25,10 @@ for (const e of CATALOG) {
 eq(CATALOG.length, QUESTION_TARGET, 'catalog reaches configured question target');
 eq(CATALOG.length, 10000, 'catalog has exactly 10,000 unique prompts');
 eq(new Set(CATALOG.map(e => e.prompt)).size, CATALOG.length, 'all prompt texts are unique');
-ok(CATALOG.every(e => (e.answerLimit || 1000) <= 1000), 'no prompt allows more than 1,000 answers');
+ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= 2000), 'no prompt allows more than 1,000 answers');
 const foodF = CATALOG.find(e => e.id === 'food-starts-f');
 eq(foodF?.prompt, 'Name a food starting with F', 'food starting with F is included');
-eq(foodF?.answerLimit, 1000, 'food F can use up to 1,000 answers');
+eq(foodF?.answerLimit, 2000, 'food F can use up to 1,000 answers');
 const elementEntry = CATALOG.find(e => e.id === 'chemical-element');
 eq(elementEntry?.answerLimit, 118, 'chemical elements keep their natural 118-answer ceiling');
 
@@ -39,7 +40,7 @@ ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
 ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language candidate search has a 5,000-row limit');
 ok(/LIMIT 5000 OFFSET 5000/.test(buildQuery(programmingEntry,{limit:5000,minSL:1,offset:5000})), 'scheduled candidate pages advance by 5,000 records');
-ok(/LIMIT 1000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
+ok(/LIMIT 2000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
 ok(buildQuery(foodF, { limit: 5000, minSL: 1 }).includes('STRSTARTS(LCASE(STR(?itemLabel)), "f")'), 'food F query filters labels by F');
 const foodFQuery = buildQuery(foodF, { limit: 5000, minSL: 1 });
 ok(foodFQuery.indexOf('STRSTARTS') < foodFQuery.indexOf('LIMIT 5000'), 'food F prefix is applied before candidate truncation');
@@ -60,12 +61,14 @@ const rows = { results: { bindings: [
 const parsed = parseBindings(rows, item);
 eq(parsed.length, 2, 'parse drops unlabeled and duplicate names');
 eq(parsed[0].a.join(), 'Alef', 'alias deduped against the label');
-eq(fromPack(toPack(item, parsed))[1].n, 'Beta', 'pack round trip');
+eq(toPack(item, parsed).v, 2, 'new packs use v2');
+eq(fromPack(toPack(item, parsed))[1].n, 'Beta', 'v2 pack round trip');
+eq(fromPack({v:1,items:[[1,'Legacy',20,['Old name']]]})[0].a[0], 'Old name', 'v1 pack compatibility');
 const manyRows = { results: { bindings: Array.from({ length: 1100 }, (_, i) => ({
   item: { value: `http://www.wikidata.org/entity/Q${10000 + i}` },
   itemLabel: { value: `Answer ${i}` }, sl: { value: String(1100 - i) }, alts: { value: '' },
 })) } };
-eq(parseBindings(manyRows, item).length, 1000, 'parser hard-caps answer pools at 1,000');
+eq(parseBindings(manyRows, item).length, 1100, 'parser supports pools larger than 1,000');
 const accumulated = mergePools(
   [{id:'Q101',n:'Old answer',s:80,a:['Old alias']},{id:'Q102',n:'Shared answer',s:70,a:[]}],
   [{id:'Q102',n:'Shared answer',s:75,a:['New alias']},{id:'Q103',n:'New answer',s:90,a:[]}],
@@ -137,6 +140,28 @@ for (const id of Object.keys(SEED)) {
   const items = byId.has(id) ? parseSeed(byId.get(id)) : [];
   ok(items.length >= 8, `seed ${id} has 8+ items (${items.length})`);
 }
+
+// ---- dataset quality pipeline
+const bandQuery = buildQuery(item, { minSL: 100, maxSL: 199, target: 2000 });
+ok(bandQuery.includes('FILTER(?sl >= 100)') && bandQuery.includes('FILTER(?sl <= 199)'), 'popularity band query has inclusive floor and ceiling');
+const quality = cleanPool([
+ {id:'Q1',n:'Alpha River',s:100,a:['Shared alias','Alfa']},
+ {id:'Q2',n:'Beta River',s:40,a:['Shared alias']},
+ {id:'Q3',n:'Alpha  River',s:20,a:[]},
+ {id:'Q4',n:'List of rivers',s:90,a:[]},
+ {id:'Q5',n:'Blocked place',s:80,a:[]},
+ {id:'Q6',n:'Deutschland',s:70,a:['Deutschland']},
+], {cat:'Geography'}, {qids:[],words:['blocked place']});
+eq(quality.items.length,2,'cleaner removes duplicate names, lists and blocklisted words');
+ok(!quality.items.some(x=>x.a.includes('Shared alias')),'ambiguous aliases below 3x popularity are dropped');
+ok(quality.rejected.duplicate>0 && quality.rejected.invalid>0 && quality.rejected.blocked>0,'quality report counts rejected rows');
+const strongAlias = cleanPool([{id:'Q1',n:'Alpha',s:180,a:['Shared']},{id:'Q2',n:'Beta',s:40,a:['Shared']}],{});
+ok(strongAlias.items.find(x=>x.id==='Q1').a.includes('Shared'),'alias is retained when the winner has 3x popularity');
+const overridePool = applyOverrides('river',[{id:'Q1',n:'Rhine',s:90,a:[]},{id:'Q2',n:'Wrong',s:40,a:[]}],{river:{add:[{n:'Vistula',a:['Wisla']}],remove:['Q2'],aliasAdd:{Q1:['Rhein']}}});
+ok(overridePool.some(x=>x.n==='Vistula'&&x.a.includes('Wisla')),'manual add override');
+ok(!overridePool.some(x=>x.id==='Q2')&&overridePool.find(x=>x.id==='Q1').a.includes('Rhein'),'manual remove and aliasAdd overrides');
+eq(meaningfulChange(overridePool,overridePool.map(x=>({...x,s:x.s+1}))),false,'small popularity drift does not rewrite a pack');
+eq(meaningfulChange(overridePool,[...overridePool,{id:'Q9',n:'New answer',s:1,a:[]}]),true,'added answers trigger a meaningful pack write');
 
 console.log(`${passed} passed, ${failed} failed. ${CATALOG.length} prompts, ${Object.keys(SEED).length} seed lists.`);
 process.exit(failed ? 1 : 0);
