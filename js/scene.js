@@ -31,6 +31,11 @@ let getHaptics = () => false;
 let getColorSafe = () => false;
 let focusTimer = 0;
 let lowQuality = false;
+let graphicsTier = 'high';
+let tierLocked = false;
+let frameSampleStart = 0;
+let frameSampleCount = 0;
+const QUALITY = { high:{dpr:2,bubbles:40,plankton:100,fish:30,jellies:5}, medium:{dpr:1.5,bubbles:24,plankton:60,fish:18,jellies:3}, low:{dpr:1,bubbles:12,plankton:20,fish:10,jellies:2} };
 let perfWindowStart = 0;
 let perfFrames = 0;
 
@@ -61,7 +66,15 @@ function resize() {
   width = Math.max(1, window.innerWidth);
   height = Math.max(1, window.innerHeight);
   // High-detail drawing without allowing very high-DPI devices to allocate excessive memory.
-  dpr = Math.min(2, Math.max(1, window.devicePixelRatio || 1));
+  const touch = matchMedia('(hover:none) and (pointer:coarse)').matches || width < 700;
+  const manual = document.body?.dataset.graphics || 'auto';
+  if (manual !== 'auto') { graphicsTier = manual; tierLocked = true; }
+  else if (!tierLocked) {
+    const hc = navigator.hardwareConcurrency || 8, mem = navigator.deviceMemory || 8;
+    graphicsTier = touch && (hc <= 4 || mem <= 4) ? 'low' : touch ? 'medium' : 'high';
+  }
+  const q = QUALITY[graphicsTier] || QUALITY.medium;
+  dpr = Math.min(q.dpr, Math.max(1, window.devicePixelRatio || 1));
   canvas.width = Math.floor(width * dpr);
   canvas.height = Math.floor(height * dpr);
   canvas.style.width = width + 'px';
@@ -69,23 +82,24 @@ function resize() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   const mobile = width < 700;
+  const q = QUALITY[graphicsTier] || QUALITY.medium;
   const quality = lowQuality ? 0.62 : 1;
-  bubbles = Array.from({length:Math.round((mobile?24:40)*quality)},()=>({
+  bubbles = Array.from({length:Math.round(q.bubbles*quality)},()=>({
     x:rand(0,width), y:rand(0,height), r:rand(0.8,4.2),
     speed:rand(0.18,0.92), drift:rand(0.35,1.9), phase:rand(0,TAU),
     alpha:rand(0.14,0.52), near:Math.random()<0.18
   }));
-  plankton = Array.from({length:Math.round((mobile?60:100)*quality)},()=>({
+  plankton = Array.from({length:Math.round(q.plankton*quality)},()=>({
     x:rand(0,width),y:rand(0,height),r:rand(0.45,1.75),
     speed:rand(0.08,0.42),phase:rand(0,TAU),alpha:rand(0.08,0.38)
   }));
-  fish = Array.from({length:Math.round((mobile?18:30)*quality)},(_,i)=>({
+  fish = Array.from({length:Math.round(q.fish*quality)},(_,i)=>({
     u:((i%5)-2)*0.18+rand(-0.09,0.09),v:rand(-0.5,0.42),z:rand(0.015,0.72),
     scale:rand(0.48,0.94),speed:rand(0.00010,0.00022),
     dir:Math.random()<0.5?-1:1, phase:rand(0,TAU),
     palette:FISH_PALETTE[i%FISH_PALETTE.length],kind:i%8,group:i%5
   }));
-  jellies = Array.from({length:mobile?3:5},(_,i)=>({
+  jellies = Array.from({length:q.jellies},(_,i)=>({
     u:rand(0.08,0.92),v:rand(0.12,0.76),scale:rand(0.26,0.58),
     phase:rand(0,TAU),speed:rand(0.000025,0.000055),drift:rand(0.012,0.035),kind:i%3
   }));
@@ -1458,7 +1472,9 @@ function frame(time) {
   if(!perfWindowStart)perfWindowStart=time;
   if(time-perfWindowStart>=2000){
     const fps=perfFrames*1000/(time-perfWindowStart);
-    if(fps<40&&!lowQuality){lowQuality=true;resize();}
+    if(fps<45&&!tierLocked && graphicsTier!=='low'){
+      graphicsTier=graphicsTier==='high'?'medium':'low'; tierLocked=true; lowQuality=false; document.body.classList.toggle('quality-med',graphicsTier==='medium'); document.body.classList.toggle('quality-low',graphicsTier==='low'); resize();
+    }
     perfWindowStart=time;perfFrames=0;
   }
   if(!still){
@@ -1516,10 +1532,7 @@ function frame(time) {
 
   // Pressure darkens the edge of the lens progressively with depth.
   const pressure=0.12+visualDepth*0.34;
-  const edge=ctx.createRadialGradient(w*0.5,h*0.48,Math.min(w,h)*0.24,w*0.5,h*0.48,Math.max(w,h)*0.76);
-  edge.addColorStop(0,'rgba(0,3,9,0)');
-  edge.addColorStop(1,'rgba(0,2,8,'+pressure+')');
-  ctx.fillStyle=edge;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle=`rgba(0,2,8,${pressure*0.22})`;ctx.fillRect(0,0,w,h);
   if(!document.hidden) rafHandle=requestAnimationFrame(frame);
   else frameStarted=false;
 }
