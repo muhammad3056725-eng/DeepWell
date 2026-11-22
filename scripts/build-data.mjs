@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Polite, resumable, popularity-banded Wikidata pack builder.
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
@@ -51,7 +51,7 @@ async function main(){
    if(missing.length||forbidden.length){
      const previousKeys=new Set(old.flatMap(x=>[x.n,...(x.a||[])]).map(x=>normalizeDataName(x)));
      const previousSafe=!required.some(x=>!previousKeys.has(normalizeDataName(x)))&&!must.some(x=>previousKeys.has(normalizeDataName(x)));
-     if(!previousSafe) throw new Error('anchor regression and previous pack is not known-good: '+JSON.stringify({missing,forbidden}));
+     if(!previousSafe){ await unlink(file).catch(()=>{}); throw new Error('anchor regression and previous pack was not known-good: '+JSON.stringify({missing,forbidden}));}
      throw new Error('anchor regression; previous known-good pack retained: '+JSON.stringify({missing,forbidden}));
    }
    const raw=JSON.stringify(toPack(e,items)),bytes=Buffer.byteLength(raw);if(bytes>400*1024)throw new Error('pack exceeds 400 KB safety ceiling');
