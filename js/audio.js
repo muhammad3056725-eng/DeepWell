@@ -50,6 +50,7 @@ export function predatorGulp() {
   sweepTone(118,38,0.48,0.22,'sawtooth');
   sweepTone(430,92,0.34,0.075,'sine',0.12);
   sweepTone(620,210,0.18,0.035,'triangle',0.22);
+  sweepTone(240,680,0.24,0.028,'sine',0.16);
 }
 
 export function rareSparkle() {
