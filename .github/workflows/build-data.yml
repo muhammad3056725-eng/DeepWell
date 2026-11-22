@@ -86,6 +86,12 @@ jobs:
           ARGS+=(--candidate-offset "$CANDIDATE_OFFSET")
           node scripts/build-data.mjs "${ARGS[@]}"
 
+      - name: Backfill legacy manifest metadata and validate data
+        run: |
+          node scripts/backfill-manifest.mjs
+          node scripts/validate-data.mjs
+          node scripts/report-data.mjs
+
       - name: Commit updated data
         run: |
           git config user.name "deepwell-bot"

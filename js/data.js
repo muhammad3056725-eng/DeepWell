@@ -61,7 +61,7 @@ async function fromPackFile(entry) {
   if (!res.ok) throw new Error('pack ' + res.status);
   let items = fromPack(await res.json());
   if (entry.startsWith) items = items.filter(i => i.n.toLowerCase().startsWith(entry.startsWith.toLowerCase()));
-  const answerLimit = Math.max(1, Math.min(Number(entry.answerLimit) || 1000, 1000));
+  const answerLimit = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, 2000));
   items = items.slice(0, answerLimit);
   if (items.length < Math.min(entry.minPool || 20, 8)) throw new Error('pack too small');
   return { items, source: 'wikidata' };

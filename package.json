@@ -7,7 +7,11 @@
   "scripts": {
     "serve": "python3 -m http.server 8080",
     "test": "node scripts/selftest.mjs",
-    "build-data": "node scripts/build-data.mjs --out data/packs"
+    "build-data": "node scripts/build-data.mjs --out data/packs",
+    "validate-data": "node scripts/backfill-manifest.mjs && node scripts/validate-data.mjs",
+    "report-data": "node scripts/report-data.mjs"
   },
-  "engines": { "node": ">=20" }
+  "engines": {
+    "node": ">=20"
+  }
 }

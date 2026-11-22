@@ -5,11 +5,12 @@ const Q = s => String(s).replace(/"/g, '');
 
 /** Build the SPARQL query for one catalog entry. */
 export function buildQuery(entry, overrides = {}) {
-  const minSL = overrides.minSL ?? entry.minSL ?? 1;
+  const minSL = overrides.minSL ?? Math.max(Number(entry.floor ?? 2), Number(entry.minSL ?? 1));
   // Search broadly, then enforce a separate hard answer-pool ceiling.
   const limit = Math.max(1, Math.min(Number(overrides.limit ?? entry.limit ?? 5000), 5000));
+  const maxSL = Number.isFinite(Number(overrides.maxSL)) && overrides.maxSL !== undefined ? `FILTER(?sl <= ${Math.max(1, Number(overrides.maxSL))})` : '';
   const offset = Math.max(0, Math.floor(Number(overrides.offset) || 0));
-  const answerLimit = Math.max(1, Math.min(Number(overrides.answerLimit ?? entry.answerLimit ?? 1000), 1000));
+  const answerLimit = Math.max(1, Math.min(Number(overrides.target ?? entry.target ?? entry.answerLimit ?? 2000), 2000));
   const rawLetter = overrides.startsWith ?? entry.startsWith ?? null;
   const letter = /^[a-z]$/i.test(String(rawLetter || '')) ? String(rawLetter).toLowerCase() : null;
   if (entry.kind === 'taxon') {
@@ -25,6 +26,7 @@ export function buildQuery(entry, overrides = {}) {
   { SELECT DISTINCT ?item ?sl WHERE {
       ?item wdt:P31 wd:Q16521; ${entry.pattern}; wikibase:sitelinks ?sl; wdt:P1843 ?filterName.
       FILTER(?sl >= ${minSL})
+      ${maxSL}
       FILTER(LANG(?filterName) = "en")
       ${candidateFilter}
     } ORDER BY DESC(?sl) LIMIT ${limit} OFFSET ${offset} }
@@ -40,10 +42,13 @@ export function buildQuery(entry, overrides = {}) {
   { SELECT ?item ?itemLabel ?sl WHERE {
       ?item ${entry.pattern}; wikibase:sitelinks ?sl.
       FILTER(?sl >= ${minSL})
+      ${maxSL}
+      FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q4167410 }
+      FILTER NOT EXISTS { ?item wdt:P31/wdt:P279* wd:Q13406463 }
       SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
       ${candidateFilter}
     } ORDER BY DESC(?sl) LIMIT ${limit} OFFSET ${offset} }
-  OPTIONAL { ?item skos:altLabel ?alt. FILTER(LANG(?alt) = "en") }
+  OPTIONAL { ?item ?aliasProperty ?alt. VALUES ?aliasProperty { skos:altLabel wdt:P1448 wdt:P1813 wdt:P1705 } FILTER(LANG(?alt) IN ("en", "de", "fr", "es", "it", "pt", "nl", "tr", "id")) }
 } GROUP BY ?item ?itemLabel ?sl ORDER BY DESC(?sl) LIMIT ${answerLimit}`;
 }
 
@@ -64,14 +69,14 @@ export function parseBindings(json, entry) {
     const id = (row.item?.value || '').split('/').pop();
     const name = (entry.kind === 'taxon' ? row.name?.value : row.itemLabel?.value) || '';
     const s = Number(row.sl?.value || 0);
-    if (!id || !name || looksLikeId(name) || name.length > 120) continue;
+    if (!id || !/^Q\d+$/.test(id) || !name || looksLikeId(name) || name.length > 60 || /^\d{1,4}$/.test(name.trim()) || /^(list of|category:|template:)/i.test(name.trim()) || /https?:\/\//i.test(name) || /[<>]/.test(name)) continue;
     const key = name.toLowerCase();
     if (seenName.has(key)) continue; // same label twice: the first (most linked) wins
     seenName.add(key);
     const aliases = [];
     const pushAlias = v => {
       v = String(v || '').trim();
-      if (!v || v.length > 120 || looksLikeId(v)) return;
+      if (!v || v.length > 120 || looksLikeId(v) || !/^[A-Za-zÀ-ž0-9][A-Za-zÀ-ž0-9 .,'’&()/-]*$/.test(v)) return;
       if (v.toLowerCase() === key || aliases.some(x => x.toLowerCase() === v.toLowerCase())) return;
       aliases.push(v);
     };
@@ -80,7 +85,7 @@ export function parseBindings(json, entry) {
     if (entry.startsWith && !name.toLowerCase().startsWith(entry.startsWith.toLowerCase())) continue;
     out.push({ id, n: name, s, a: aliases.slice(0, 24) });
   }
-  const answerLimit = Math.max(1, Math.min(Number(entry.answerLimit) || 1000, 1000));
+  const answerLimit = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, 2000));
   return out.slice(0, answerLimit);
 }
 
@@ -104,7 +109,7 @@ export function mergePools(existingItems = [], freshItems = [], entry = {}) {
   };
   for (const item of existingItems) upsert(item);
   for (const item of freshItems) upsert(item);
-  const cap = Math.max(1,Math.min(Number(entry.answerLimit)||1000,1000));
+  const cap = Math.max(1,Math.min(Number(entry.target ?? entry.answerLimit)||2000,2000));
   const names = new Set();
   return [...byId.values()].sort((a,b)=>b.s-a.s||a.n.localeCompare(b.n)).filter(item=>{
     const key=item.n.trim().toLowerCase();
@@ -135,15 +140,18 @@ export async function fetchLive(entry, { endpoint, timeoutMs = 9000, fetchImpl =
   }
 }
 
-/** Compact on-disk pack format used by data/packs/*.json */
+/** Compact v2 packs; the reader continues to accept legacy v1 files. */
 export function toPack(entry, items) {
-  return {
-    v: 1,
-    id: entry.id,
-    built: new Date().toISOString().slice(0, 10),
-    items: items.slice(0, Math.max(1, Math.min(Number(entry.answerLimit) || 1000, 1000))).map(i => [Number(i.id.slice(1)), i.n, i.s, i.a]),
-  };
+  const cap = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, 2000));
+  const rows = items.slice(0, cap), aliases = {};
+  rows.forEach((item, i) => { if (item.a?.length) aliases[i] = item.a; });
+  return { v: 2, id: entry.id, built: new Date().toISOString().slice(0,10),
+    ids: rows.map(i => String(i.id)), names: rows.map(i => i.n),
+    sitelinks: rows.map(i => Number(i.s)||0), aliases };
 }
 export function fromPack(pack) {
-  return (pack.items || []).map(([num, n, s, a]) => ({ id: 'Q' + num, n, s, a: a || [] }));
+  if (pack?.v === 2) return (pack.names || []).map((n,i) => ({
+    id: String(pack.ids?.[i] ?? ''), n, s: Number(pack.sitelinks?.[i])||0, a: pack.aliases?.[i]||[],
+  })).filter(i => i.id && i.n);
+  return (pack.items || []).map(([num,n,s,a]) => ({ id:'Q'+num, n, s, a:a||[] }));
 }
