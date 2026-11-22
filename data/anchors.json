@@ -1,0 +1,1028 @@
+{
+  "country": {
+    "anchors": [
+      "United States",
+      "India",
+      "China"
+    ],
+    "mustNot": []
+  },
+  "capital": {
+    "anchors": [
+      "London",
+      "Paris",
+      "Tokyo"
+    ],
+    "mustNot": []
+  },
+  "city": {
+    "anchors": [
+      "Tokyo",
+      "Paris",
+      "London"
+    ],
+    "mustNot": []
+  },
+  "island": {
+    "anchors": [
+      "Greenland",
+      "Madagascar",
+      "Borneo"
+    ],
+    "mustNot": []
+  },
+  "river": {
+    "anchors": [
+      "Nile",
+      "Amazon River",
+      "Yangtze"
+    ],
+    "mustNot": [
+      "Atlantis"
+    ]
+  },
+  "mountain": {
+    "anchors": [
+      "Mount Everest",
+      "K2",
+      "Kilimanjaro"
+    ],
+    "mustNot": []
+  },
+  "lake": {
+    "anchors": [
+      "Lake Superior",
+      "Lake Victoria"
+    ],
+    "mustNot": []
+  },
+  "volcano": {
+    "anchors": [
+      "Mount Etna",
+      "Mount Fuji",
+      "Vesuvius"
+    ],
+    "mustNot": []
+  },
+  "desert": {
+    "anchors": [
+      "Sahara",
+      "Gobi Desert"
+    ],
+    "mustNot": []
+  },
+  "sea": {
+    "anchors": [
+      "Mediterranean Sea",
+      "Caribbean Sea"
+    ],
+    "mustNot": []
+  },
+  "waterfall": {
+    "anchors": [
+      "Niagara Falls"
+    ],
+    "mustNot": []
+  },
+  "national-park": {
+    "anchors": [
+      "Yellowstone National Park"
+    ],
+    "mustNot": []
+  },
+  "mountain-range": {
+    "anchors": [
+      "Himalayas",
+      "Andes",
+      "Alps"
+    ],
+    "mustNot": []
+  },
+  "peninsula": {
+    "anchors": [
+      "Arabian Peninsula",
+      "Iberian Peninsula"
+    ],
+    "mustNot": []
+  },
+  "strait": {
+    "anchors": [
+      "Strait of Gibraltar",
+      "Strait of Malacca"
+    ],
+    "mustNot": []
+  },
+  "bay": {
+    "anchors": [
+      "Bay of Bengal",
+      "Hudson Bay"
+    ],
+    "mustNot": []
+  },
+  "glacier": {
+    "anchors": [
+      "Aletsch Glacier"
+    ],
+    "mustNot": []
+  },
+  "canyon": {
+    "anchors": [
+      "Grand Canyon"
+    ],
+    "mustNot": []
+  },
+  "archipelago": {
+    "anchors": [
+      "Hawaiian Islands"
+    ],
+    "mustNot": []
+  },
+  "us-state": {
+    "anchors": [
+      "California",
+      "Texas"
+    ],
+    "mustNot": []
+  },
+  "indian-state": {
+    "anchors": [
+      "Maharashtra",
+      "Uttar Pradesh"
+    ],
+    "mustNot": []
+  },
+  "world-heritage": {
+    "anchors": [
+      "Taj Mahal",
+      "Great Wall of China"
+    ],
+    "mustNot": []
+  },
+  "museum": {
+    "anchors": [
+      "Louvre Museum",
+      "British Museum"
+    ],
+    "mustNot": []
+  },
+  "airport": {
+    "anchors": [
+      "London Heathrow Airport"
+    ],
+    "mustNot": []
+  },
+  "stadium": {
+    "anchors": [
+      "Wembley Stadium"
+    ],
+    "mustNot": []
+  },
+  "bridge": {
+    "anchors": [
+      "Golden Gate Bridge"
+    ],
+    "mustNot": []
+  },
+  "castle": {
+    "anchors": [
+      "Windsor Castle"
+    ],
+    "mustNot": []
+  },
+  "skyscraper": {
+    "anchors": [
+      "Burj Khalifa"
+    ],
+    "mustNot": []
+  },
+  "cathedral": {
+    "anchors": [
+      "Notre-Dame de Paris"
+    ],
+    "mustNot": []
+  },
+  "mosque": {
+    "anchors": [
+      "Masjid al-Haram"
+    ],
+    "mustNot": []
+  },
+  "lighthouse": {
+    "anchors": [
+      "Tower of Hercules"
+    ],
+    "mustNot": []
+  },
+  "dam": {
+    "anchors": [
+      "Three Gorges Dam"
+    ],
+    "mustNot": []
+  },
+  "tower": {
+    "anchors": [
+      "Eiffel Tower"
+    ],
+    "mustNot": []
+  },
+  "university": {
+    "anchors": [
+      "Harvard University",
+      "University of Oxford"
+    ],
+    "mustNot": []
+  },
+  "zoo": {
+    "anchors": [
+      "San Diego Zoo"
+    ],
+    "mustNot": []
+  },
+  "amusement-park": {
+    "anchors": [
+      "Disneyland"
+    ],
+    "mustNot": []
+  },
+  "railway-station": {
+    "anchors": [
+      "Grand Central Terminal"
+    ],
+    "mustNot": []
+  },
+  "historical-country": {
+    "anchors": [
+      "Prussia",
+      "Ottoman Empire"
+    ],
+    "mustNot": []
+  },
+  "country-africa": {
+    "anchors": [
+      "Nigeria",
+      "Egypt"
+    ],
+    "mustNot": []
+  },
+  "country-europe": {
+    "anchors": [
+      "Germany",
+      "France"
+    ],
+    "mustNot": []
+  },
+  "country-asia": {
+    "anchors": [
+      "India",
+      "China"
+    ],
+    "mustNot": []
+  },
+  "country-south-america": {
+    "anchors": [
+      "Brazil",
+      "Argentina"
+    ],
+    "mustNot": []
+  },
+  "country-north-america": {
+    "anchors": [
+      "United States",
+      "Canada"
+    ],
+    "mustNot": []
+  },
+  "country-oceania": {
+    "anchors": [
+      "Australia",
+      "New Zealand"
+    ],
+    "mustNot": []
+  },
+  "city-in-united-states": {
+    "anchors": [
+      "New York City"
+    ],
+    "mustNot": []
+  },
+  "city-in-canada": {
+    "anchors": [
+      "Toronto"
+    ],
+    "mustNot": []
+  },
+  "city-in-united-kingdom": {
+    "anchors": [
+      "London"
+    ],
+    "mustNot": []
+  },
+  "city-in-australia": {
+    "anchors": [
+      "Sydney"
+    ],
+    "mustNot": []
+  },
+  "city-in-india": {
+    "anchors": [
+      "Mumbai"
+    ],
+    "mustNot": []
+  },
+  "city-in-germany": {
+    "anchors": [
+      "Berlin"
+    ],
+    "mustNot": []
+  },
+  "city-in-france": {
+    "anchors": [
+      "Paris"
+    ],
+    "mustNot": []
+  },
+  "city-in-italy": {
+    "anchors": [
+      "Rome"
+    ],
+    "mustNot": []
+  },
+  "city-in-spain": {
+    "anchors": [
+      "Madrid"
+    ],
+    "mustNot": []
+  },
+  "city-in-china": {
+    "anchors": [
+      "Beijing"
+    ],
+    "mustNot": []
+  },
+  "city-in-mexico": {
+    "anchors": [
+      "Mexico City"
+    ],
+    "mustNot": []
+  },
+  "city-in-russia": {
+    "anchors": [
+      "Moscow"
+    ],
+    "mustNot": []
+  },
+  "city-in-pakistan": {
+    "anchors": [
+      "Karachi"
+    ],
+    "mustNot": []
+  },
+  "city-in-turkey": {
+    "anchors": [
+      "Istanbul"
+    ],
+    "mustNot": []
+  },
+  "city-in-egypt": {
+    "anchors": [
+      "Cairo"
+    ],
+    "mustNot": []
+  },
+  "city-in-nigeria": {
+    "anchors": [
+      "Lagos"
+    ],
+    "mustNot": []
+  },
+  "city-in-argentina": {
+    "anchors": [
+      "Buenos Aires"
+    ],
+    "mustNot": []
+  },
+  "city-in-netherlands": {
+    "anchors": [
+      "Amsterdam"
+    ],
+    "mustNot": []
+  },
+  "city-in-poland": {
+    "anchors": [
+      "Warsaw"
+    ],
+    "mustNot": []
+  },
+  "city-in-sweden": {
+    "anchors": [
+      "Stockholm"
+    ],
+    "mustNot": []
+  },
+  "city-in-iran": {
+    "anchors": [
+      "Tehran"
+    ],
+    "mustNot": []
+  },
+  "city-in-saudi-arabia": {
+    "anchors": [
+      "Riyadh"
+    ],
+    "mustNot": []
+  },
+  "city-in-new-zealand": {
+    "anchors": [
+      "Auckland"
+    ],
+    "mustNot": []
+  },
+  "city-in-greece": {
+    "anchors": [
+      "Athens"
+    ],
+    "mustNot": []
+  },
+  "city-in-ukraine": {
+    "anchors": [
+      "Kyiv"
+    ],
+    "mustNot": []
+  },
+  "city-in-chile": {
+    "anchors": [
+      "Santiago"
+    ],
+    "mustNot": []
+  },
+  "city-in-peru": {
+    "anchors": [
+      "Lima"
+    ],
+    "mustNot": []
+  },
+  "city-in-kenya": {
+    "anchors": [
+      "Nairobi"
+    ],
+    "mustNot": []
+  },
+  "city-in-morocco": {
+    "anchors": [
+      "Casablanca"
+    ],
+    "mustNot": []
+  },
+  "city-in-bangladesh": {
+    "anchors": [
+      "Dhaka"
+    ],
+    "mustNot": []
+  },
+  "river-in-united-states": {
+    "anchors": [
+      "Mississippi River"
+    ],
+    "mustNot": []
+  },
+  "river-in-canada": {
+    "anchors": [
+      "Mackenzie River"
+    ],
+    "mustNot": []
+  },
+  "river-in-germany": {
+    "anchors": [
+      "Rhine"
+    ],
+    "mustNot": []
+  },
+  "river-in-france": {
+    "anchors": [
+      "Seine"
+    ],
+    "mustNot": []
+  },
+  "river-in-india": {
+    "anchors": [
+      "Ganges"
+    ],
+    "mustNot": []
+  },
+  "river-in-china": {
+    "anchors": [
+      "Yangtze"
+    ],
+    "mustNot": []
+  },
+  "river-in-russia": {
+    "anchors": [
+      "Volga"
+    ],
+    "mustNot": []
+  },
+  "river-in-brazil": {
+    "anchors": [
+      "Amazon River"
+    ],
+    "mustNot": []
+  },
+  "river-in-australia": {
+    "anchors": [
+      "Murray River"
+    ],
+    "mustNot": []
+  },
+  "river-in-italy": {
+    "anchors": [
+      "Po"
+    ],
+    "mustNot": []
+  },
+  "river-in-spain": {
+    "anchors": [
+      "Ebro"
+    ],
+    "mustNot": []
+  },
+  "river-in-poland": {
+    "anchors": [
+      "Vistula"
+    ],
+    "mustNot": []
+  },
+  "river-in-pakistan": {
+    "anchors": [
+      "Indus River"
+    ],
+    "mustNot": []
+  },
+  "river-in-united-kingdom": {
+    "anchors": [
+      "River Thames"
+    ],
+    "mustNot": []
+  },
+  "river-in-japan": {
+    "anchors": [
+      "Shinano River"
+    ],
+    "mustNot": []
+  },
+  "river-in-turkey": {
+    "anchors": [
+      "Kızılırmak River"
+    ],
+    "mustNot": []
+  },
+  "river-in-mexico": {
+    "anchors": [
+      "Rio Grande"
+    ],
+    "mustNot": []
+  },
+  "river-in-argentina": {
+    "anchors": [
+      "Paraná River"
+    ],
+    "mustNot": []
+  },
+  "river-in-ukraine": {
+    "anchors": [
+      "Dnieper"
+    ],
+    "mustNot": []
+  },
+  "river-in-sweden": {
+    "anchors": [
+      "Göta älv"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-united-states": {
+    "anchors": [
+      "Denali"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-canada": {
+    "anchors": [
+      "Mount Logan"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-germany": {
+    "anchors": [
+      "Zugspitze"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-france": {
+    "anchors": [
+      "Mont Blanc"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-india": {
+    "anchors": [
+      "Kangchenjunga"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-china": {
+    "anchors": [
+      "Mount Everest"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-russia": {
+    "anchors": [
+      "Mount Elbrus"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-italy": {
+    "anchors": [
+      "Mont Blanc"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-japan": {
+    "anchors": [
+      "Mount Fuji"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-pakistan": {
+    "anchors": [
+      "K2"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-new-zealand": {
+    "anchors": [
+      "Aoraki / Mount Cook"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-australia": {
+    "anchors": [
+      "Mount Kosciuszko"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-spain": {
+    "anchors": [
+      "Mulhacén"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-peru": {
+    "anchors": [
+      "Huascarán"
+    ],
+    "mustNot": []
+  },
+  "mountain-in-kenya": {
+    "anchors": [
+      "Mount Kenya"
+    ],
+    "mustNot": []
+  },
+  "lake-in-united-states": {
+    "anchors": [
+      "Lake Superior"
+    ],
+    "mustNot": []
+  },
+  "lake-in-canada": {
+    "anchors": [
+      "Great Bear Lake"
+    ],
+    "mustNot": []
+  },
+  "lake-in-germany": {
+    "anchors": [
+      "Lake Constance"
+    ],
+    "mustNot": []
+  },
+  "lake-in-france": {
+    "anchors": [
+      "Lake Geneva"
+    ],
+    "mustNot": []
+  },
+  "lake-in-italy": {
+    "anchors": [
+      "Lake Garda"
+    ],
+    "mustNot": []
+  },
+  "lake-in-russia": {
+    "anchors": [
+      "Lake Baikal"
+    ],
+    "mustNot": []
+  },
+  "lake-in-sweden": {
+    "anchors": [
+      "Lake Vänern"
+    ],
+    "mustNot": []
+  },
+  "lake-in-india": {
+    "anchors": [
+      "Vembanad Lake"
+    ],
+    "mustNot": []
+  },
+  "lake-in-china": {
+    "anchors": [
+      "Poyang Lake"
+    ],
+    "mustNot": []
+  },
+  "lake-in-pakistan": {
+    "anchors": [
+      "Manchar Lake"
+    ],
+    "mustNot": []
+  },
+  "lake-in-australia": {
+    "anchors": [
+      "Lake Eyre"
+    ],
+    "mustNot": []
+  },
+  "lake-in-switzerland": {
+    "anchors": [
+      "Lake Geneva"
+    ],
+    "mustNot": []
+  },
+  "university-in-united-states": {
+    "anchors": [
+      "Harvard University"
+    ],
+    "mustNot": []
+  },
+  "university-in-united-kingdom": {
+    "anchors": [
+      "University of Oxford"
+    ],
+    "mustNot": []
+  },
+  "university-in-canada": {
+    "anchors": [
+      "University of Toronto"
+    ],
+    "mustNot": []
+  },
+  "university-in-australia": {
+    "anchors": [
+      "University of Melbourne"
+    ],
+    "mustNot": []
+  },
+  "university-in-india": {
+    "anchors": [
+      "University of Delhi"
+    ],
+    "mustNot": []
+  },
+  "university-in-pakistan": {
+    "anchors": [
+      "University of the Punjab"
+    ],
+    "mustNot": []
+  },
+  "university-in-germany": {
+    "anchors": [
+      "Heidelberg University"
+    ],
+    "mustNot": []
+  },
+  "university-in-france": {
+    "anchors": [
+      "Sorbonne University"
+    ],
+    "mustNot": []
+  },
+  "university-in-china": {
+    "anchors": [
+      "Peking University"
+    ],
+    "mustNot": []
+  },
+  "university-in-japan": {
+    "anchors": [
+      "University of Tokyo"
+    ],
+    "mustNot": []
+  },
+  "university-in-italy": {
+    "anchors": [
+      "University of Bologna"
+    ],
+    "mustNot": []
+  },
+  "university-in-spain": {
+    "anchors": [
+      "University of Barcelona"
+    ],
+    "mustNot": []
+  },
+  "university-in-brazil": {
+    "anchors": [
+      "University of São Paulo"
+    ],
+    "mustNot": []
+  },
+  "university-in-turkey": {
+    "anchors": [
+      "Istanbul University"
+    ],
+    "mustNot": []
+  },
+  "university-in-iran": {
+    "anchors": [
+      "University of Tehran"
+    ],
+    "mustNot": []
+  },
+  "university-in-egypt": {
+    "anchors": [
+      "Cairo University"
+    ],
+    "mustNot": []
+  },
+  "museum-in-united-states": {
+    "anchors": [
+      "Metropolitan Museum of Art"
+    ],
+    "mustNot": []
+  },
+  "museum-in-united-kingdom": {
+    "anchors": [
+      "British Museum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-france": {
+    "anchors": [
+      "Louvre Museum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-germany": {
+    "anchors": [
+      "Pergamon Museum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-italy": {
+    "anchors": [
+      "Uffizi"
+    ],
+    "mustNot": []
+  },
+  "museum-in-spain": {
+    "anchors": [
+      "Prado Museum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-russia": {
+    "anchors": [
+      "Hermitage Museum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-japan": {
+    "anchors": [
+      "Tokyo National Museum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-china": {
+    "anchors": [
+      "National Museum of China"
+    ],
+    "mustNot": []
+  },
+  "museum-in-netherlands": {
+    "anchors": [
+      "Rijksmuseum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-canada": {
+    "anchors": [
+      "Royal Ontario Museum"
+    ],
+    "mustNot": []
+  },
+  "museum-in-india": {
+    "anchors": [
+      "Indian Museum"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-united-kingdom": {
+    "anchors": [
+      "Manchester United F.C."
+    ],
+    "mustNot": []
+  },
+  "football-club-in-germany": {
+    "anchors": [
+      "FC Bayern Munich"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-italy": {
+    "anchors": [
+      "Juventus FC"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-spain": {
+    "anchors": [
+      "Real Madrid CF"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-france": {
+    "anchors": [
+      "Paris Saint-Germain F.C."
+    ],
+    "mustNot": []
+  },
+  "football-club-in-brazil": {
+    "anchors": [
+      "Santos FC"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-argentina": {
+    "anchors": [
+      "Boca Juniors"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-netherlands": {
+    "anchors": [
+      "AFC Ajax"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-portugal": {
+    "anchors": [
+      "SL Benfica"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-turkey": {
+    "anchors": [
+      "Galatasaray S.K."
+    ],
+    "mustNot": []
+  },
+  "football-club-in-mexico": {
+    "anchors": [
+      "Club América"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-united-states": {
+    "anchors": [
+      "Inter Miami CF"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-russia": {
+    "anchors": [
+      "FC Spartak Moscow"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-ukraine": {
+    "anchors": [
+      "FC Dynamo Kyiv"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-poland": {
+    "anchors": [
+      "Legia Warsaw"
+    ],
+    "mustNot": []
+  },
+  "football-club-in-greece": {
+    "anchors": [
+      "Olympiacos F.C."
+    ],
+    "mustNot": []
+  }
+}
