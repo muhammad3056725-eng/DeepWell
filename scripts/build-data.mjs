@@ -1,141 +1,65 @@
 #!/usr/bin/env node
-// Build data/packs/*.json + data/manifest.json from Wikidata.
-//   node scripts/build-data.mjs                 build everything (about 30-60 min, polite rate)
-//   node scripts/build-data.mjs --only river,lake,film   build specific prompt ids
-//   node scripts/build-data.mjs --resume         skip packs built in the last 6 days
-//   node scripts/build-data.mjs --verify-only    only check that catalog Q-ids match their labels
-// Runs in GitHub Actions weekly (.github/workflows/build-data.yml) and commits the result.
+// Polite, resumable, popularity-banded Wikidata pack builder.
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
 import { buildQuery, buildLabelQuery, parseBindings, queryUrl, toPack, fromPack, mergePools } from '../js/wikidata.js';
-
-const args = process.argv.slice(2);
-const flag = n => args.includes('--' + n);
-const opt = (n, d) => { const i = args.indexOf('--' + n); return i >= 0 ? args[i + 1] : d; };
-const OUT = path.resolve(opt('out', 'data/packs'));
-const MANIFEST = path.resolve(opt('manifest', 'data/manifest.json'));
-const ONLY = opt('only') ? new Set(opt('only').split(',')) : null;
-const BATCH = opt('batch');
-const BATCH_SIZE = Math.max(1, Number.parseInt(opt('batch-size', '500'), 10) || 500);
-const CANDIDATE_OFFSET = Math.max(0, Number.parseInt(opt('candidate-offset', '0'), 10) || 0);
-const ENDPOINT = 'https://query.wikidata.org/sparql';
-const UA = 'DeepwellBuild/2.0 (https://deepwell.games; static trivia game data build)';
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-async function sparql(query, tries = 4) {
-  for (let t = 1; t <= tries; t++) {
-    try {
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 70000);
-      const res = await fetch(queryUrl(ENDPOINT, query).replace('&origin=*', ''), {
-        signal: ctrl.signal,
-        headers: { Accept: 'application/sparql-results+json', 'User-Agent': UA },
-      });
-      clearTimeout(timer);
-      if (res.status === 429 || res.status >= 500) {
-        const wait = (Number(res.headers.get('retry-after')) || 8 * t) * 1000;
-        await sleep(wait);
-        continue;
-      }
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return await res.json();
-    } catch (e) {
-      if (t === tries) throw e;
-      await sleep(4000 * t);
-    }
-  }
-  throw new Error('unreachable');
+import { cleanPool, applyOverrides, meaningfulChange } from './data-quality.mjs';
+const args=process.argv.slice(2),flag=n=>args.includes('--'+n),opt=(n,d)=>{const i=args.indexOf('--'+n);return i>=0?args[i+1]:d;};
+const OUT=path.resolve(opt('out','data/packs')),MANIFEST=path.resolve(opt('manifest','data/manifest.json')),ONLY=opt('only')?new Set(opt('only').split(',')):null,BATCH=opt('batch');
+const BATCH_SIZE=Math.max(1,parseInt(opt('batch-size','500'),10)||500),CANDIDATE_OFFSET=Math.max(0,parseInt(opt('candidate-offset','0'),10)||0);
+const ENDPOINT='https://query.wikidata.org/sparql',UA='DeepwellDatasetBuilder/3.0 (https://deepwell.games; static trivia data maintenance)';
+const sleep=ms=>new Promise(r=>setTimeout(r,ms)),sha=v=>createHash('sha256').update(v).digest('hex');
+const BANDS=[{min:200},{min:100,max:199},{min:60,max:99},{min:40,max:59},{min:25,max:39},{min:15,max:24},{min:10,max:14},{min:6,max:9},{min:4,max:5},{min:3,max:3},{min:2,max:2},{min:1,max:1}];
+function retryDelay(value,attempt){if(!value)return 8000*attempt;const n=Number(value);if(Number.isFinite(n))return Math.max(1000,n*1000);const d=Date.parse(value);return Number.isFinite(d)?Math.max(1000,d-Date.now()):8000*attempt;}
+async function sparql(query,tries=4){
+ for(let t=1;t<=tries;t++){const c=new AbortController(),timer=setTimeout(()=>c.abort(),55000);try{
+  const r=await fetch(queryUrl(ENDPOINT,query).replace('&origin=*',''),{signal:c.signal,headers:{Accept:'application/sparql-results+json','User-Agent':UA}});clearTimeout(timer);
+  if(r.status===429||r.status>=500){await sleep(retryDelay(r.headers.get('retry-after'),t));continue;}if(!r.ok)throw new Error('Wikidata HTTP '+r.status);return await r.json();
+ }catch(e){clearTimeout(timer);if(t===tries)throw e;await sleep(4000*t);}}
+ throw new Error('Wikidata retry limit reached');
 }
-
-async function verifyIds() {
-  const ids = [...ENTITY_LABELS.keys()];
-  const labels = new Map();
-  for (let i = 0; i < ids.length; i += 80) {
-    const json = await sparql(buildLabelQuery(ids.slice(i, i + 80)));
-    for (const b of json.results.bindings) labels.set(b.q.value.split('/').pop(), b.l.value.toLowerCase());
-  }
-  const bad = new Set();
-  for (const [q, expect] of ENTITY_LABELS) {
-    const got = labels.get(q);
-    if (!got || !(got.includes(expect) || expect.includes(got))) {
-      bad.add(q);
-      console.warn(`  ID MISMATCH ${q}: expected "${expect}", Wikidata says "${got ?? 'none'}"`);
-    }
-  }
-  return bad;
+async function readJson(file,fallback){try{return JSON.parse(await readFile(file,'utf8'));}catch{return fallback;}}
+async function verifyIds(){const ids=[...ENTITY_LABELS.keys()],labels=new Map();for(let i=0;i<ids.length;i+=80){const j=await sparql(buildLabelQuery(ids.slice(i,i+80)));for(const b of j.results.bindings)labels.set(b.q.value.split('/').pop(),b.l.value.toLowerCase());if(i+80<ids.length)await sleep(1500);}const bad=new Set();for(const [q,e] of ENTITY_LABELS){const a=labels.get(q);if(!a||!(a.includes(e)||e.includes(a))){bad.add(q);console.warn('Q-id mismatch',q,'expected',e,'got',a||'(missing)');}}return bad;}
+async function buildBands(entry){
+ const target=Math.max(1,Math.min(Number(entry.target??entry.answerLimit)||2000,2000)),floor=Math.max(1,Number(entry.floor??entry.minSL??2)),merged=new Map(),errors=[];
+ const accept=rows=>{for(const x of rows){const old=merged.get(x.id);if(!old)merged.set(x.id,x);else{old.s=Math.max(old.s,x.s);old.a=[...new Set([...old.a,...x.a])];}}};
+ for(const band of BANDS){if(band.min<floor||merged.size>=target)continue;try{
+  const j=await sparql(buildQuery(entry,{limit:5000,minSL:Math.max(floor,band.min),maxSL:band.max,target,offset:CANDIDATE_OFFSET}));accept(parseBindings(j,entry));
+ }catch(e){errors.push({band,message:e.message});for(const letter of 'abcdefghijklmnopqrstuvwxyz'){if(merged.size>=target)break;const j=await sparql(buildQuery(entry,{limit:5000,minSL:Math.max(floor,band.min),maxSL:band.max,target,offset:CANDIDATE_OFFSET,startsWith:letter}));accept(parseBindings(j,{...entry,startsWith:letter}));await sleep(1500);}}
+ await sleep(1500);}
+ return {items:[...merged.values()].sort((a,b)=>b.s-a.s).slice(0,target),errors};
 }
-
-async function main() {
-  await mkdir(OUT, { recursive: true });
-  console.log(`Catalog: ${CATALOG.length} prompts, ${ENTITY_LABELS.size} Q-ids`);
-  console.log('Verifying Q-ids against Wikidata labels...');
-  const badIds = await verifyIds();
-  console.log(badIds.size ? `${badIds.size} bad ids: affected prompts will be skipped.` : 'All ids verified.');
-  if (flag('verify-only')) return process.exit(badIds.size ? 1 : 0);
-
-  let manifest = { version: 0, built: null, packs: {} };
-  try { manifest = JSON.parse(await readFile(MANIFEST, 'utf8')); } catch { /* first run */ }
-  const report = { skipped: [], failed: [], built: 0 };
-  const today = new Date().toISOString().slice(0, 10);
-
-  const allTodo = CATALOG.filter(e => !ONLY || ONLY.has(e.id));
-  let todo = allTodo;
-  if (BATCH !== undefined && BATCH !== 'all') {
-    const batchIndex = Number.parseInt(BATCH, 10);
-    if (!Number.isInteger(batchIndex) || batchIndex < 0) throw new Error('Invalid --batch index: ' + BATCH);
-    todo = allTodo.slice(batchIndex * BATCH_SIZE, (batchIndex + 1) * BATCH_SIZE);
-    console.log(`Building batch ${batchIndex} (items ${batchIndex * BATCH_SIZE + 1}-${Math.min((batchIndex + 1) * BATCH_SIZE, allTodo.length)} of ${allTodo.length}; batch size ${BATCH_SIZE}).`);
-  } else if (BATCH === 'all') {
-    console.warn('Building the entire catalog in one run; this may exceed the workflow time limit.');
-  }
-  if (!todo.length) {
-    console.log('No prompts in this batch. Nothing to build.');
-    return;
-  }
-  let n = 0;
-  for (const entry of todo) {
-    n++;
-    const tag = `[${n}/${todo.length}] ${entry.id}`;
-    if (entityIdsOf(entry).some(q => badIds.has(q))) { report.skipped.push(entry.id + ' (bad id)'); console.log(`${tag}: skipped, bad id`); continue; }
-    const prev = manifest.packs[entry.id];
-    if (flag('resume') && prev && prev.built && (Date.parse(today) - Date.parse(prev.built)) < 6 * 864e5) { console.log(`${tag}: fresh, skipped`); continue; }
-    try {
-      const json = await sparql(buildQuery(entry, flag('wide') ? { limit: 5000, minSL: 1, offset: CANDIDATE_OFFSET } : { offset: CANDIDATE_OFFSET }));
-      const freshItems = parseBindings(json, entry);
-      const packPath = path.join(OUT, entry.id + '.json');
-      let existingItems = [];
-      try {
-        const savedPack = JSON.parse(await readFile(packPath, 'utf8'));
-        existingItems = fromPack(savedPack);
-      } catch { /* no previous pack yet */ }
-      const items = mergePools(existingItems, freshItems, entry);
-      const minimumItems = Math.min(entry.minPool || 20, 8);
-      if (items.length < minimumItems) {
-        report.skipped.push(`${entry.id} (only ${items.length} cumulative answers; needs ${minimumItems})`);
-        console.log(`${tag}: only ${items.length} cumulative answers; keeping previous pack if one exists`);
-      } else {
-        await writeFile(packPath, JSON.stringify(toPack(entry, items)));
-        manifest.packs[entry.id] = { n: items.length, built: today };
-        report.built++;
-        console.log(`${tag}: ${items.length} answers (${Math.max(0,items.length-existingItems.length)} net new)`);
-      }
-    } catch (e) {
-      report.failed.push(`${entry.id}: ${e.message}`);
-      console.warn(`${tag}: FAILED ${e.message}`);
-    }
-    await sleep(1500); // be polite to the public endpoint
-  }
-
-  manifest.version = (manifest.version || 0) + 1;
-  manifest.built = today;
-  await mkdir(path.dirname(MANIFEST), { recursive: true });
-  await writeFile(MANIFEST, JSON.stringify(manifest));
-  const total = Object.values(manifest.packs).reduce((s, p) => s + p.n, 0);
-  console.log(`\nDone. ${report.built} packs built, ${Object.keys(manifest.packs).length} in manifest, ${total} answers total.`);
-  if (report.skipped.length) console.log('Skipped:\n  ' + report.skipped.join('\n  '));
-  if (report.failed.length) console.log('Failed:\n  ' + report.failed.join('\n  '));
-  // Fail the job only if nothing worked at all, so one bad query never blocks a deploy.
-  if (!Object.keys(manifest.packs).length) process.exit(1);
+async function main(){
+ await mkdir(OUT,{recursive:true});console.log(`Catalog ${CATALOG.length}; validating ${ENTITY_LABELS.size} registered Q-ids`);
+ const bad=await verifyIds();if(flag('verify-only'))process.exit(bad.size?1:0);
+ const manifest=await readJson(MANIFEST,{version:0,built:null,packs:{}}),overrides=await readJson('data/overrides.json',{}),blocklist=await readJson('data/blocklist.json',{qids:[],words:[]}),anchors=await readJson('data/anchors.json',{});
+ const report={skipped:[],failed:[],built:0,unchanged:0,fallback:[],rejected:{}},today=new Date().toISOString().slice(0,10);
+ const all=CATALOG.filter(e=>!ONLY||ONLY.has(e.id));let todo=all;if(BATCH!==undefined&&BATCH!=='all'){const b=parseInt(BATCH,10);if(!Number.isInteger(b)||b<0)throw new Error('Invalid batch index');todo=all.slice(b*BATCH_SIZE,(b+1)*BATCH_SIZE);}
+ if(!todo.length){console.log('No prompts in this batch.');return;}
+ for(let i=0;i<todo.length;i++){const e=todo[i],tag=`[${i+1}/${todo.length}] ${e.id}`;if(entityIdsOf(e).some(q=>bad.has(q))){report.skipped.push(e.id+' (bad registered Q-id)');continue;}
+  const meta=manifest.packs[e.id];if(flag('resume')&&meta?.built&&(Date.parse(today)-Date.parse(meta.built))<6*864e5){report.skipped.push(e.id+' (fresh resume)');continue;}
+  const file=path.join(OUT,e.id+'.json');try{
+   const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);
+   const merged=mergePools(old,fresh.items,{...e,target:e.target??e.answerLimit??2000}),cleaned=cleanPool(merged,e,blocklist);
+   const items=applyOverrides(e.id,cleaned.items,overrides).slice(0,e.target??e.answerLimit??2000),min=Math.min(e.minPool||20,8);
+   if(items.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
+   const rule=anchors[e.id]||{},must=rule.mustNot||e.mustNot||[],required=rule.anchors||e.anchors||[],keys=new Set(items.flatMap(x=>[x.n,...(x.a||[])]).map(x=>String(x).toLowerCase()));
+   const missing=required.filter(x=>!keys.has(String(x).toLowerCase())),forbidden=must.filter(x=>keys.has(String(x).toLowerCase()));
+   if(missing.length||forbidden.length)console.warn(tag,'anchor warnings',JSON.stringify({missing,forbidden}));
+   const raw=JSON.stringify(toPack(e,items)),bytes=Buffer.byteLength(raw);if(bytes>400*1024)throw new Error('pack exceeds 400 KB safety ceiling');
+   if(!meaningfulChange(old,items)){report.unchanged++;continue;}await writeFile(file,raw);
+   const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-missing.length,missingAnchors:missing,mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,fallback:fresh.errors.length>0};
+   report.rejected[e.id]=cleaned.rejected;if(fresh.errors.length)report.fallback.push(e.id);
+   manifest.packs[e.id]={n:items.length,built:today,hash:sha(raw),bytes,source:'wikidata',quality};report.built++;
+   console.log(`${tag}: ${items.length} accepted; ${quality.aliases} aliases; ${fresh.errors.length} fallback band(s)`);
+  }catch(err){report.failed.push(e.id+': '+err.message);console.warn(tag,'FAILED; old pack retained:',err.message);}
+  await sleep(1500);
+ }
+ if(report.failed.length/Math.max(1,todo.length)>0.25){console.error('Over 25% of packs failed; refusing to publish.');process.exit(1);}
+ if(report.built){manifest.version=(manifest.version||0)+1;manifest.built=today;}
+ await writeFile(MANIFEST,JSON.stringify(manifest));await writeFile('data/BUILD-REPORT.json',JSON.stringify(report,null,2)+'\n');
+ console.log(`Finished: ${report.built} changed, ${report.unchanged} unchanged, ${report.failed.length} failed.`);
 }
-main().catch(e => { console.error(e); process.exit(1); });
+main().catch(e=>{console.error(e);process.exit(1);});
