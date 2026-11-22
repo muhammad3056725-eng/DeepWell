@@ -69,7 +69,7 @@ export function parseBindings(json, entry) {
     const id = (row.item?.value || '').split('/').pop();
     const name = (entry.kind === 'taxon' ? row.name?.value : row.itemLabel?.value) || '';
     const s = Number(row.sl?.value || 0);
-    if (!id || !/^Q\\d+$/.test(id) || !name || looksLikeId(name) || name.length > 60 || /^\\d{1,4}$/.test(name.trim()) || /^(list of|category:|template:)/i.test(name.trim()) || /https?:\\/\\//i.test(name) || /[<>]/.test(name)) continue;
+    if (!id || !/^Q\d+$/.test(id) || !name || looksLikeId(name) || name.length > 60 || /^\d{1,4}$/.test(name.trim()) || /^(list of|category:|template:)/i.test(name.trim()) || /https?:\/\//i.test(name) || /[<>]/.test(name)) continue;
     const key = name.toLowerCase();
     if (seenName.has(key)) continue; // same label twice: the first (most linked) wins
     seenName.add(key);
