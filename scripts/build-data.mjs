@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Polite, resumable, popularity-banded Wikidata pack builder.
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
@@ -72,7 +72,7 @@ async function main(){
     const message=String(err?.message||err);
     const anchorRegression=/anchor regression:/i.test(message);
     if(anchorRegression && hadPrevious){
-      try { await writeFile(file,''); } catch {}
+      try { await unlink(file); } catch {}
       report.failed.push(e.id+': '+message+'; previous pack was invalid and was not retained');
       console.error(tag,'FAILED; previous pack also failed anchors and was not retained:',message);
     } else {
