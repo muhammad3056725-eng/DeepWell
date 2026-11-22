@@ -4,13 +4,13 @@ import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=ten-thous
 import { loadManifest } from './data.js?v=ten-thousand-prompts-20261121';
 import { prepareDive, examples } from './game.js?v=random-no-repeat-questions-20261121';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=cinematic-abyss-20261122';
-import { wake, tone, buzz } from './audio.js';
+import * as S from './state.js?v=deepwell-mobilefix-20261122-1';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=deepwell-mobilefix-20261122-1';
+import { wake, tone, buzz } from './audio.js?v=deepwell-mobilefix-20261122-1';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=ten-thousand-prompts-20261121';
+} from './ui.js?v=deepwell-mobilefix-20261122-1';
 
 let run = null; // the dive in progress
 let timerRaf = 0;
