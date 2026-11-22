@@ -371,3 +371,28 @@ body.reduced .breakdown .row{animation:none!important}
 .cat-grid .button:nth-child(19n+17){background:linear-gradient(120deg,#4a6d4b,#8bb275);color:#f7fff3}
 .cat-grid .button:nth-child(19n+18){background:linear-gradient(120deg,#a35a38,#df9460);color:#fff8f1}
 .cat-grid .button:nth-child(19n+19){background:linear-gradient(120deg,#356e9b,#6ba5cf);color:#f5fbff}
+
+/* Mobile performance: keep the visual identity, remove GPU-heavy effects on touch/small screens. */
+.timer>i{width:100%;transform:scaleX(1);transform-origin:left;transition:none;will-change:transform}
+.meter-line{transition:none;transform-origin:bottom;will-change:transform}
+.sub{transition:none;will-change:transform}
+.gauge-marker{transition:none;will-change:transform}
+.toast{transition:opacity .18s,transform .18s}
+@media (hover:none) and (pointer:coarse), (max-width:700px){
+  #vignette{display:none}
+  #scene{filter:none!important}
+  .panel,#game .prompt-panel,.depth-chip{backdrop-filter:none;-webkit-backdrop-filter:none}
+  .panel{background:rgba(7,35,52,.92);box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  #game .prompt-panel{box-shadow:0 6px 18px rgba(0,0,0,.22)}
+  .depth-chip{box-shadow:none}
+  .button{box-shadow:0 4px 10px rgba(0,0,0,.16)}
+  .button.primary{box-shadow:0 4px 12px rgba(71,230,221,.16)}
+  .hero-title,.brand,.eyebrow,.prompt,.score{filter:none;text-shadow:none}
+  .sub{filter:none}
+  .gauge-marker{box-shadow:none}
+}
+body.quality-low .panel,body.quality-med .panel{backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
+body.quality-low #vignette,body.quality-med #vignette{display:none}
+body.quality-low #scene,body.quality-med #scene{filter:none!important}
+body.quality-low .hero-title,body.quality-med .hero-title{filter:none;text-shadow:none}
+body.quality-low .sub,body.quality-med .sub{filter:none}
