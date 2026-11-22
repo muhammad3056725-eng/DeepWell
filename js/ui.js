@@ -135,7 +135,7 @@ export function loadSettingsUI() {
   const s = S.store.settings;
   $('soundSetting').value = s.sound; $('hapticSetting').checked = s.haptics;
   $('motionSetting').checked = s.motion; $('colorSetting').checked = s.color;
-  $('timerSetting').value = String(s.timer); $('textSetting').value = String(s.text);
+  $('timerSetting').value = String(s.timer); $('textSetting').value = String(s.text); $('graphicsSetting').value = s.graphics || 'auto';
 }
 
 export function readSettingsUI() {
