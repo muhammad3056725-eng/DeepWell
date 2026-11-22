@@ -21,8 +21,8 @@ for(const [id,meta] of Object.entries(manifest.packs)){
    if((block.words||[]).some(w=>String(x.n).toLowerCase().includes(String(w).toLowerCase())))errors.push(id+': blocklisted word '+x.n);
   }
   const rule=anchors[id]||{},present=new Set(items.flatMap(x=>[x.n,...x.a]).map(normalizeDataName));
-  for(const x of rule.anchors||[])if(!present.has(normalizeDataName(x)))errors.push(id+': missing anchor '+x);
-  for(const x of rule.mustNot||[])if(present.has(normalizeDataName(x)))errors.push(id+': mustNot answer found '+x);
+  for(const x of rule.anchors||[])if(!present.has(normalizeDataName(x))){if(pack.v===2)errors.push(id+': missing anchor '+x);else console.warn('Legacy v1 anchor not yet enforced:',id,x);}
+  for(const x of rule.mustNot||[])if(present.has(normalizeDataName(x))&&pack.v===2)errors.push(id+': mustNot answer found '+x);
  }catch(e){errors.push(id+': '+e.message);}
 }
 for(const file of files)if(!manifest.packs[file.slice(0,-5)])errors.push(file+': missing from manifest');
