@@ -25,8 +25,30 @@ export function cleanPool(items, entry = {}, blocklist = {qids:[],words:[]}) {
   if(/film|literature|music/i.test(entry.cat||''))add(item,item.n.replace(/^(the|a|an) /i,'').replace(/[:–—-].*$/,'').replace(/&/g,'and'));
  }
  const primary=new Set(clean.map(i=>normalizeDataName(i.n))), aliases=new Map(clean.map(i=>[i.id,[]]));
- for(const [key,rows] of candidates){if(primary.has(key))continue;const unique=[...new Map(rows.map(r=>[r.item.id,r])).values()].sort((a,b)=>(+b.item.s||0)-(+a.item.s||0));if(unique.length>1&&(+unique[0].item.s||0)<3*Math.max(1,+unique[1].item.s||0))continue;const win=unique[0];if(win&&!aliases.get(win.item.id).includes(win.a))aliases.get(win.item.id).push(win.a);}
- return {items:clean.map(i=>({...i,a:[...new Set(aliases.get(i.id)||[])].slice(0,12)})),rejected};
+ for(const [key,rows] of candidates){
+  if(primary.has(key))continue;
+  const unique=[...new Map(rows.map(r=>[r.item.id,r])).values()].sort((a,b)=>(+b.item.s||0)-(+a.item.s||0)||a.a.localeCompare(b.a));
+  if(unique.length>1&&(+unique[0].item.s||0)<3*Math.max(1,+unique[1].item.s||0))continue;
+  const win=unique[0];
+  if(win) aliases.get(win.item.id).push(win.a);
+ }
+ const rankAlias=(a,item)=>{
+  const n=normalizeDataName(a), label=normalizeDataName(item.n);
+  const stripped=normalizeDataName(item.n.replace(/^(the|a|an|people's republic of|republic of|kingdom of|state of) /i,''));
+  let score=0;
+  if(n===stripped)score+=1000;
+  if(n.length>=5&&n.length<=24)score+=100;
+  if(/^[a-z0-9 ]+$/i.test(a))score+=40;
+  if(!/[^\\x00-\\x7F]/.test(a))score+=20;
+  score-=Math.abs(a.length-12);
+  if(n===label)score-=1000;
+  return score;
+ };
+ return {items:clean.map(i=>{
+  const unique=[...new Set(aliases.get(i.id)||[])];
+  unique.sort((a,b)=>rankAlias(b,i)-rankAlias(a,i));
+  return {...i,a:unique.slice(0,25)};
+ }),rejected};
 }
 export function applyOverrides(id,items,overrides={}){
  const rule=overrides[id]||{}, removed=new Set(rule.remove||[]), byId=new Map(items.filter(i=>!removed.has(i.id)).map(i=>[i.id,{...i,a:[...(i.a||[])]}]));
