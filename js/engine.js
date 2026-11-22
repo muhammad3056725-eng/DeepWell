@@ -128,15 +128,29 @@ export function matchAnswer(input, pool) {
   const hit = pool.exact.get(value);
   if (hit) return { item: hit, exact: true, key: value };
   if (value.length < 5) return null;
-  let best = null;
+  // Fuzzy matching is deliberately conservative. Primary labels beat aliases,
+  // aliases shorter than 5 chars are ignored, and an obscure alias cannot win
+  // merely because it is one edit away from a common answer.
+  const candidates = [];
   for (const [key, item] of pool.keys) {
-    if (key[0] !== value[0]) continue;
+    if (key[0] !== value[0] || key.length < 5) continue;
     const limit = key.length < 8 ? 1 : key.length < 13 ? 2 : 3;
     if (Math.abs(key.length - value.length) > limit) continue;
     const d = distance(value, key, limit);
-    if (d <= limit && (!best || d < best.d || (d === best.d && item.s > best.item.s))) best = { item, d, key };
+    if (d <= limit) candidates.push({ item, d, key, primary: normalize(item.n) === key });
   }
-  return best ? { item: best.item, near: true, key: best.key } : null;
+  if (!candidates.length) return null;
+  candidates.sort((a,b) =>
+    a.d - b.d ||
+    Number(b.primary) - Number(a.primary) ||
+    b.item.s - a.item.s ||
+    a.key.length - b.key.length
+  );
+  const best = candidates[0];
+  const sameDistance = candidates.filter(c => c.d === best.d);
+  const common = sameDistance.find(c => c.primary) || sameDistance[0];
+  if (common && best.item.s + 40 < common.item.s) return { item: common.item, near: true, key: common.key };
+  return { item: best.item, near: true, key: best.key };
 }
 
 /* -------------------------------------------------------------- crowd blend */
