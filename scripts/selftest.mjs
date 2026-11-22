@@ -25,10 +25,10 @@ for (const e of CATALOG) {
 eq(CATALOG.length, QUESTION_TARGET, 'catalog reaches configured question target');
 eq(CATALOG.length, 10000, 'catalog has exactly 10,000 unique prompts');
 eq(new Set(CATALOG.map(e => e.prompt)).size, CATALOG.length, 'all prompt texts are unique');
-ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= 2000), 'no prompt allows more than 1,000 answers');
+ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= 2000), 'no prompt allows more than 2,000 answers');
 const foodF = CATALOG.find(e => e.id === 'food-starts-f');
 eq(foodF?.prompt, 'Name a food starting with F', 'food starting with F is included');
-eq(foodF?.answerLimit, 2000, 'food F can use up to 1,000 answers');
+eq(foodF?.answerLimit, 2000, 'food F can use up to 2,000 answers');
 const elementEntry = CATALOG.find(e => e.id === 'chemical-element');
 eq(elementEntry?.answerLimit, 118, 'chemical elements keep their natural 118-answer ceiling');
 
@@ -40,7 +40,7 @@ ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
 ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language candidate search has a 5,000-row limit');
 ok(/LIMIT 5000 OFFSET 5000/.test(buildQuery(programmingEntry,{limit:5000,minSL:1,offset:5000})), 'scheduled candidate pages advance by 5,000 records');
-ok(/LIMIT 2000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
+ok(/LIMIT 2000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 2,000');
 ok(buildQuery(foodF, { limit: 5000, minSL: 1 }).includes('STRSTARTS(LCASE(STR(?itemLabel)), "f")'), 'food F query filters labels by F');
 const foodFQuery = buildQuery(foodF, { limit: 5000, minSL: 1 });
 ok(foodFQuery.indexOf('STRSTARTS') < foodFQuery.indexOf('LIMIT 5000'), 'food F prefix is applied before candidate truncation');
@@ -48,7 +48,7 @@ const insectA = { ...taxon, startsWith: 'A' };
 const insectAQuery = buildQuery(insectA, { limit: 5000, minSL: 1 });
 ok(insectAQuery.includes('STRSTARTS(LCASE(STR(?filterName)), "a")'), 'taxon letter filtering is applied to common names before candidate limit');
 ok(insectAQuery.indexOf('STRSTARTS') < insectAQuery.indexOf('LIMIT 5000'), 'taxon prefix is applied before candidate truncation');
-ok(/LIMIT 2000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than 2,000 answers');
+ok(/LIMIT 2000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than 2,000 answers');\nconst capitalEntry = CATALOG.find(e => e.id === 'capital');\nok(capitalEntry?.pattern.includes('P36') && capitalEntry?.pattern.includes('Q3624078'), 'capital query uses sovereign-state P36 relationship');
 ok(/LIMIT 118$/.test(buildQuery(elementEntry)), 'chemical-element query respects its 118-answer limit');
 
 ok(/P1843/.test(buildQuery(taxon)), 'taxon query uses common names');
@@ -78,7 +78,7 @@ eq(accumulated.length,3,'scheduled refresh accumulates saved and new records');
 eq(accumulated.find(x=>x.id==='Q102')?.s,75,'refresh updates popularity metadata');
 ok(accumulated.find(x=>x.id==='Q102')?.a.includes('New alias'),'refresh adds aliases');
 const capped=mergePools(Array.from({length:1000},(_,i)=>({id:'Q'+(2000+i),n:'Entry '+i,s:2000-i,a:[]})),[{id:'Q9999',n:'New entry',s:9999,a:[]}],{answerLimit:1000});
-eq(capped.length,1000,'cumulative merge never exceeds 1,000 answers');
+eq(capped.length,1000,'cumulative merge never exceeds configured answer cap');
 const filtered=mergePools([{id:'Q1',n:'Apple pie',s:20,a:[]}],[{id:'Q2',n:'Falafel',s:10,a:[]}],{startsWith:'F'});
 eq(filtered.length,1,'letter-prompt merge excludes labels outside requested letter');
 
