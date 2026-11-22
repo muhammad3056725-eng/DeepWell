@@ -28,3 +28,28 @@ node scripts/validate-data.mjs
 node scripts/report-data.mjs
 ```
 Validation is offline and checks hashes, counts, ordering, duplicates, anchors, blocklist and size budgets. The report is written to `data/REPORT.md`.
+
+## First full 10,000-prompt build
+
+After merging the data-pipeline change, open **GitHub → Actions → Build question data → Run workflow** and use these inputs:
+
+| Input | First-run value |
+|---|---|
+| `only` | Leave blank |
+| `wide` | `true` |
+| `batch` | `0` |
+| `batch_size` | `500` |
+| `candidate_offset` | `0` |
+
+The successful run queues batches 1 through 19 automatically. Keep the workflow's existing `build-data` concurrency group enabled; it deliberately serializes requests to the public Wikidata endpoint. Do not choose `batch=all` for the first run: that disables chaining and tries the entire catalogue in one hosted job.
+
+Plan for roughly **12–30 hours overall**, spread across the 20 queued runs; actual time depends on Wikidata response times, how many popularity bands each prompt needs, and endpoint throttling. Each run has a 170-minute Actions limit and each SPARQL request is cut off at 55 seconds. If a shard repeatedly approaches its job limit, rerun the remaining range with a smaller `batch_size` (for example 100) and continue with the next 0-based batch index. The build is network-dependent and has not been run as part of the offline PR checks.
+
+After a run, open `data/REPORT.md`:
+- The first section gives total packs, answers, raw size and manifest version.
+- Category coverage shows question counts, answer totals and median pool size.
+- The next tables list the 20 smallest pools and 20 highest rejection rates.
+- Fallback and change sections show retained previous packs, added/removed answers and query splits.
+- The repository-size section compares the pack directory with the 60 MiB budget.
+
+For a local offline check, run `npm test`, then `npm run validate-data` (which backfills legacy hashes before validation), then `npm run report-data`. The generated `data/REPORT.md` is written locally; commit it only when it reflects the build you intend to publish.
