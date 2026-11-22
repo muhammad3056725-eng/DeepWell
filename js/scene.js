@@ -40,6 +40,9 @@ let perfOverlay = null;
 const QUALITY = { high:{dpr:2,bubbles:40,plankton:100,fish:30,jellies:5}, medium:{dpr:1.5,bubbles:24,plankton:60,fish:18,jellies:3}, low:{dpr:1,bubbles:12,plankton:20,fish:10,jellies:2} };
 let perfWindowStart = 0;
 let perfFrames = 0;
+let waterCache = [];
+let waterCacheW = 0;
+let waterCacheH = 0;
 
 const TAU = Math.PI * 2;
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -82,6 +85,7 @@ function resize() {
   canvas.style.width = width + 'px';
   canvas.style.height = height + 'px';
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  buildWaterCache();
 
   const mobile = width < 700;
   const quality = lowQuality ? 0.62 : 1;
@@ -275,6 +279,35 @@ function mixHex(a,b,t) {
   return `rgb(${Math.round(mix(ar,br,t))},${Math.round(mix(ag,bg,t))},${Math.round(mix(ab,bb,t))})`;
 }
 
+function buildWaterCache() {
+  waterCache = [];
+  waterCacheW = width;
+  waterCacheH = height;
+  if(graphicsTier !== 'high' || !width || !height) return;
+  const slices = 16;
+  for(let i=0;i<slices;i++){
+    const depth=i/(slices-1), colors=waterPalette(depth);
+    const c=document.createElement('canvas');
+    c.width=Math.max(1,Math.floor(width)); c.height=Math.max(1,Math.floor(height));
+    const g=c.getContext('2d');
+    const base=g.createLinearGradient(width*0.16,0,width*0.72,height);
+    base.addColorStop(0,colors[0]);base.addColorStop(0.48,colors[1]);base.addColorStop(1,colors[2]);
+    g.fillStyle=base;g.fillRect(0,0,width,height);
+    const lightPower=Math.pow(1-depth,1.75)*0.42;
+    const halo=g.createRadialGradient(width*0.48,-height*0.08,4,width*0.48,height*0.12,height*0.96);
+    halo.addColorStop(0,'rgba(183,230,220,'+lightPower+')');
+    halo.addColorStop(0.34,'rgba(82,166,178,'+(lightPower*0.42)+')');
+    halo.addColorStop(1,'rgba(5,35,54,0)');
+    g.fillStyle=halo;g.fillRect(0,0,width,height);
+    const haze=g.createLinearGradient(0,0,0,height);
+    haze.addColorStop(0,'rgba(2,17,29,'+(0.015+depth*0.07)+')');
+    haze.addColorStop(0.54,'rgba(1,13,23,'+(0.08+depth*0.13)+')');
+    haze.addColorStop(1,'rgba(0,5,12,'+(0.35+depth*0.48)+')');
+    g.fillStyle=haze;g.fillRect(0,0,width,height);
+    waterCache.push(c);
+  }
+}
+
 function waterPalette(depth) {
   let index=0;
   while(index<WATER_ZONES.length-2 && depth>WATER_ZONES[index+1].at) index++;
@@ -305,17 +338,13 @@ function drawWater(w,h,depth,time) {
     }
     return;
   }
-  const g=ctx.createLinearGradient(w*0.16,0,w*0.72,h);
-  g.addColorStop(0,colors[0]);g.addColorStop(0.48,colors[1]);g.addColorStop(1,colors[2]);
-  ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
-
-  // The surface glow dies away as the camera descends.
-  const lightPower=Math.pow(1-depth,1.75)*0.42;
-  const halo=ctx.createRadialGradient(w*0.48,-h*0.08,4,w*0.48,h*0.12,h*0.96);
-  halo.addColorStop(0,'rgba(183,230,220,'+lightPower+')');
-  halo.addColorStop(0.34,'rgba(82,166,178,'+(lightPower*0.42)+')');
-  halo.addColorStop(1,'rgba(5,35,54,0)');
-  ctx.fillStyle=halo;ctx.fillRect(0,0,w,h);
+  const slice=Math.max(0,Math.min(waterCache.length-1,Math.round(depth*(waterCache.length-1))));
+  if(waterCache[slice] && waterCacheW===w && waterCacheH===h) ctx.drawImage(waterCache[slice],0,0,w,h);
+  else {
+    const g=ctx.createLinearGradient(w*0.16,0,w*0.72,h);
+    g.addColorStop(0,colors[0]);g.addColorStop(0.48,colors[1]);g.addColorStop(1,colors[2]);
+    ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
+  }
 
   // Narrow, soft shafts retain direction without the graphic stripe effect.
   if(depth<0.76){
@@ -493,10 +522,10 @@ function drawReefAndKelp(w,h,time,depth,still) {
     for(const k of kelp){
       const sway=still?0:Math.sin(time*0.0009+k.phase)*22*k.lean;
       ctx.strokeStyle=k.color;ctx.lineWidth=k.width;ctx.lineCap='round';
-      ctx.shadowColor=k.color;ctx.shadowBlur=8;
+      ctx.strokeStyle=k.color;ctx.lineWidth=Math.max(1,k.width*0.9);
       ctx.beginPath();ctx.moveTo(k.x,h+15);
       ctx.bezierCurveTo(k.x-18+sway*0.3,h-k.height*0.25,k.x+20+sway,h-k.height*0.65,k.x+sway,h-k.height);
-      ctx.stroke();ctx.shadowBlur=0;
+      ctx.stroke();
       ctx.strokeStyle='rgba(176,255,211,0.18)';ctx.lineWidth=1.5;
       ctx.beginPath();ctx.moveTo(k.x,h-3);ctx.quadraticCurveTo(k.x+sway*0.45,h-k.height*0.52,k.x+sway,h-k.height);ctx.stroke();
     }
