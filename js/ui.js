@@ -10,6 +10,8 @@ export const $ = id => document.getElementById(id);
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 let toastTimer = null;
+let depthAnimation = 0;
+let displayedDepth = 0;
 export function toast(text) {
   const el = $('toast');
   el.textContent = text; el.classList.add('show');
@@ -25,10 +27,36 @@ export function show(id) {
   window.scrollTo(0, 0);
 }
 
+const DEPTH_ZONES = [
+  {key:'sunlight',label:'Sunlight zone',end:400},
+  {key:'twilight',label:'Twilight zone',end:1500},
+  {key:'midnight',label:'Midnight zone',end:3500},
+  {key:'abyss',label:'Abyss',end:7000},
+];
+
 export function updateDepthUI(depth) {
-  const d = Math.round(depth);
+  const d = Math.max(0,Math.round(Number(depth)||0));
   const readout = $('topDepth');
-  if (readout) readout.textContent = `${d.toLocaleString()} m below`;
+  if(depthAnimation) cancelAnimationFrame(depthAnimation);
+  const from=displayedDepth,started=performance.now();
+  const duration=S.store.settings.motion?0:340;
+  const paint=now=>{
+    const t=duration?Math.min(1,(now-started)/duration):1;
+    const eased=1-Math.pow(1-t,3);
+    displayedDepth=Math.round(from+(d-from)*eased);
+    if(readout)readout.textContent=`${displayedDepth.toLocaleString()} m below`;
+    if(t<1)depthAnimation=requestAnimationFrame(paint);
+    else {displayedDepth=d;depthAnimation=0;}
+  };
+  paint(performance.now());
+  const zone = DEPTH_ZONES.find(z => d < z.end) || DEPTH_ZONES[DEPTH_ZONES.length-1];
+  const zoneReadout = $('zoneLabel');
+  if(zoneReadout) zoneReadout.textContent = zone.label;
+  document.body.dataset.zone = zone.key;
+  const marker = $('depthMarker');
+  if(marker) marker.style.top = `${Math.min(100,d/7000*100)}%`;
+  const gaugeValue = $('depthGaugeValue');
+  if(gaugeValue) gaugeValue.textContent = `${d.toLocaleString()} m`;
 }
 
 function untilReset() {
