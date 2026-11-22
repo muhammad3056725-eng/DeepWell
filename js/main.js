@@ -13,6 +13,8 @@ import {
 } from './ui.js?v=ten-thousand-prompts-20261121';
 
 let run = null; // the dive in progress
+let timerRaf = 0;
+let lastTimerPaint = -1;
 let runId = 0;  // guards against a stale async load finishing after the player left
 
 const SOURCE_LABEL = { wikidata: 'Wikidata', seed: 'Offline list', live: 'Live Wikidata' };
@@ -26,12 +28,13 @@ async function startDive(mode, category = null) {
   clearInterval(run?.timer);
   run = null;
   show('game');
+  document.body.classList.add('in-game');
   $('roundLabel').textContent = 'LOADING';
   $('modeLabel').textContent = label(mode, category);
   $('srcBadge').textContent = '';
   $('promptText').innerHTML = '<span class="loading">Finding questions…</span>';
   $('feedback').textContent = '';
-  $('timerBar').style.width = '100%';
+  $('timerBar').style.transform = 'scaleX(1)';
   $('answerInput').disabled = true; $('submitBtn').disabled = true;
   updateDepthUI(0);
 
@@ -42,6 +45,7 @@ async function startDive(mode, category = null) {
     if (id !== runId) return;
     toast(e.message || 'Could not start a dive.');
     show('home');
+    document.body.classList.remove('in-game');
     return;
   }
   if (id !== runId) return;
@@ -72,25 +76,39 @@ function nextPrompt() {
 /* ------------------------------------------------------------------- timer */
 function startTimer() {
   clearInterval(run.timer);
+  if (timerRaf) cancelAnimationFrame(timerRaf);
   const seconds = run.mode === 'daily' ? CONFIG.DAILY_SECONDS : S.store.settings.timer;
   run.total = seconds * 1000; run.remaining = run.total;
   const bar = $('timerBar');
-  bar.style.background = '#7dffa0';
+  lastTimerPaint = -1;
+  bar.style.transform = 'scaleX(1)';
+  bar.dataset.timerColor = '';
   let last = performance.now(), lastSec = seconds;
   const mine = run;
-  run.timer = setInterval(() => {
-    if (run !== mine) return clearInterval(mine.timer);
-    const now = performance.now(), dt = now - last; last = now;
-    if (run.paused || run.locked) return;
-    run.remaining = Math.max(0, run.remaining - dt);
-    bar.style.width = (run.remaining / run.total) * 100 + '%';
-    const sec = Math.ceil(run.remaining / 1000);
-    const ratio = run.remaining / run.total;
-    bar.style.background = ratio > 0.55 ? '#7dffa0' : ratio > 0.22 ? '#ffd23f' : '#ff6f91';
-    if (run.remaining < 5000 && sec !== lastSec && sec > 0) tone(220, 0.05);
-    lastSec = sec;
-    if (run.remaining <= 0) { clearInterval(run.timer); resolve(null, ''); }
-  }, 100);
+  const tick = now => {
+    if (run !== mine || document.hidden) { timerRaf = 0; return; }
+    const dt = Math.min(100, now - last); last = now;
+    if (!run.paused && !run.locked) {
+      run.remaining = Math.max(0, run.remaining - dt);
+      const ratio = run.remaining / run.total;
+      const pct = Math.round(ratio * 200);
+      if (pct !== lastTimerPaint) {
+        bar.style.transform = `scaleX(${ratio})`;
+        lastTimerPaint = pct;
+      }
+      const color = ratio > 0.55 ? '#7dffa0' : ratio > 0.22 ? '#ffd23f' : '#ff6f91';
+      if (bar.dataset.timerColor !== color) {
+        bar.style.background = color;
+        bar.dataset.timerColor = color;
+      }
+      const sec = Math.ceil(run.remaining / 1000);
+      if (run.remaining < 5000 && sec !== lastSec && sec > 0) tone(220, 0.05);
+      lastSec = sec;
+      if (run.remaining <= 0) { timerRaf = 0; resolve(null, ''); return; }
+    }
+    timerRaf = requestAnimationFrame(tick);
+  };
+  timerRaf = requestAnimationFrame(tick);
 }
 
 /* ------------------------------------------------------------- answering */
@@ -169,6 +187,7 @@ function finish() {
   const streak = S.recordDive({ mode: run.mode, depth: run.depth, answers: valid });
   renderResults(run, run.mode === 'daily' ? streak : S.liveStreak());
   show('results');
+  document.body.classList.remove('in-game');
 }
 
 async function share() {
