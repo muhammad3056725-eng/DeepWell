@@ -25,10 +25,10 @@ for (const e of CATALOG) {
 eq(CATALOG.length, QUESTION_TARGET, 'catalog reaches configured question target');
 eq(CATALOG.length, 10000, 'catalog has exactly 10,000 unique prompts');
 eq(new Set(CATALOG.map(e => e.prompt)).size, CATALOG.length, 'all prompt texts are unique');
-ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= 2000), 'no prompt allows more than 1,000 answers');
+ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= 2000), 'no prompt allows more than 2,000 answers');
 const foodF = CATALOG.find(e => e.id === 'food-starts-f');
 eq(foodF?.prompt, 'Name a food starting with F', 'food starting with F is included');
-eq(foodF?.answerLimit, 2000, 'food F can use up to 1,000 answers');
+eq(foodF?.answerLimit, 2000, 'food F can use up to 2,000 answers');
 const elementEntry = CATALOG.find(e => e.id === 'chemical-element');
 eq(elementEntry?.answerLimit, 118, 'chemical elements keep their natural 118-answer ceiling');
 
@@ -107,6 +107,18 @@ eq(matchAnswer('xyz', pool), null, 'nonsense does not match');
 eq(matchAnswer('Rhin', pool)?.near, undefined, 'short fuzzy inputs are not guessed');
 const people = buildPool([{ id: 'Q1', n: 'Albert Einstein', s: 90, a: [] }, { id: 'Q2', n: 'Isaac Newton', s: 80, a: [] }], { people: true });
 eq(matchAnswer('Einstein', people)?.item.n, 'Albert Einstein', 'unique surname matches a person');
+
+const mustAccept = [
+  ['country','China'], ['country','United States'], ['capital','Paris'], ['capital','Tokyo'],
+  ['city','Tokyo'], ['island','Madagascar'], ['mountain','Kilimanjaro'], ['volcano','Mount Etna'],
+  ['river','Nile'], ['university','Harvard University'], ['tower','Eiffel Tower']
+];
+for (const [id, answer] of mustAccept) {
+  const entry = CATALOG.find(e => e.id === id);
+  const seed = parseSeed(entry);
+  const result = seed.length ? matchAnswer(answer, buildPool(seed, {people:entry.people})) : null;
+  if (seed.length) ok(result?.exact, `must-accept ${id}/${answer}`);
+}
 
 // ---- rarity
 const ranked = assignRarity([{ s: 100 }, { s: 80 }, { s: 50 }, { s: 10 }, { s: 5 }]);
