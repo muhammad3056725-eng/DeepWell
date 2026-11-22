@@ -27,7 +27,7 @@ export const hasSeed = id => typeof SEED[id] === 'string';
 
 /** Entries that can be served without a live query: the only ones the Daily Dive may use. */
 export function stableEntries() {
-  return CATALOG.filter(e => hasPack(e.id) || hasSeed(e.id));
+  return CATALOG.filter(e => hasPack(e.id) || hasSeed(e.id) || (e.startsWith && (hasPack(e.id.replace(/-starts-[a-z]$/i, '')) || hasSeed(e.id.replace(/-starts-[a-z]$/i, ''))));
 }
 
 export function libraryStats() {
@@ -57,7 +57,9 @@ export function parseSeed(entry) {
 }
 
 async function fromPackFile(entry) {
-  const res = await fetch(`${CONFIG.PACK_DIR}/${entry.id}.json?v=${manifest.version || 0}`);
+  const directId = entry.startsWith ? entry.id.replace(/-starts-[a-z]$/i, '') : entry.id;
+  const urlId = entry.startsWith ? (hasPack(entry.id) ? entry.id : directId) : entry.id;
+  const res = await fetch(`${CONFIG.PACK_DIR}/${urlId}.json?v=${manifest.version || 0}`);
   if (!res.ok) throw new Error('pack ' + res.status);
   let items = fromPack(await res.json());
   if (entry.startsWith) items = items.filter(i => i.n.toLowerCase().startsWith(entry.startsWith.toLowerCase()));
