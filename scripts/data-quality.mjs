@@ -25,8 +25,8 @@ export function cleanPool(items, entry = {}, blocklist = {qids:[],words:[]}) {
   if(/film|literature|music/i.test(entry.cat||''))add(item,item.n.replace(/^(the|a|an) /i,'').replace(/[:–—-].*$/,'').replace(/&/g,'and'));
  }
  const primary=new Set(clean.map(i=>normalizeDataName(i.n))), aliases=new Map(clean.map(i=>[i.id,[]]));
- for(const [key,rows] of candidates){if(primary.has(key))continue;const unique=[...new Map(rows.map(r=>[r.item.id,r])).values()].sort((a,b)=>(+b.item.s||0)-(+a.item.s||0));if(unique.length>1&&(+unique[0].item.s||0)<3*Math.max(1,+unique[1].item.s||0))continue;const win=unique[0];if(win&&!aliases.get(win.item.id).includes(win.a))aliases.get(win.item.id).push(win.a);}
- return {items:clean.map(i=>({...i,a:[...new Set(aliases.get(i.id)||[])].slice(0,12)})),rejected};
+ for(const [key,rows] of candidates){if(primary.has(key))continue;const unique=[...new Map(rows.map(r=>[r.item.id,r])).values()].sort((a,b)=>{\n  const common=v=>/^[A-Za-z0-9][A-Za-z0-9 .,'’&()/-]*$/.test(v)&&v.length>=4&&!/^(the|a|an)\\s/i.test(v)?1:0;\n  return common(b.a)-common(a.a)||(+b.item.s||0)-(+a.item.s||0);\n});if(unique.length>1&&(+unique[0].item.s||0)<3*Math.max(1,+unique[1].item.s||0))continue;const win=unique[0];if(win&&!aliases.get(win.item.id).includes(win.a))aliases.get(win.item.id).push(win.a);}
+ return {items:clean.map(i=>({...i,a:[...new Set(aliases.get(i.id)||[])].slice(0,25)})),rejected};
 }
 export function applyOverrides(id,items,overrides={}){
  const rule=overrides[id]||{}, removed=new Set(rule.remove||[]), byId=new Map(items.filter(i=>!removed.has(i.id)).map(i=>[i.id,{...i,a:[...(i.a||[])]}]));
