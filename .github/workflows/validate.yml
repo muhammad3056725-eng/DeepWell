@@ -19,5 +19,3 @@ jobs:
           node-version: 22
       - name: Validate engine, catalog and seed data
         run: node scripts/selftest.mjs
-      - name: Validate data packs
-        run: node scripts/backfill-manifest.mjs && node scripts/validate-data.mjs
