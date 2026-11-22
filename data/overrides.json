@@ -1,1 +1,13 @@
-{}
+{
+  "country": {
+    "aliasAdd": {
+      "Q148": ["China"],
+      "Q30": ["United States", "USA", "US"],
+      "Q145": ["United Kingdom", "UK", "Britain"],
+      "Q878": ["United Arab Emirates", "UAE"],
+      "Q213": ["Czechia", "Czech Republic"],
+      "Q1050": ["Eswatini", "Swaziland"],
+      "Q836": ["Myanmar", "Burma"]
+    }
+  }
+}
