@@ -22,3 +22,13 @@
 - `data/anchors.json`, `data/blocklist.json`, `data/overrides.json`, `data/README.md` — add curated anchors for 165 core prompts, editable safety/override files, and maintenance documentation.
 - `.github/workflows/build-data.yml` — run manifest backfill, validation and reporting before committing generated data.
 - `package.json`, `scripts/selftest.mjs` — add validation/report commands and offline tests for v2 compatibility, expanded pools, band bounds, cleaning, aliases, overrides and no-op writes.
+
+
+## Mobile performance fix — 2026-11-22
+- `css/style.css`: touch/small-screen panels no longer use backdrop blur; the canvas filter and vignette are disabled; large shadows/glows are reduced; timer/gauge/toast transitions are transform/opacity based.
+- `js/scene.js`: added Auto/High/Medium/Low quality tiers, touch-device DPR caps (High 2, Medium 1.5, Low 1), lower creature counts, 30fps Low-tier pacing, 2-second auto-downgrade, hidden-tab pause, and an opt-in `?perf` overlay. The full-screen per-frame pressure gradient was replaced by a cheap translucent overlay.
+- `js/main.js`: timer progress now uses `transform: scaleX()` and only repaints when the visible value changes; the 100ms layout-writing interval was removed.
+- `js/state.js`, `js/ui.js`, `index.html`: added a persistent Graphics quality setting (Auto/High/Medium/Low).
+- Before: touch devices used DPR up to 2, about 24 bubbles/60 plankton/18 fish/3 jellyfish, plus stacked CSS blur/filter effects. Timer wrote layout width every 100ms.
+- After: Auto selects Medium on touch and Low on constrained touch hardware; Low uses DPR 1, 12 bubbles/20 plankton/10 fish/2 jellyfish and 30fps pacing. Timer uses compositor transform updates instead of width layout.
+- Measurement note: no real-device Chrome DevTools 4x/6x Performance profile was available in this environment, so no fabricated before/after FPS or frame-time numbers are claimed.
