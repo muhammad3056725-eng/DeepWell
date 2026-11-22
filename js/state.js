@@ -9,7 +9,7 @@ const DEFAULTS = () => ({
   dailyLog: {}, // 'YYYY-MM-DD' -> {depth, answers}
   recentPrompts: [], // question IDs and text used across all dive modes
   misses: 0,
-  settings: { sound: 0.45, haptics: true, motion: false, color: false, timer: 20, text: 1 },
+  settings: { sound: 0.45, haptics: true, motion: false, color: false, timer: 20, text: 1, graphics: 'auto' },
 });
 
 export const store = DEFAULTS();
