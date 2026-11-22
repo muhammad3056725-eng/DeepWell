@@ -39,7 +39,7 @@ export function cleanPool(items, entry = {}, blocklist = {qids:[],words:[]}) {
   if(n===stripped)score+=1000;
   if(n.length>=5&&n.length<=24)score+=100;
   if(/^[a-z0-9 ]+$/i.test(a))score+=40;
-  if(!/[^\\x00-\\x7F]/.test(a))score+=20;
+  if(!/[^\x00-\x7F]/.test(a))score+=20;
   score-=Math.abs(a.length-12);
   if(n===label)score-=1000;
   return score;
