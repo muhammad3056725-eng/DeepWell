@@ -1041,6 +1041,13 @@ function drawSubmersible(w,h,time,depth,still,panic=0,overrideX=null,overrideY=n
       drawBubble(bx,by,2.4+i*0.7,0.5);
     }
   }
+  if(overrideX!==null && eventScene?.kind==='predator' && eventScene.p>0.82){
+    const burst=smooth((eventScene.p-0.82)/0.18);
+    for(let i=0;i<22;i++){
+      const a=i/22*TAU,rad=18+burst*(35+(i%4)*7);
+      drawBubble(x+Math.cos(a)*rad,y+Math.sin(a)*rad*0.58,2.2+(i%3)*0.9,0.46*(1-burst*0.25));
+    }
+  }
 }
 
 function updatePredatorPose(w,h,time) {
@@ -1201,7 +1208,7 @@ function drawPredatorFront(w,h,time) {
     ctx.save();ctx.globalCompositeOperation='screen';
     for(let i=0;i<20;i++){
       const a=i/20*TAU,rad=140+burst*(40+(i%4)*15);
-      drawBubble(e.x+Math.cos(a)*rad*e.scaleNow,e.y+Math.sin(a)*rad*0.45*e.scaleNow,2.4+(i%3),0.36);
+      drawBubble(Math.cos(a)*rad,Math.sin(a)*rad*0.45,2.4+(i%3),0.36);
     }
     ctx.restore();
   }
@@ -1478,6 +1485,12 @@ function frame(time) {
   }
   drawForegroundBubbles(w,h,t,still);
   ctx.restore();
+
+  if(predatorEvent && eventScene?.kind==='predator' && eventScene.p>0.58 && eventScene.p<0.7 && !still){
+    const flash=(1-Math.abs(eventScene.p-0.64)/0.06)*0.085;
+    ctx.fillStyle=`rgba(205,244,255,${Math.max(0,flash)})`;
+    ctx.fillRect(0,0,w,h);
+  }
 
   // Pressure darkens the edge of the lens progressively with depth.
   const pressure=0.12+visualDepth*0.34;
