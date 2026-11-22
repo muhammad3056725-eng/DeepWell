@@ -23,7 +23,7 @@ async function sparql(query,tries=4){
 async function readJson(file,fallback){try{return JSON.parse(await readFile(file,'utf8'));}catch{return fallback;}}
 async function verifyIds(){const ids=[...ENTITY_LABELS.keys()],labels=new Map();for(let i=0;i<ids.length;i+=80){const j=await sparql(buildLabelQuery(ids.slice(i,i+80)));for(const b of j.results.bindings)labels.set(b.q.value.split('/').pop(),b.l.value.toLowerCase());if(i+80<ids.length)await sleep(1500);}const bad=new Set();for(const [q,e] of ENTITY_LABELS){const a=labels.get(q);if(!a||!(a.includes(e)||e.includes(a))){bad.add(q);console.warn('Q-id mismatch',q,'expected',e,'got',a||'(missing)');}}return bad;}
 async function buildBands(entry){
- const target=Math.max(1,Math.min(Number(entry.target??entry.answerLimit)||2000,2000)),floor=Math.max(1,Number(entry.floor??entry.minSL??2)),merged=new Map(),errors=[];
+ const target=Math.max(1,Math.min(Number(entry.target??entry.answerLimit)||2000,2000)),floor=Math.max(1,Number(entry.floor??2),Number(entry.minSL??1)),merged=new Map(),errors=[];
  const accept=rows=>{for(const x of rows){const old=merged.get(x.id);if(!old)merged.set(x.id,x);else{old.s=Math.max(old.s,x.s);old.a=[...new Set([...old.a,...x.a])];}}};
  for(const band of BANDS){if(band.min<floor||merged.size>=target)continue;try{
   const j=await sparql(buildQuery(entry,{limit:5000,minSL:Math.max(floor,band.min),maxSL:band.max,target,offset:CANDIDATE_OFFSET}));accept(parseBindings(j,entry));
@@ -35,13 +35,13 @@ async function main(){
  await mkdir(OUT,{recursive:true});console.log(`Catalog ${CATALOG.length}; validating ${ENTITY_LABELS.size} registered Q-ids`);
  const bad=await verifyIds();if(flag('verify-only'))process.exit(bad.size?1:0);
  const manifest=await readJson(MANIFEST,{version:0,built:null,packs:{}}),overrides=await readJson('data/overrides.json',{}),blocklist=await readJson('data/blocklist.json',{qids:[],words:[]}),anchors=await readJson('data/anchors.json',{});
- const report={skipped:[],failed:[],built:0,unchanged:0,fallback:[],rejected:{}},today=new Date().toISOString().slice(0,10);
+ const report={skipped:[],failed:[],built:0,unchanged:0,fallback:[],previousRetained:[],rejected:{}},today=new Date().toISOString().slice(0,10);
  const all=CATALOG.filter(e=>!ONLY||ONLY.has(e.id));let todo=all;if(BATCH!==undefined&&BATCH!=='all'){const b=parseInt(BATCH,10);if(!Number.isInteger(b)||b<0)throw new Error('Invalid batch index');todo=all.slice(b*BATCH_SIZE,(b+1)*BATCH_SIZE);}
  if(!todo.length){console.log('No prompts in this batch.');return;}
  for(let i=0;i<todo.length;i++){const e=todo[i],tag=`[${i+1}/${todo.length}] ${e.id}`;if(entityIdsOf(e).some(q=>bad.has(q))){report.skipped.push(e.id+' (bad registered Q-id)');continue;}
   const meta=manifest.packs[e.id];if(flag('resume')&&meta?.built&&(Date.parse(today)-Date.parse(meta.built))<6*864e5){report.skipped.push(e.id+' (fresh resume)');continue;}
-  const file=path.join(OUT,e.id+'.json');try{
-   const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);
+  const file=path.join(OUT,e.id+'.json');let hadPrevious=false;try{
+   const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);hadPrevious=Boolean(oldPack);
    const merged=mergePools(old,fresh.items,{...e,target:e.target??e.answerLimit??2000}),cleaned=cleanPool(merged,e,blocklist);
    const items=applyOverrides(e.id,cleaned.items,overrides).slice(0,e.target??e.answerLimit??2000),min=Math.min(e.minPool||20,8);
    if(items.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
@@ -50,11 +50,11 @@ async function main(){
    if(missing.length||forbidden.length)console.warn(tag,'anchor warnings',JSON.stringify({missing,forbidden}));
    const raw=JSON.stringify(toPack(e,items)),bytes=Buffer.byteLength(raw);if(bytes>400*1024)throw new Error('pack exceeds 400 KB safety ceiling');
    if(!meaningfulChange(old,items)){report.unchanged++;continue;}await writeFile(file,raw);
-   const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-missing.length,missingAnchors:missing,mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,fallback:fresh.errors.length>0};
+   const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-missing.length,missingAnchors:missing,mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,querySplitFallback:fresh.errors.length>0,fallback:false};
    report.rejected[e.id]=cleaned.rejected;if(fresh.errors.length)report.fallback.push(e.id);
    manifest.packs[e.id]={n:items.length,built:today,hash:sha(raw),bytes,source:'wikidata',quality};report.built++;
    console.log(`${tag}: ${items.length} accepted; ${quality.aliases} aliases; ${fresh.errors.length} fallback band(s)`);
-  }catch(err){report.failed.push(e.id+': '+err.message);console.warn(tag,'FAILED; old pack retained:',err.message);}
+  }catch(err){report.failed.push(e.id+': '+err.message);if(hadPrevious)report.previousRetained=(report.previousRetained||[]).concat(e.id);console.warn(tag,'FAILED; old pack retained:',err.message);}
   await sleep(1500);
  }
  if(report.failed.length/Math.max(1,todo.length)>0.25){console.error('Over 25% of packs failed; refusing to publish.');process.exit(1);}
