@@ -32,3 +32,22 @@
 - Before: touch devices used DPR up to 2, about 24 bubbles/60 plankton/18 fish/3 jellyfish, plus stacked CSS blur/filter effects. Timer wrote layout width every 100ms.
 - After: Auto selects Medium on touch and Low on constrained touch hardware; Low uses DPR 1, 12 bubbles/20 plankton/10 fish/2 jellyfish and 30fps pacing. Timer uses compositor transform updates instead of width layout.
 - Measurement note: no real-device Chrome DevTools 4x/6x Performance profile was available in this environment, so no fabricated before/after FPS or frame-time numbers are claimed.
+
+## Famous-answer + data-pipeline safeguards — 2026-11-22
+- js/catalog.js: broadened the major geography/landmark classes with subclass closure; capitals now use the sovereign-state P36 relation.
+- scripts/data-quality.mjs: common aliases are ranked and up to 25 retained; Latin-script/common-name aliases receive priority.
+- data/overrides.json: added explicit common-name aliases for major country-name edge cases.
+- js/engine.js: fuzzy suggestions now ignore keys shorter than 5 characters and prefer primary/common labels.
+- data/anchors.json: expanded famous-answer anchors for major geography, landmarks, universities, airports and country/city prompts.
+- scripts/validate-data.mjs: anchors are validated through the real matchAnswer() path.
+- scripts/build-data.mjs: rebuilt packs fail on anchor regressions; a previous pack is retained only when it is itself known-good.
+- js/data.js: letter prompts can derive from their base pack, reducing dependence on tiny per-letter packs.
+- .github/workflows/validate.yml: CI now runs manifest backfill and data validation in addition to the offline self-test.
+
+## Canvas performance safeguards — 2026-11-22
+- js/scene.js: cached 16 depth-sliced high-quality water base layers to remove the base water/halo/haze gradient construction from every frame.
+- js/scene.js: removed the remaining rock/kelp shadowBlur work.
+- Medium and Low tiers use substantially cheaper flat-fill rendering; Low uses 1x canvas, fewer layers and 30 FPS pacing.
+- Auto quality can step High → Medium → Low based on a rolling 2-second frame sample.
+
+Verification status: source-level fixes are implemented, but the full Wikidata rebuild and the brief's Pixel 5/4x-CPU browser benchmark still require a GitHub Actions/browser run before measured pass numbers can honestly be reported.
