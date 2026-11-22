@@ -183,17 +183,24 @@ function focusSceneBriefly(ms=980) {
 }
 
 export function triggerAnswerVisual(points, state) {
-  const failed = state !== 'hit';
+  const failed = state !== 'hit'; 
+  if(isStill()) {
+    if(state!=='hit' || points<=20) {
+      const species=PREDATOR_SPECIES[Math.floor(Math.random()*PREDATOR_SPECIES.length)];
+      addFeedbackCaption(species.caption);
+    } else if(points>=70) {
+      addFeedbackCaption('A rare creature glides past in the still water.');
+    }
+    eventScene=null;
+    document.body?.classList.remove('scene-focus');
+    return;
+  }
   if(failed || points <= 20) {
     const species=PREDATOR_SPECIES[Math.floor(Math.random()*PREDATOR_SPECIES.length)];
     const skins=getColorSafe()?SAFE_PREDATOR_SKINS:PREDATOR_SKINS;
     const caption=species.caption;
     addFeedbackCaption(caption);
     eventScene=null;
-    if(isStill()) {
-      document.body?.classList.remove('scene-focus');
-      return;
-    }
     eventScene={
       kind:'predator',species:species.id,name:species.name,caption,
       start:performance.now(),duration:1820,seed:rand(0,TAU),
