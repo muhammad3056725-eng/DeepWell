@@ -25,10 +25,25 @@ export function show(id) {
   window.scrollTo(0, 0);
 }
 
+const DEPTH_ZONES = [
+  {key:'sunlight',label:'Sunlight zone',end:400},
+  {key:'twilight',label:'Twilight zone',end:1500},
+  {key:'midnight',label:'Midnight zone',end:3500},
+  {key:'abyss',label:'Abyss',end:7000},
+];
+
 export function updateDepthUI(depth) {
-  const d = Math.round(depth);
+  const d = Math.max(0,Math.round(Number(depth)||0));
   const readout = $('topDepth');
   if (readout) readout.textContent = `${d.toLocaleString()} m below`;
+  const zone = DEPTH_ZONES.find(z => d < z.end) || DEPTH_ZONES[DEPTH_ZONES.length-1];
+  const zoneReadout = $('zoneLabel');
+  if(zoneReadout) zoneReadout.textContent = zone.label;
+  document.body.dataset.zone = zone.key;
+  const marker = $('depthMarker');
+  if(marker) marker.style.top = `${Math.min(100,d/7000*100)}%`;
+  const gaugeValue = $('depthGaugeValue');
+  if(gaugeValue) gaugeValue.textContent = `${d.toLocaleString()} m`;
 }
 
 function untilReset() {
