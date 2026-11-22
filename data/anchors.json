@@ -3,9 +3,7 @@
     "anchors": [
       "United States",
       "India",
-      "China",
-      "Japan",
-      "Germany"
+      "China"
     ],
     "mustNot": []
   },
@@ -13,9 +11,7 @@
     "anchors": [
       "London",
       "Paris",
-      "Tokyo",
-      "Washington, D.C.",
-      "Beijing"
+      "Tokyo"
     ],
     "mustNot": []
   },
@@ -23,9 +19,7 @@
     "anchors": [
       "Tokyo",
       "Paris",
-      "London",
-      "Berlin",
-      "Rome"
+      "London"
     ],
     "mustNot": []
   },
@@ -33,9 +27,7 @@
     "anchors": [
       "Greenland",
       "Madagascar",
-      "Borneo",
-      "Great Britain",
-      "Iceland"
+      "Borneo"
     ],
     "mustNot": []
   },
@@ -53,9 +45,7 @@
     "anchors": [
       "Mount Everest",
       "K2",
-      "Kilimanjaro",
-      "Mount Fuji",
-      "Mont Blanc"
+      "Kilimanjaro"
     ],
     "mustNot": []
   },
@@ -70,9 +60,7 @@
     "anchors": [
       "Mount Etna",
       "Mount Fuji",
-      "Vesuvius",
-      "Krakatoa",
-      "Mount St. Helens"
+      "Vesuvius"
     ],
     "mustNot": []
   },
@@ -173,19 +161,13 @@
   "museum": {
     "anchors": [
       "Louvre Museum",
-      "British Museum",
-      "Metropolitan Museum of Art",
-      "Prado Museum"
+      "British Museum"
     ],
     "mustNot": []
   },
   "airport": {
     "anchors": [
-      "London Heathrow Airport",
-      "Heathrow",
-      "John F. Kennedy International Airport",
-      "Dubai International Airport",
-      "Charles de Gaulle Airport"
+      "London Heathrow Airport"
     ],
     "mustNot": []
   },
@@ -197,10 +179,7 @@
   },
   "bridge": {
     "anchors": [
-      "Golden Gate Bridge",
-      "Brooklyn Bridge",
-      "Tower Bridge",
-      "Sydney Harbour Bridge"
+      "Golden Gate Bridge"
     ],
     "mustNot": []
   },
@@ -242,19 +221,14 @@
   },
   "tower": {
     "anchors": [
-      "Eiffel Tower",
-      "Tokyo Tower",
-      "CN Tower",
-      "Leaning Tower of Pisa"
+      "Eiffel Tower"
     ],
     "mustNot": []
   },
   "university": {
     "anchors": [
       "Harvard University",
-      "University of Oxford",
-      "MIT",
-      "Stanford University"
+      "University of Oxford"
     ],
     "mustNot": []
   },
@@ -327,10 +301,7 @@
   },
   "city-in-united-states": {
     "anchors": [
-      "New York City",
-      "Los Angeles",
-      "Chicago",
-      "Washington, D.C."
+      "New York City"
     ],
     "mustNot": []
   },
@@ -342,10 +313,7 @@
   },
   "city-in-united-kingdom": {
     "anchors": [
-      "London",
-      "Manchester",
-      "Birmingham",
-      "Liverpool"
+      "London"
     ],
     "mustNot": []
   },
@@ -363,46 +331,31 @@
   },
   "city-in-germany": {
     "anchors": [
-      "Berlin",
-      "Munich",
-      "Hamburg",
-      "Frankfurt"
+      "Berlin"
     ],
     "mustNot": []
   },
   "city-in-france": {
     "anchors": [
-      "Paris",
-      "Marseille",
-      "Lyon",
-      "Toulouse"
+      "Paris"
     ],
     "mustNot": []
   },
   "city-in-italy": {
     "anchors": [
-      "Rome",
-      "Milan",
-      "Naples",
-      "Venice"
+      "Rome"
     ],
     "mustNot": []
   },
   "city-in-spain": {
     "anchors": [
-      "Madrid",
-      "Barcelona",
-      "Seville",
-      "Valencia"
+      "Madrid"
     ],
     "mustNot": []
   },
   "city-in-china": {
     "anchors": [
-      "Beijing",
-      "Shanghai",
-      "Guangzhou",
-      "Shenzhen"
+      "Beijing"
     ],
     "mustNot": []
   },
@@ -414,9 +367,7 @@
   },
   "city-in-russia": {
     "anchors": [
-      "Moscow",
-      "Saint Petersburg",
-      "Kazan"
+      "Moscow"
     ],
     "mustNot": []
   },
@@ -434,10 +385,7 @@
   },
   "city-in-egypt": {
     "anchors": [
-      "Cairo",
-      "Alexandria",
-      "Giza",
-      "Luxor"
+      "Cairo"
     ],
     "mustNot": []
   },
@@ -473,10 +421,7 @@
   },
   "city-in-iran": {
     "anchors": [
-      "Tehran",
-      "Mashhad",
-      "Isfahan",
-      "Shiraz"
+      "Tehran"
     ],
     "mustNot": []
   },
