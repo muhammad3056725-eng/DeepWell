@@ -11,7 +11,7 @@ on:
         description: 'Optional: comma-separated prompt ids to rebuild (blank = all)'
         required: false
       wide:
-        description: 'Search up to 5,000 candidates; save at most 1,000 answers per prompt'
+        description: 'Search up to 5,000 candidates; save at most 2,000 answers per prompt'
         required: false
         default: 'true'
       batch:
