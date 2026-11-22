@@ -998,7 +998,8 @@ function drawSubmersible(w,h,time,depth,still,panic=0,overrideX=null,overrideY=n
   ctx.save();ctx.translate(x+shake,y+Math.cos(time*0.061)*panic*2);ctx.scale(size,size);
 
   // The craft lamp becomes the key light as the sunlight disappears.
-  const lampPower=0.13+depth*0.58;
+  const flicker=panic>0&&!still?0.68+0.32*Math.sin(time*0.046):1;
+  const lampPower=(0.13+depth*0.58)*flicker;
   const lamp=ctx.createLinearGradient(12,4,205,150);
   lamp.addColorStop(0,'rgba(196,255,237,'+(lampPower*0.72)+')');
   lamp.addColorStop(0.38,'rgba(106,220,233,'+(lampPower*0.22)+')');
@@ -1066,7 +1067,9 @@ function updatePredatorPose(w,h,time) {
     document.body?.classList.remove('scene-focus');
     return false;
   }
-  const p=clamp(elapsed/e.duration,0,1);
+  const raw=clamp(elapsed/e.duration,0,1);
+  // A short slow-motion pocket holds the open-jaw gulp beat before the retreat.
+  const p=raw<0.58?raw:raw<0.72?0.58+(raw-0.58)*0.45:0.643+(raw-0.72)*1.275;
   const enter=easeOut(Math.min(1,p/0.34));
   const leave=smooth((p-0.76)/0.24);
   const from=e.direction>0?w+360:-360;
@@ -1089,6 +1092,14 @@ function drawPredatorRear(w,h,time) {
   const fin=ctx.createLinearGradient(-250,-160,250,180);
   fin.addColorStop(0,skin.fin);fin.addColorStop(0.5,skin.top);fin.addColorStop(1,'#10283a');
   ctx.fillStyle=fin;
+  if(e.p<0.46){
+    ctx.save();ctx.globalAlpha=(1-e.p/0.46)*0.2;ctx.strokeStyle='rgba(204,246,242,0.7)';ctx.lineWidth=2;
+    for(let streak=0;streak<8;streak++){
+      const sy=-126+streak*34;
+      ctx.beginPath();ctx.moveTo(-e.direction*(300+streak*11),sy);ctx.lineTo(-e.direction*(420+streak*18),sy+Math.sin(time*0.012+streak)*7);ctx.stroke();
+    }
+    ctx.restore();
+  }
   // Tail and pectoral fins remain behind the player craft.
   ctx.save();ctx.translate(-178,20);ctx.rotate(Math.sin(time*0.004+e.seed)*0.22);
   ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(-94,-100,-154,-119);
