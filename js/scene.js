@@ -84,7 +84,6 @@ function resize() {
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
   const mobile = width < 700;
-  const q = QUALITY[graphicsTier] || QUALITY.medium;
   const quality = lowQuality ? 0.62 : 1;
   bubbles = Array.from({length:Math.round(q.bubbles*quality)},()=>({
     x:rand(0,width), y:rand(0,height), r:rand(0.8,4.2),
