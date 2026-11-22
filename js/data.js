@@ -27,7 +27,10 @@ export const hasSeed = id => typeof SEED[id] === 'string';
 
 /** Entries that can be served without a live query: the only ones the Daily Dive may use. */
 export function stableEntries() {
-  return CATALOG.filter(e => hasPack(e.id) || hasSeed(e.id) || (e.startsWith && (hasPack(e.id.replace(/-starts-[a-z]$/i, '')) || hasSeed(e.id.replace(/-starts-[a-z]$/i, ''))));
+  return CATALOG.filter(e => {
+    const baseId = e.startsWith ? e.id.replace(/-starts-[a-z]$/i, '') : e.id;
+    return hasPack(e.id) || hasSeed(e.id) || (e.startsWith && (hasPack(baseId) || hasSeed(baseId)));
+  });
 }
 
 export function libraryStats() {
