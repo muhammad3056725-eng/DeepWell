@@ -5,7 +5,7 @@ import { loadManifest } from './data.js?v=ten-thousand-prompts-20261121';
 import { prepareDive, examples } from './game.js?v=random-no-repeat-questions-20261121';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
 import * as S from './state.js';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=immersive-descent-20261121';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=cinematic-abyss-20261122';
 import { wake, tone, buzz } from './audio.js';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
@@ -75,7 +75,7 @@ function startTimer() {
   const seconds = run.mode === 'daily' ? CONFIG.DAILY_SECONDS : S.store.settings.timer;
   run.total = seconds * 1000; run.remaining = run.total;
   const bar = $('timerBar');
-  bar.style.background = 'var(--cyan)';
+  bar.style.background = '#7dffa0';
   let last = performance.now(), lastSec = seconds;
   const mine = run;
   run.timer = setInterval(() => {
@@ -85,10 +85,9 @@ function startTimer() {
     run.remaining = Math.max(0, run.remaining - dt);
     bar.style.width = (run.remaining / run.total) * 100 + '%';
     const sec = Math.ceil(run.remaining / 1000);
-    if (run.remaining < 5000) {
-      bar.style.background = 'var(--pink)';
-      if (sec !== lastSec && sec > 0) tone(220, 0.05);
-    }
+    const ratio = run.remaining / run.total;
+    bar.style.background = ratio > 0.55 ? '#7dffa0' : ratio > 0.22 ? '#ffd23f' : '#ff6f91';
+    if (run.remaining < 5000 && sec !== lastSec && sec > 0) tone(220, 0.05);
     lastSec = sec;
     if (run.remaining <= 0) { clearInterval(run.timer); resolve(null, ''); }
   }, 100);
@@ -212,7 +211,7 @@ async function boot() {
   applySettings();
   buildPackButtons(cat => startDive('pack', cat));
   bind();
-  startScene(() => run?.depth || 0, () => S.store.settings.motion, () => run ? run.index / CONFIG.PROMPTS_PER_DIVE : 0);
+  startScene(() => run?.depth || 0, () => S.store.settings.motion, () => run ? run.index / CONFIG.PROMPTS_PER_DIVE : 0, () => S.store.settings.haptics, () => S.store.settings.color);
   updateDepthUI(0);
   renderHome();
   await loadManifest();
