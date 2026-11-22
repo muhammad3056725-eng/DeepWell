@@ -48,7 +48,9 @@ const insectA = { ...taxon, startsWith: 'A' };
 const insectAQuery = buildQuery(insectA, { limit: 5000, minSL: 1 });
 ok(insectAQuery.includes('STRSTARTS(LCASE(STR(?filterName)), "a")'), 'taxon letter filtering is applied to common names before candidate limit');
 ok(insectAQuery.indexOf('STRSTARTS') < insectAQuery.indexOf('LIMIT 5000'), 'taxon prefix is applied before candidate truncation');
-ok(/LIMIT 2000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than 2,000 answers');\nconst capitalEntry = CATALOG.find(e => e.id === 'capital');\nok(capitalEntry?.pattern.includes('P36') && capitalEntry?.pattern.includes('Q3624078'), 'capital query uses sovereign-state P36 relationship');
+ok(/LIMIT 2000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than 2,000 answers');
+const capitalEntry = CATALOG.find(e => e.id === 'capital');
+ok(capitalEntry?.pattern.includes('P36') && capitalEntry?.pattern.includes('Q3624078'), 'capital query uses sovereign-state P36 relationship');
 ok(/LIMIT 118$/.test(buildQuery(elementEntry)), 'chemical-element query respects its 118-answer limit');
 
 ok(/P1843/.test(buildQuery(taxon)), 'taxon query uses common names');
