@@ -285,6 +285,26 @@ function waterPalette(depth) {
 
 function drawWater(w,h,depth,time) {
   const colors=waterPalette(depth);
+  // Medium/low intentionally avoid the expensive per-frame gradient stack.
+  if(graphicsTier!=='high'){
+    ctx.fillStyle=colors[1];ctx.fillRect(0,0,w,h);
+    const lightPower=Math.pow(1-depth,1.75)*0.28;
+    if(lightPower>0.01){
+      ctx.fillStyle='rgba(183,230,220,'+lightPower+')';
+      ctx.fillRect(0,0,w,h*0.28);
+    }
+    if(graphicsTier==='medium' && depth<0.76){
+      ctx.save();ctx.globalCompositeOperation='screen';ctx.globalAlpha=0.10*(1-depth);
+      for(let i=0;i<4;i++){
+        const x=w*(0.08+i*0.27), spread=w*(0.025+(i%2)*0.018);
+        ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+spread,0);
+        ctx.lineTo(x+spread*2.1,h*0.78);ctx.lineTo(x-spread*0.9,h*0.78);
+        ctx.closePath();ctx.fill();
+      }
+      ctx.restore();
+    }
+    return;
+  }
   const g=ctx.createLinearGradient(w*0.16,0,w*0.72,h);
   g.addColorStop(0,colors[0]);g.addColorStop(0.48,colors[1]);g.addColorStop(1,colors[2]);
   ctx.fillStyle=g;ctx.fillRect(0,0,w,h);
@@ -345,6 +365,7 @@ function drawWater(w,h,depth,time) {
 }
  
 function drawSurfaceMoment(w,h,depth,time,still) {
+  if(graphicsTier==='medium') return;
   const strength=1-smooth(depth/0.235);
   if(strength<0.006) return;
   const waterline=h*(0.305-depth*0.78);
@@ -414,7 +435,7 @@ function drawRock(x,y,scale,time) {
   ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);
   const body=ctx.createLinearGradient(-45,-50,40,38);
   body.addColorStop(0,'#42616a');body.addColorStop(0.35,'#1d3d4c');body.addColorStop(1,'#081b29');
-  ctx.fillStyle=body;ctx.shadowColor='#071b29';ctx.shadowBlur=22;
+  ctx.fillStyle=body;
   ctx.beginPath();ctx.moveTo(-65,26);ctx.bezierCurveTo(-72,-8,-50,-48,-18,-42);
   ctx.bezierCurveTo(4,-70,35,-43,42,-20);ctx.bezierCurveTo(76,-8,70,23,54,36);
   ctx.quadraticCurveTo(0,52,-65,26);ctx.fill();
@@ -1461,6 +1482,49 @@ function drawEventBackdrop(w,h,time) {
   }
 }
 
+function drawLowScene(w,h,time,depth,still){
+  const colors=waterPalette(depth);
+  ctx.fillStyle=colors[1];ctx.fillRect(0,0,w,h);
+  const light=Math.pow(1-depth,1.5)*0.24;
+  ctx.fillStyle='rgba(183,230,220,'+light+')';ctx.fillRect(0,0,w,h*0.34);
+
+  // Low tier keeps the same underwater composition but uses only flat fills.
+  const fishCount=6;
+  for(let i=0;i<fishCount;i++){
+    const x=(w*(0.12+i*0.16)+Math.sin(time*0.00035+i)*w*0.04)%w;
+    const y=h*(0.18+((i*0.13)%0.38))+Math.sin(time*0.001+i)*10;
+    const dir=i%2?1:-1, s=Math.max(0.7,Math.min(w,h)/700);
+    ctx.save();ctx.translate(x,y);ctx.scale(dir*s,s);
+    ctx.fillStyle=FISH_PALETTE[i%FISH_PALETTE.length][0];
+    ctx.beginPath();ctx.ellipse(0,0,28,11,0,0,TAU);ctx.fill();
+    ctx.beginPath();ctx.moveTo(-28,0);ctx.lineTo(-43,-13);ctx.lineTo(-43,13);ctx.closePath();ctx.fill();
+    ctx.restore();
+  }
+
+  if(eventScene){
+    const p=clamp((time-eventScene.start)/eventScene.duration,0,1);
+    const x=w*(0.5+eventScene.lane), y=h*0.43;
+    ctx.fillStyle='rgba(210,245,240,'+(0.04+0.08*(1-p))+')';
+    ctx.beginPath();ctx.arc(x,y,Math.min(w,h)*(0.08+0.22*p),0,TAU);ctx.fill();
+  }
+
+  const sx=w*0.5, sy=h*0.575;
+  ctx.fillStyle='#183d4f';ctx.beginPath();ctx.ellipse(sx,sy,72,25,0,0,TAU);ctx.fill();
+  ctx.fillStyle='#91d7df';ctx.beginPath();ctx.ellipse(sx+18,sy-8,26,13,0,0,TAU);ctx.fill();
+  ctx.fillStyle='#d7e7e2';ctx.fillRect(sx-8,sy-30,12,48);
+  ctx.fillStyle='#0a1b28';ctx.beginPath();ctx.arc(sx+3,sy-15,11,0,TAU);ctx.fill();
+  ctx.fillStyle='#7ee6e5';ctx.beginPath();ctx.arc(sx+4,sy-15,6,0,TAU);ctx.fill();
+
+  if(!still){
+    for(let i=0;i<8;i++){
+      const phase=(time*0.00006+i/8)%1;
+      const bx=(i*137)%w, by=h*(1-phase);
+      ctx.fillStyle='rgba(207,248,239,'+(0.06+phase*0.08)+')';
+      ctx.beginPath();ctx.arc(bx,by,1.5+phase*3,0,TAU);ctx.fill();
+    }
+  }
+}
+
 function frame(time) {
   if(!ctx||!canvas||document.hidden){frameStarted=false;return;}
   if(graphicsTier==='low' && lastPerfTime && time-lastPerfTime<33){rafHandle=requestAnimationFrame(frame);return;}
@@ -1480,7 +1544,12 @@ function frame(time) {
   if(time-perfWindowStart>=2000){
     const fps=perfFrames*1000/(time-perfWindowStart);
     if(fps<45&&!tierLocked && graphicsTier!=='low'){
-      graphicsTier=graphicsTier==='high'?'medium':'low'; tierLocked=true; lowQuality=false; document.body.classList.toggle('quality-med',graphicsTier==='medium'); document.body.classList.toggle('quality-low',graphicsTier==='low'); resize();
+      graphicsTier=graphicsTier==='high'?'medium':'low';
+      if(graphicsTier==='low') tierLocked=true;
+      lowQuality=false;
+      document.body.classList.toggle('quality-med',graphicsTier==='medium');
+      document.body.classList.toggle('quality-low',graphicsTier==='low');
+      resize();
     }
     perfWindowStart=time;perfFrames=0;
   }
@@ -1495,6 +1564,13 @@ function frame(time) {
   const predatorT=predatorEvent?clamp((t-eventScene.start)/eventScene.duration,0,1):0;
   const impact=predatorEvent&&!still?smooth((predatorT-0.58)/0.18):0;
   const hitShake=still?0:Math.sin(t*0.082)*impact*10;
+
+  if(graphicsTier==='low'){
+    drawLowScene(w,h,t,visualDepth,still);
+    if(!document.hidden) rafHandle=requestAnimationFrame(frame);
+    else frameStarted=false;
+    return;
+  }
 
   drawWater(w,h,visualDepth,t);
   drawSurfaceMoment(w,h,visualDepth,t,still);
