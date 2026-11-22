@@ -68,7 +68,19 @@ async function main(){
    report.rejected[e.id]=cleaned.rejected;if(fresh.errors.length)report.fallback.push(e.id);
    manifest.packs[e.id]={n:items.length,built:today,hash:sha(raw),bytes,source:'wikidata',quality};report.built++;
    console.log(`${tag}: ${items.length} accepted; ${quality.aliases} aliases; ${fresh.errors.length} fallback band(s)`);
-  }catch(err){report.failed.push(e.id+': '+err.message);if(hadPrevious)report.previousRetained=(report.previousRetained||[]).concat(e.id);console.warn(tag,'FAILED; old pack retained:',err.message);}
+  }catch(err){
+    const message=String(err?.message||err);
+    const anchorRegression=/anchor regression:/i.test(message);
+    if(anchorRegression && hadPrevious){
+      try { await writeFile(file,''); } catch {}
+      report.failed.push(e.id+': '+message+'; previous pack was invalid and was not retained');
+      console.error(tag,'FAILED; previous pack also failed anchors and was not retained:',message);
+    } else {
+      report.failed.push(e.id+': '+message);
+      if(hadPrevious)report.previousRetained=(report.previousRetained||[]).concat(e.id);
+      console.warn(tag,'FAILED; old pack retained:',message);
+    }
+  }
   await sleep(1500);
  }
  if(report.failed.length/Math.max(1,todo.length)>0.25){console.error('Over 25% of packs failed; refusing to publish.');process.exit(1);}
