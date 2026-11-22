@@ -34,7 +34,7 @@ const seen = new Set();
 function add(cat, id, prompt, pattern, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
   seen.add(id);
-  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 1, limit: 5000, answerLimit: 1000, minPool: 20, ...o });
+  CATALOG.push({ id, cat, prompt, kind: 'item', pattern, minSL: 2, floor: 2, limit: 5000, answerLimit: 2000, minPool: 20, ...o, target: o.target ?? o.answerLimit ?? 2000 });
 }
 function addTaxon(cat, id, prompt, parentQ, parentLabel, rankQ, rankLabel, o = {}) {
   if (seen.has(id)) throw new Error('duplicate catalog id ' + id);
@@ -43,7 +43,7 @@ function addTaxon(cat, id, prompt, parentQ, parentLabel, rankQ, rankLabel, o = {
   CATALOG.push({
     id, cat, prompt, kind: 'taxon', parent: parentQ, rank: rankQ,
     pattern: `wdt:P171+ wd:${parentQ}; wdt:P105 wd:${rankQ}`,
-    minSL: 5, limit: 2000, answerLimit: 1000, minPool: 20, ...o,
+    minSL: 5, floor: 2, limit: 5000, answerLimit: 2000, minPool: 20, ...o, target: o.target ?? o.answerLimit ?? 2000,
   });
 }
 const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
