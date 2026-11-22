@@ -46,9 +46,14 @@ async function main(){
    const merged=mergePools(old,fresh.items,{...e,target:e.target??e.answerLimit??2000}),cleaned=cleanPool(merged,e,blocklist);
    const items=applyOverrides(e.id,cleaned.items,overrides).slice(0,e.target??e.answerLimit??2000),min=Math.min(e.minPool||20,8);
    if(items.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
-   const rule=anchors[e.id]||{},must=rule.mustNot||e.mustNot||[],required=rule.anchors||e.anchors||[],keys=new Set(items.flatMap(x=>[x.n,...(x.a||[])]).map(x=>String(x).toLowerCase()));
+   const rule=anchors[e.id]||{},must=rule.mustNot||e.mustNot||[],required=rule.anchors||e.anchors||[],keys=new Set(items.flatMap(x=>[x.n,...(x.a||[])]).map(x=>normalizeDataName(x)));
    const missing=required.filter(x=>!keys.has(normalizeDataName(x))),forbidden=must.filter(x=>keys.has(normalizeDataName(x)));
-   if(missing.length||forbidden.length)console.warn(tag,'anchor warnings',JSON.stringify({missing,forbidden}));
+   if(missing.length||forbidden.length){
+     const previousKeys=new Set(old.flatMap(x=>[x.n,...(x.a||[])]).map(x=>normalizeDataName(x)));
+     const previousSafe=!required.some(x=>!previousKeys.has(normalizeDataName(x)))&&!must.some(x=>previousKeys.has(normalizeDataName(x)));
+     if(!previousSafe) throw new Error('anchor regression and previous pack is not known-good: '+JSON.stringify({missing,forbidden}));
+     throw new Error('anchor regression; previous known-good pack retained: '+JSON.stringify({missing,forbidden}));
+   }
    const raw=JSON.stringify(toPack(e,items)),bytes=Buffer.byteLength(raw);if(bytes>400*1024)throw new Error('pack exceeds 400 KB safety ceiling');
    if(!meaningfulChange(old,items)){report.unchanged++;continue;}await writeFile(file,raw);
    const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-missing.length,missingAnchors:missing,mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,querySplitFallback:fresh.errors.length>0,fallback:false};
