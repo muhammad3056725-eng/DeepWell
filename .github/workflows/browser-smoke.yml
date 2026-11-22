@@ -1,0 +1,88 @@
+name: Browser smoke test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/browser-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --prefix /tmp/pw --no-save --no-package-lock playwright
+          /tmp/pw/node_modules/.bin/playwright install --with-deps chromium
+
+      - name: Open live game and exercise controls
+        run: |
+          node --input-type=module <<'NODE'
+          import { chromium } from '/tmp/pw/node_modules/playwright/index.mjs';
+
+          const browser = await chromium.launch({ headless: true });
+          const page = await browser.newPage({ viewport: { width: 1365, height: 900 } });
+          const errors = [];
+          const failedRequests = [];
+
+          page.on('pageerror', error => errors.push('PAGE: ' + error.stack));
+          page.on('console', msg => {
+            if (msg.type() === 'error') errors.push('CONSOLE: ' + msg.text());
+          });
+          page.on('requestfailed', request => {
+            failedRequests.push(request.url() + ' :: ' + (request.failure()?.errorText || 'failed'));
+          });
+
+          try {
+            const response = await page.goto('https://deepwell.games/?browser-smoke=' + Date.now(), {
+              waitUntil: 'networkidle',
+              timeout: 60000
+            });
+            console.log('HTTP status:', response?.status());
+            console.log('Loaded URL:', page.url());
+
+            await page.locator('#home').waitFor({ state: 'visible', timeout: 10000 });
+            await page.locator('#howBtn').click();
+            await page.waitForFunction(() => document.querySelector('#how')?.classList.contains('active'), null, { timeout: 5000 });
+            console.log('PASS: How to play button responds');
+
+            await page.locator('#how [data-home]').first().click();
+            await page.waitForFunction(() => document.querySelector('#home')?.classList.contains('active'), null, { timeout: 5000 });
+            console.log('PASS: Return-home button responds');
+
+            await page.locator('#endlessBtn').click();
+            await page.waitForFunction(() => {
+              const game = document.querySelector('#game');
+              const prompt = document.querySelector('#promptText')?.textContent?.trim() || '';
+              return game?.classList.contains('active') && prompt && prompt !== 'Finding questions…';
+            }, null, { timeout: 90000 });
+            console.log('PASS: Endless Dive opens and a prompt is loaded');
+            console.log('Prompt:', await page.locator('#promptText').innerText());
+
+            await page.locator('#answerInput').fill('zzzznotarealanswer123');
+            await page.locator('#submitBtn').click();
+            await page.waitForFunction(() => (document.querySelector('#feedback')?.textContent || '').trim().length > 0, null, { timeout: 7000 });
+            console.log('PASS: Submit button responds');
+            console.log('Feedback:', await page.locator('#feedback').innerText());
+
+            if (errors.length) {
+              console.error('Browser errors:', errors.join('\n'));
+              throw new Error('Browser reported JavaScript errors');
+            }
+            console.log('PASS: No uncaught page or console errors');
+          } finally {
+            if (failedRequests.length) console.log('Failed requests:', failedRequests.join('\n'));
+            await browser.close();
+          }
+          NODE
