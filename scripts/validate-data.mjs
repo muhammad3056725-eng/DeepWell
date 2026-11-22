@@ -2,6 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { normalizeDataName } from './data-quality.mjs';
 import { CATALOG } from '../js/catalog.js';
+import { buildPool, matchAnswer } from '../js/engine.js';
 const errors=[],manifest=JSON.parse(await readFile('data/manifest.json','utf8')),block=JSON.parse(await readFile('data/blocklist.json','utf8')),anchors=JSON.parse(await readFile('data/anchors.json','utf8'));
 const catalog=new Set(CATALOG.map(e=>e.id)),files=(await readdir('data/packs')).filter(f=>f.endsWith('.json'));let total=0;
 for(const [id,meta] of Object.entries(manifest.packs)){
@@ -20,7 +21,14 @@ for(const [id,meta] of Object.entries(manifest.packs)){
    if((block.qids||[]).includes(x.id)||(block.words||[]).some(w=>String(x.n).toLowerCase().includes(String(w).toLowerCase()))){if(pack.v===2)errors.push(id+': blocklist violation '+x.n);else console.warn('Legacy v1 blocklist item to remove on rebuild:',id,x.n);}
   }
   const rule=anchors[id]||{},present=new Set(items.flatMap(x=>[x.n,...x.a]).map(normalizeDataName));
-  for(const x of rule.anchors||[])if(!present.has(normalizeDataName(x))){if(pack.v===2)errors.push(id+': missing anchor '+x);else console.warn('Legacy v1 anchor not yet enforced:',id,x);}
+  const pool=buildPool(items,{people:CATALOG.find(e=>e.id===id)?.people});
+  for(const x of rule.anchors||[]){
+    const result=matchAnswer(x,pool);
+    if(!result?.exact){
+      if(pack.v===2)errors.push(id+': anchor does not exact-match '+x);
+      else console.warn('Legacy v1 anchor not yet enforced:',id,x);
+    }
+  }
   for(const x of rule.mustNot||[])if(present.has(normalizeDataName(x))&&pack.v===2)errors.push(id+': mustNot answer found '+x);
  }catch(e){errors.push(id+': '+e.message);}
 }
