@@ -35,6 +35,8 @@ let graphicsTier = 'high';
 let tierLocked = false;
 let frameSampleStart = 0;
 let frameSampleCount = 0;
+let lastPerfTime = 0;
+let perfOverlay = null;
 const QUALITY = { high:{dpr:2,bubbles:40,plankton:100,fish:30,jellies:5}, medium:{dpr:1.5,bubbles:24,plankton:60,fish:18,jellies:3}, low:{dpr:1,bubbles:12,plankton:20,fish:10,jellies:2} };
 let perfWindowStart = 0;
 let perfFrames = 0;
@@ -1462,6 +1464,8 @@ function drawEventBackdrop(w,h,time) {
 
 function frame(time) {
   if(!ctx||!canvas||document.hidden){frameStarted=false;return;}
+  if(graphicsTier==='low' && lastPerfTime && time-lastPerfTime<33){rafHandle=requestAnimationFrame(frame);return;}
+  lastPerfTime=time;
   const w=width||window.innerWidth,h=height||window.innerHeight;
   const actualDepth=clamp((Number(getDepth())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
   const promptProgress=clamp(Number(getProgress())||0,0,1);
@@ -1469,6 +1473,10 @@ function frame(time) {
   const still=Boolean(isStill());
   const delta=still?0:Math.min(42,previousTime?time-previousTime:16);
   perfFrames++;
+  if (window.location.search.includes('perf')) {
+    if (!perfOverlay) { perfOverlay=document.createElement('div'); perfOverlay.style.cssText='position:fixed;left:8px;bottom:8px;z-index:99;padding:6px 8px;border-radius:6px;background:rgba(0,0,0,.72);color:#fff;font:11px/1.3 monospace;pointer-events:none'; document.body.appendChild(perfOverlay); }
+    const fps=delta>0?Math.round(1000/delta):0; perfOverlay.textContent=`FPS ${fps} · ${delta.toFixed(1)}ms · ${graphicsTier} · ${fish.length+ jellies.length} creatures`;
+  }
   if(!perfWindowStart)perfWindowStart=time;
   if(time-perfWindowStart>=2000){
     const fps=perfFrames*1000/(time-perfWindowStart);
