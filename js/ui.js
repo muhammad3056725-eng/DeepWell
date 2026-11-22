@@ -125,6 +125,10 @@ export function applySettings() {
   document.body.classList.toggle('reduced', Boolean(s.motion));
   document.body.classList.toggle('colorsafe', Boolean(s.color));
   setVolume(s.sound);
+  const graphics = s.graphics || 'auto';
+  document.body.classList.remove('quality-low','quality-med','quality-high','quality-auto');
+  document.body.classList.add(graphics === 'low' ? 'quality-low' : graphics === 'medium' ? 'quality-med' : graphics === 'high' ? 'quality-high' : 'quality-auto');
+  document.body.dataset.graphics = graphics;
 }
 
 export function loadSettingsUI() {
@@ -138,6 +142,6 @@ export function readSettingsUI() {
   const s = S.store.settings;
   s.sound = Number($('soundSetting').value); s.haptics = $('hapticSetting').checked;
   s.motion = $('motionSetting').checked; s.color = $('colorSetting').checked;
-  s.timer = Number($('timerSetting').value); s.text = Number($('textSetting').value);
+  s.timer = Number($('timerSetting').value); s.text = Number($('textSetting').value); s.graphics = $('graphicsSetting')?.value || s.graphics || 'auto';
   applySettings(); S.save();
 }
