@@ -1,5 +1,6 @@
 // Offline self-test: node scripts/selftest.mjs
 // Checks the catalog, query builder, matching, rarity and seeded picking. No network needed.
+import { readFile } from 'node:fs/promises';
 import { CATALOG, ENTITY_LABELS, entityIdsOf, QUESTION_TARGET } from '../js/catalog.js';
 import { buildQuery, parseBindings, toPack, fromPack, mergePools } from '../js/wikidata.js';
 import {
@@ -115,9 +116,10 @@ const mustAccept = [
 ];
 for (const [id, answer] of mustAccept) {
   const entry = CATALOG.find(e => e.id === id);
-  const seed = parseSeed(entry);
-  const result = seed.length ? matchAnswer(answer, buildPool(seed, {people:entry.people})) : null;
-  if (seed.length) ok(result?.exact, `must-accept ${id}/${answer}`);
+  let raw = null;
+  try { raw = JSON.parse(await readFile(`data/packs/${id}.json`, 'utf8')); } catch {}
+  const items = raw ? fromPack(raw) : parseSeed(entry);
+  if (items.length) ok(matchAnswer(answer, buildPool(items, {people:entry.people}))?.exact, `must-accept ${id}/${answer}`);
 }
 
 // ---- rarity
