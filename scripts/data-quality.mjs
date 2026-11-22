@@ -1,14 +1,14 @@
 // Offline dataset hygiene helpers.
 export const normalizeDataName = value => String(value ?? '').toLowerCase().normalize('NFD')
- .replace(/[\\u0300-\\u036f]/g,'').replace(/ß/g,'ss').replace(/ø/g,'o').replace(/æ/g,'ae').replace(/œ/g,'oe').replace(/ł/g,'l').replace(/đ/g,'d')
- .replace(/&/g,' and ').replace(/[^a-z0-9 ]/g,' ').replace(/\\b(the|a|an)\\b/g,' ').replace(/\\s+/g,' ').trim();
-const latin = value => /^[\\p{Script=Latin}\\p{N}\\p{P}\\p{Zs}]+$/u.test(value);
+ .replace(/[\u0300-\u036f]/g,'').replace(/ß/g,'ss').replace(/ø/g,'o').replace(/æ/g,'ae').replace(/œ/g,'oe').replace(/ł/g,'l').replace(/đ/g,'d')
+ .replace(/&/g,' and ').replace(/[^a-z0-9 ]/g,' ').replace(/\b(the|a|an)\b/g,' ').replace(/\s+/g,' ').trim();
+const latin = value => /^[\p{Script=Latin}\p{N}\p{P}\p{Zs}]+$/u.test(value);
 const slug = value => normalizeDataName(value).replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
 
 export function cleanPool(items, entry = {}, blocklist = {qids:[],words:[]}) {
  const rejected={invalid:0,blocked:0,duplicate:0,wrongClass:0}, ids=new Set(blocklist.qids||[]), words=(blocklist.words||[]).map(x=>String(x).toLowerCase()), byName=new Map();
  for(const item of items||[]){
-  const n=String(item?.n||'').trim(), invalid=!n||n.length>60||/^Q\\d+$/.test(n)||/^\\d{1,4}$/.test(n)||/^(list of|category:|template:)/i.test(n)||/https?:\\/\\//i.test(n)||/[<>]/.test(n);
+  const n=String(item?.n||'').trim(), invalid=!n||n.length>60||/^Q\d+$/.test(n)||/^\d{1,4}$/.test(n)||/^(list of|category:|template:)/i.test(n)||/https?:\/\//i.test(n)||/[<>]/.test(n);
   if(invalid){rejected.invalid++;continue;}
   if(ids.has(item.id)||words.some(w=>w&&n.toLowerCase().includes(w))){rejected.blocked++;continue;}
   const key=normalizeDataName(n);if(!key){rejected.invalid++;continue;}
