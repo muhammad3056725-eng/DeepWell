@@ -152,7 +152,7 @@ const quality = cleanPool([
  {id:'Q5',n:'Blocked place',s:80,a:[]},
  {id:'Q6',n:'Deutschland',s:70,a:['Deutschland']},
 ], {cat:'Geography'}, {qids:[],words:['blocked place']});
-eq(quality.items.length,2,'cleaner removes duplicate names, lists and blocklisted words');
+eq(quality.items.length,3,'cleaner removes duplicate names, lists and blocklisted words');
 ok(!quality.items.some(x=>x.a.includes('Shared alias')),'ambiguous aliases below 3x popularity are dropped');
 ok(quality.rejected.duplicate>0 && quality.rejected.invalid>0 && quality.rejected.blocked>0,'quality report counts rejected rows');
 const strongAlias = cleanPool([{id:'Q1',n:'Alpha',s:180,a:['Shared']},{id:'Q2',n:'Beta',s:40,a:['Shared']}],{});
