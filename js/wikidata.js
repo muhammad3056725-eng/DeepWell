@@ -5,7 +5,7 @@ const Q = s => String(s).replace(/"/g, '');
 
 /** Build the SPARQL query for one catalog entry. */
 export function buildQuery(entry, overrides = {}) {
-  const minSL = overrides.minSL ?? entry.floor ?? entry.minSL ?? 2;
+  const minSL = overrides.minSL ?? Math.max(Number(entry.floor ?? 2), Number(entry.minSL ?? 1));
   // Search broadly, then enforce a separate hard answer-pool ceiling.
   const limit = Math.max(1, Math.min(Number(overrides.limit ?? entry.limit ?? 5000), 5000));
   const maxSL = Number.isFinite(Number(overrides.maxSL)) && overrides.maxSL !== undefined ? `FILTER(?sl <= ${Math.max(1, Number(overrides.maxSL))})` : '';
