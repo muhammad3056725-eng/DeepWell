@@ -3,8 +3,8 @@ import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
 import { CATEGORIES } from './catalog.js?v=ten-thousand-prompts-20261121';
 import { libraryStats } from './data.js?v=ten-thousand-prompts-20261121';
 import { tierClass, utcDate } from './engine.js?v=ten-thousand-prompts-20261121';
-import * as S from './state.js';
-import { setVolume } from './audio.js';
+import * as S from './state.js?v=deepwell-mobilefix-20261122-1';
+import { setVolume } from './audio.js?v=deepwell-mobilefix-20261122-1';
 
 export const $ = id => document.getElementById(id);
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
