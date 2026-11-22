@@ -349,3 +349,25 @@ body.reduced.scene-focus #game .confirm{opacity:1}
   .depth-marker,.gauge-marker,.breakdown .row{animation:none!important;transition:none!important}
 }
 body.reduced .breakdown .row{animation:none!important}
+
+
+/* Individual currents in the themed-pack selector. */
+.cat-grid .button:nth-child(19n+1){background:linear-gradient(120deg,#167fa2,#39c8d2);color:#f4ffff}
+.cat-grid .button:nth-child(19n+2){background:linear-gradient(120deg,#3e78c8,#6bb9f0);color:#f7fcff}
+.cat-grid .button:nth-child(19n+3){background:linear-gradient(120deg,#275b78,#4e9e9c);color:#f4ffff}
+.cat-grid .button:nth-child(19n+4){background:linear-gradient(120deg,#26755d,#6cb68b);color:#f4fff7}
+.cat-grid .button:nth-child(19n+5){background:linear-gradient(120deg,#bd7634,#edb45a);color:#26180d}
+.cat-grid .button:nth-child(19n+6){background:linear-gradient(120deg,#875fc4,#c17cdc);color:#fff8ff}
+.cat-grid .button:nth-child(19n+7){background:linear-gradient(120deg,#b94d78,#ee86a7);color:#fff8fb}
+.cat-grid .button:nth-child(19n+8){background:linear-gradient(120deg,#9b6941,#d6aa70);color:#21160f}
+.cat-grid .button:nth-child(19n+9){background:linear-gradient(120deg,#536dbe,#8298e5);color:#f9fbff}
+.cat-grid .button:nth-child(19n+10){background:linear-gradient(120deg,#8e7135,#c2a74d);color:#211a0c}
+.cat-grid .button:nth-child(19n+11){background:linear-gradient(120deg,#286d99,#62a7d9);color:#f5fbff}
+.cat-grid .button:nth-child(19n+12){background:linear-gradient(120deg,#4e5e9e,#8796d2);color:#f7f8ff}
+.cat-grid .button:nth-child(19n+13){background:linear-gradient(120deg,#287c80,#58b8b0);color:#f3ffff}
+.cat-grid .button:nth-child(19n+14){background:linear-gradient(120deg,#975b93,#d28dc5);color:#fff8ff}
+.cat-grid .button:nth-child(19n+15){background:linear-gradient(120deg,#396c7c,#73aabd);color:#f4fcff}
+.cat-grid .button:nth-child(19n+16){background:linear-gradient(120deg,#8662a8,#c092dc);color:#fff8ff}
+.cat-grid .button:nth-child(19n+17){background:linear-gradient(120deg,#4a6d4b,#8bb275);color:#f7fff3}
+.cat-grid .button:nth-child(19n+18){background:linear-gradient(120deg,#a35a38,#df9460);color:#fff8f1}
+.cat-grid .button:nth-child(19n+19){background:linear-gradient(120deg,#356e9b,#6ba5cf);color:#f5fbff}
