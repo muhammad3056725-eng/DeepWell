@@ -15,10 +15,9 @@ for(const [id,meta] of Object.entries(manifest.packs)){
   if(Buffer.byteLength(raw)>400*1024)errors.push(id+': exceeds 400 KB chunking threshold');
   const seen=new Set();for(let i=0;i<items.length;i++){
    const x=items[i],key=normalizeDataName(x.n);if(!x.n||!String(x.n).trim())errors.push(id+': empty name');
-   if(seen.has(key))errors.push(id+': duplicate normalized name '+x.n);seen.add(key);
+   if(seen.has(key)){if(pack.v===2)errors.push(id+': duplicate normalized name '+x.n);else console.warn('Legacy v1 duplicate name to clean on rebuild:',id,x.n);}seen.add(key);
    if(i&&items[i].s>items[i-1].s)errors.push(id+': not popularity sorted');
-   if((block.qids||[]).includes(x.id))errors.push(id+': blocked id '+x.id);
-   if((block.words||[]).some(w=>String(x.n).toLowerCase().includes(String(w).toLowerCase())))errors.push(id+': blocklisted word '+x.n);
+   if((block.qids||[]).includes(x.id)||(block.words||[]).some(w=>String(x.n).toLowerCase().includes(String(w).toLowerCase()))){if(pack.v===2)errors.push(id+': blocklist violation '+x.n);else console.warn('Legacy v1 blocklist item to remove on rebuild:',id,x.n);}
   }
   const rule=anchors[id]||{},present=new Set(items.flatMap(x=>[x.n,...x.a]).map(normalizeDataName));
   for(const x of rule.anchors||[])if(!present.has(normalizeDataName(x))){if(pack.v===2)errors.push(id+': missing anchor '+x);else console.warn('Legacy v1 anchor not yet enforced:',id,x);}
