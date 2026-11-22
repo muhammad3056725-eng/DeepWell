@@ -1491,8 +1491,12 @@ function frame(time) {
     const e=eventScene;
     if(e&&e.kind==='predator'){
       const panic=1-smooth((e.p-0.2)/0.36);
-      const craftY=e.y+68*e.scaleNow;
-      drawSubmersible(w,h,t,visualDepth,still,panic,e.x,craftY);
+      // The predator exits first; the submersible settles back to the camera
+      // centre and emits its respawn bubble ring after the gulp.
+      const respawn=smooth((e.p-0.70)/0.16);
+      const craftY=mix(e.y+68*e.scaleNow,h*0.575,respawn);
+      const craftX=mix(e.x,w*0.5,respawn);
+      drawSubmersible(w,h,t,visualDepth,still,panic,craftX,craftY);
       drawPredatorFront(w,h,t);
     } else {
       drawSubmersible(w,h,t,visualDepth,still);
