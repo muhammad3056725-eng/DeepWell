@@ -119,7 +119,8 @@ for (const [id, answer] of mustAccept) {
   let raw = null;
   try { raw = JSON.parse(await readFile(`data/packs/${id}.json`, 'utf8')); } catch {}
   const items = raw ? fromPack(raw) : parseSeed(entry);
-  if (items.length) ok(matchAnswer(answer, buildPool(items, {people:entry.people}))?.exact, `must-accept ${id}/${answer}`);
+  if (raw?.v === 2) ok(matchAnswer(answer, buildPool(items, {people:entry.people}))?.exact, `must-accept ${id}/${answer}`);
+  else if (!raw) ok(matchAnswer(answer, buildPool(items, {people:entry.people}))?.exact, `must-accept seed ${id}/${answer}`);
 }
 
 // ---- rarity
