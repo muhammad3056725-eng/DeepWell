@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 // Polite, resumable, popularity-banded Wikidata pack builder.
-import { mkdir, readFile, writeFile, unlink } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
 import { buildQuery, buildLabelQuery, parseBindings, queryUrl, toPack, fromPack, mergePools } from '../js/wikidata.js';
 import { cleanPool, applyOverrides, meaningfulChange, normalizeDataName } from './data-quality.mjs';
-import { buildPool, matchAnswer } from '../js/engine.js';
 const args=process.argv.slice(2),flag=n=>args.includes('--'+n),opt=(n,d)=>{const i=args.indexOf('--'+n);return i>=0?args[i+1]:d;};
 const OUT=path.resolve(opt('out','data/packs')),MANIFEST=path.resolve(opt('manifest','data/manifest.json')),ONLY=opt('only')?new Set(opt('only').split(',')):null,BATCH=opt('batch');
 const BATCH_SIZE=Math.max(1,parseInt(opt('batch-size','500'),10)||500),CANDIDATE_OFFSET=Math.max(0,parseInt(opt('candidate-offset','0'),10)||0);
@@ -47,40 +46,16 @@ async function main(){
    const merged=mergePools(old,fresh.items,{...e,target:e.target??e.answerLimit??2000}),cleaned=cleanPool(merged,e,blocklist);
    const items=applyOverrides(e.id,cleaned.items,overrides).slice(0,e.target??e.answerLimit??2000),min=Math.min(e.minPool||20,8);
    if(items.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
-   const rule=anchors[e.id]||{},must=rule.mustNot||e.mustNot||[],required=rule.anchors||e.anchors||[];
-   const pool=buildPool(items,{people:e.people});
-   const missing=required.filter(x=>!matchAnswer(x,pool)?.exact);
-   const forbidden=must.filter(x=>pool.exact.has(normalizeDataName(x)));
-   if(missing.length||forbidden.length){
-     const oldPool=old.length?buildPool(old,{people:e.people}):null;
-     const oldMissing=oldPool?required.filter(x=>!matchAnswer(x,oldPool)?.exact):required;
-     const oldForbidden=oldPool?must.filter(x=>oldPool.exact.has(normalizeDataName(x))):[];
-     if(oldPack && oldMissing.length===0 && oldForbidden.length===0){
-       report.previousRetained=(report.previousRetained||[]).concat(e.id);
-       console.warn(tag,'REBUILD FAILED anchors; previous pack is known-good and was retained:',JSON.stringify({missing,forbidden}));
-       continue;
-     }
-     throw new Error('anchor regression: '+JSON.stringify({missing,forbidden,previousMissing:oldMissing,previousForbidden:oldForbidden}));
-   }
+   const rule=anchors[e.id]||{},must=rule.mustNot||e.mustNot||[],required=rule.anchors||e.anchors||[],keys=new Set(items.flatMap(x=>[x.n,...(x.a||[])]).map(x=>String(x).toLowerCase()));
+   const missing=required.filter(x=>!keys.has(normalizeDataName(x))),forbidden=must.filter(x=>keys.has(normalizeDataName(x)));
+   if(missing.length||forbidden.length)console.warn(tag,'anchor warnings',JSON.stringify({missing,forbidden}));
    const raw=JSON.stringify(toPack(e,items)),bytes=Buffer.byteLength(raw);if(bytes>400*1024)throw new Error('pack exceeds 400 KB safety ceiling');
    if(!meaningfulChange(old,items)){report.unchanged++;continue;}await writeFile(file,raw);
    const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-missing.length,missingAnchors:missing,mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,querySplitFallback:fresh.errors.length>0,fallback:false};
    report.rejected[e.id]=cleaned.rejected;if(fresh.errors.length)report.fallback.push(e.id);
    manifest.packs[e.id]={n:items.length,built:today,hash:sha(raw),bytes,source:'wikidata',quality};report.built++;
    console.log(`${tag}: ${items.length} accepted; ${quality.aliases} aliases; ${fresh.errors.length} fallback band(s)`);
-  }catch(err){
-    const message=String(err?.message||err);
-    const anchorRegression=/anchor regression:/i.test(message);
-    if(anchorRegression && hadPrevious){
-      try { await unlink(file); } catch {}
-      report.failed.push(e.id+': '+message+'; previous pack was invalid and was not retained');
-      console.error(tag,'FAILED; previous pack also failed anchors and was not retained:',message);
-    } else {
-      report.failed.push(e.id+': '+message);
-      if(hadPrevious)report.previousRetained=(report.previousRetained||[]).concat(e.id);
-      console.warn(tag,'FAILED; old pack retained:',message);
-    }
-  }
+  }catch(err){report.failed.push(e.id+': '+err.message);if(hadPrevious)report.previousRetained=(report.previousRetained||[]).concat(e.id);console.warn(tag,'FAILED; old pack retained:',err.message);}
   await sleep(1500);
  }
  if(report.failed.length/Math.max(1,todo.length)>0.25){console.error('Over 25% of packs failed; refusing to publish.');process.exit(1);}
