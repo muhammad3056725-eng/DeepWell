@@ -1,1 +1,1752 @@
-{}
+{
+ "capital": {
+  "add": [
+   {
+    "n": "London",
+    "s": 360,
+    "a": []
+   },
+   {
+    "n": "Paris",
+    "s": 359,
+    "a": []
+   },
+   {
+    "n": "Tokyo",
+    "s": 357,
+    "a": []
+   },
+   {
+    "n": "Washington, D.C.",
+    "s": 356,
+    "a": [
+     "Washington",
+     "Washington DC",
+     "Washington D.C."
+    ]
+   },
+   {
+    "n": "Rome",
+    "s": 355,
+    "a": []
+   },
+   {
+    "n": "Berlin",
+    "s": 354,
+    "a": []
+   },
+   {
+    "n": "Moscow",
+    "s": 352,
+    "a": []
+   },
+   {
+    "n": "Beijing",
+    "s": 351,
+    "a": [
+     "Peking"
+    ]
+   },
+   {
+    "n": "Madrid",
+    "s": 350,
+    "a": []
+   },
+   {
+    "n": "Cairo",
+    "s": 348,
+    "a": []
+   },
+   {
+    "n": "New Delhi",
+    "s": 347,
+    "a": [
+     "Delhi"
+    ]
+   },
+   {
+    "n": "Canberra",
+    "s": 346,
+    "a": []
+   },
+   {
+    "n": "Ottawa",
+    "s": 344,
+    "a": []
+   },
+   {
+    "n": "Brasília",
+    "s": 343,
+    "a": [
+     "Brasilia"
+    ]
+   },
+   {
+    "n": "Buenos Aires",
+    "s": 342,
+    "a": []
+   },
+   {
+    "n": "Mexico City",
+    "s": 341,
+    "a": [
+     "Ciudad de Mexico"
+    ]
+   },
+   {
+    "n": "Athens",
+    "s": 339,
+    "a": []
+   },
+   {
+    "n": "Vienna",
+    "s": 338,
+    "a": []
+   },
+   {
+    "n": "Amsterdam",
+    "s": 337,
+    "a": []
+   },
+   {
+    "n": "Lisbon",
+    "s": 335,
+    "a": []
+   },
+   {
+    "n": "Dublin",
+    "s": 334,
+    "a": []
+   },
+   {
+    "n": "Stockholm",
+    "s": 333,
+    "a": []
+   },
+   {
+    "n": "Oslo",
+    "s": 331,
+    "a": []
+   },
+   {
+    "n": "Copenhagen",
+    "s": 330,
+    "a": []
+   },
+   {
+    "n": "Helsinki",
+    "s": 329,
+    "a": []
+   },
+   {
+    "n": "Warsaw",
+    "s": 328,
+    "a": []
+   },
+   {
+    "n": "Prague",
+    "s": 326,
+    "a": []
+   },
+   {
+    "n": "Budapest",
+    "s": 325,
+    "a": []
+   },
+   {
+    "n": "Bucharest",
+    "s": 324,
+    "a": []
+   },
+   {
+    "n": "Sofia",
+    "s": 322,
+    "a": []
+   },
+   {
+    "n": "Belgrade",
+    "s": 321,
+    "a": []
+   },
+   {
+    "n": "Zagreb",
+    "s": 320,
+    "a": []
+   },
+   {
+    "n": "Ankara",
+    "s": 318,
+    "a": []
+   },
+   {
+    "n": "Tehran",
+    "s": 317,
+    "a": []
+   },
+   {
+    "n": "Baghdad",
+    "s": 316,
+    "a": []
+   },
+   {
+    "n": "Riyadh",
+    "s": 315,
+    "a": []
+   },
+   {
+    "n": "Jerusalem",
+    "s": 313,
+    "a": []
+   },
+   {
+    "n": "Damascus",
+    "s": 312,
+    "a": []
+   },
+   {
+    "n": "Beirut",
+    "s": 311,
+    "a": []
+   },
+   {
+    "n": "Amman",
+    "s": 309,
+    "a": []
+   },
+   {
+    "n": "Kabul",
+    "s": 308,
+    "a": []
+   },
+   {
+    "n": "Islamabad",
+    "s": 307,
+    "a": []
+   },
+   {
+    "n": "Dhaka",
+    "s": 305,
+    "a": []
+   },
+   {
+    "n": "Colombo",
+    "s": 304,
+    "a": [
+     "Sri Jayawardenepura Kotte"
+    ]
+   },
+   {
+    "n": "Kathmandu",
+    "s": 303,
+    "a": []
+   },
+   {
+    "n": "Bangkok",
+    "s": 302,
+    "a": []
+   },
+   {
+    "n": "Hanoi",
+    "s": 300,
+    "a": []
+   },
+   {
+    "n": "Manila",
+    "s": 299,
+    "a": []
+   },
+   {
+    "n": "Jakarta",
+    "s": 298,
+    "a": []
+   },
+   {
+    "n": "Kuala Lumpur",
+    "s": 296,
+    "a": []
+   },
+   {
+    "n": "Singapore",
+    "s": 295,
+    "a": []
+   },
+   {
+    "n": "Seoul",
+    "s": 294,
+    "a": []
+   },
+   {
+    "n": "Pyongyang",
+    "s": 292,
+    "a": []
+   },
+   {
+    "n": "Ulaanbaatar",
+    "s": 291,
+    "a": [
+     "Ulan Bator"
+    ]
+   },
+   {
+    "n": "Wellington",
+    "s": 290,
+    "a": []
+   },
+   {
+    "n": "Nairobi",
+    "s": 289,
+    "a": []
+   },
+   {
+    "n": "Addis Ababa",
+    "s": 287,
+    "a": []
+   },
+   {
+    "n": "Pretoria",
+    "s": 286,
+    "a": []
+   },
+   {
+    "n": "Cape Town",
+    "s": 285,
+    "a": []
+   },
+   {
+    "n": "Abuja",
+    "s": 283,
+    "a": []
+   },
+   {
+    "n": "Accra",
+    "s": 282,
+    "a": []
+   },
+   {
+    "n": "Dakar",
+    "s": 281,
+    "a": []
+   },
+   {
+    "n": "Algiers",
+    "s": 279,
+    "a": []
+   },
+   {
+    "n": "Tunis",
+    "s": 278,
+    "a": []
+   },
+   {
+    "n": "Tripoli",
+    "s": 277,
+    "a": []
+   },
+   {
+    "n": "Rabat",
+    "s": 276,
+    "a": []
+   },
+   {
+    "n": "Khartoum",
+    "s": 274,
+    "a": []
+   },
+   {
+    "n": "Kampala",
+    "s": 273,
+    "a": []
+   },
+   {
+    "n": "Dodoma",
+    "s": 272,
+    "a": []
+   },
+   {
+    "n": "Lusaka",
+    "s": 270,
+    "a": []
+   },
+   {
+    "n": "Harare",
+    "s": 269,
+    "a": []
+   },
+   {
+    "n": "Luanda",
+    "s": 268,
+    "a": []
+   },
+   {
+    "n": "Kinshasa",
+    "s": 266,
+    "a": []
+   },
+   {
+    "n": "Brazzaville",
+    "s": 265,
+    "a": []
+   },
+   {
+    "n": "Lima",
+    "s": 264,
+    "a": []
+   },
+   {
+    "n": "Bogotá",
+    "s": 263,
+    "a": [
+     "Bogota"
+    ]
+   },
+   {
+    "n": "Santiago",
+    "s": 261,
+    "a": []
+   },
+   {
+    "n": "Caracas",
+    "s": 260,
+    "a": []
+   },
+   {
+    "n": "Quito",
+    "s": 259,
+    "a": []
+   },
+   {
+    "n": "La Paz",
+    "s": 257,
+    "a": []
+   },
+   {
+    "n": "Sucre",
+    "s": 256,
+    "a": []
+   },
+   {
+    "n": "Montevideo",
+    "s": 255,
+    "a": []
+   },
+   {
+    "n": "Asunción",
+    "s": 253,
+    "a": [
+     "Asuncion"
+    ]
+   },
+   {
+    "n": "Havana",
+    "s": 252,
+    "a": []
+   },
+   {
+    "n": "Kingston",
+    "s": 251,
+    "a": []
+   },
+   {
+    "n": "Santo Domingo",
+    "s": 250,
+    "a": []
+   },
+   {
+    "n": "Port-au-Prince",
+    "s": 248,
+    "a": []
+   },
+   {
+    "n": "Panama City",
+    "s": 247,
+    "a": []
+   },
+   {
+    "n": "San José",
+    "s": 246,
+    "a": [
+     "San Jose"
+    ]
+   },
+   {
+    "n": "Managua",
+    "s": 244,
+    "a": []
+   },
+   {
+    "n": "Tegucigalpa",
+    "s": 243,
+    "a": []
+   },
+   {
+    "n": "San Salvador",
+    "s": 242,
+    "a": []
+   },
+   {
+    "n": "Guatemala City",
+    "s": 240,
+    "a": []
+   },
+   {
+    "n": "Brussels",
+    "s": 239,
+    "a": []
+   },
+   {
+    "n": "Bern",
+    "s": 238,
+    "a": [
+     "Berne"
+    ]
+   },
+   {
+    "n": "Luxembourg",
+    "s": 237,
+    "a": []
+   },
+   {
+    "n": "Reykjavík",
+    "s": 235,
+    "a": [
+     "Reykjavik"
+    ]
+   },
+   {
+    "n": "Kyiv",
+    "s": 234,
+    "a": [
+     "Kiev"
+    ]
+   },
+   {
+    "n": "Minsk",
+    "s": 233,
+    "a": []
+   },
+   {
+    "n": "Vilnius",
+    "s": 231,
+    "a": []
+   },
+   {
+    "n": "Riga",
+    "s": 230,
+    "a": []
+   },
+   {
+    "n": "Tallinn",
+    "s": 229,
+    "a": []
+   },
+   {
+    "n": "Bratislava",
+    "s": 227,
+    "a": []
+   },
+   {
+    "n": "Ljubljana",
+    "s": 226,
+    "a": []
+   },
+   {
+    "n": "Sarajevo",
+    "s": 225,
+    "a": []
+   },
+   {
+    "n": "Skopje",
+    "s": 224,
+    "a": []
+   },
+   {
+    "n": "Tirana",
+    "s": 222,
+    "a": []
+   },
+   {
+    "n": "Podgorica",
+    "s": 221,
+    "a": []
+   },
+   {
+    "n": "Pristina",
+    "s": 220,
+    "a": []
+   },
+   {
+    "n": "Chisinau",
+    "s": 218,
+    "a": []
+   },
+   {
+    "n": "Tbilisi",
+    "s": 217,
+    "a": []
+   },
+   {
+    "n": "Yerevan",
+    "s": 216,
+    "a": []
+   },
+   {
+    "n": "Baku",
+    "s": 214,
+    "a": []
+   },
+   {
+    "n": "Astana",
+    "s": 213,
+    "a": []
+   },
+   {
+    "n": "Tashkent",
+    "s": 212,
+    "a": []
+   },
+   {
+    "n": "Bishkek",
+    "s": 211,
+    "a": []
+   },
+   {
+    "n": "Dushanbe",
+    "s": 209,
+    "a": []
+   },
+   {
+    "n": "Ashgabat",
+    "s": 208,
+    "a": []
+   },
+   {
+    "n": "Doha",
+    "s": 207,
+    "a": []
+   },
+   {
+    "n": "Abu Dhabi",
+    "s": 205,
+    "a": []
+   },
+   {
+    "n": "Muscat",
+    "s": 204,
+    "a": []
+   },
+   {
+    "n": "Kuwait City",
+    "s": 203,
+    "a": []
+   },
+   {
+    "n": "Manama",
+    "s": 201,
+    "a": []
+   },
+   {
+    "n": "Sana'a",
+    "s": 200,
+    "a": [
+     "Sanaa"
+    ]
+   },
+   {
+    "n": "Naypyidaw",
+    "s": 199,
+    "a": [
+     "Nay Pyi Taw",
+     "Naypyitaw"
+    ]
+   },
+   {
+    "n": "Vientiane",
+    "s": 198,
+    "a": []
+   },
+   {
+    "n": "Phnom Penh",
+    "s": 196,
+    "a": []
+   },
+   {
+    "n": "Bandar Seri Begawan",
+    "s": 195,
+    "a": []
+   },
+   {
+    "n": "Dili",
+    "s": 194,
+    "a": []
+   },
+   {
+    "n": "Thimphu",
+    "s": 192,
+    "a": []
+   },
+   {
+    "n": "Malé",
+    "s": 191,
+    "a": [
+     "Male"
+    ]
+   },
+   {
+    "n": "Port Moresby",
+    "s": 190,
+    "a": []
+   },
+   {
+    "n": "Suva",
+    "s": 188,
+    "a": []
+   },
+   {
+    "n": "Nuku'alofa",
+    "s": 187,
+    "a": []
+   },
+   {
+    "n": "Apia",
+    "s": 186,
+    "a": []
+   },
+   {
+    "n": "Honiara",
+    "s": 185,
+    "a": []
+   },
+   {
+    "n": "Port Vila",
+    "s": 183,
+    "a": []
+   },
+   {
+    "n": "Valletta",
+    "s": 182,
+    "a": []
+   },
+   {
+    "n": "Nicosia",
+    "s": 181,
+    "a": []
+   },
+   {
+    "n": "Monaco",
+    "s": 179,
+    "a": []
+   },
+   {
+    "n": "Vaduz",
+    "s": 178,
+    "a": []
+   },
+   {
+    "n": "San Marino",
+    "s": 177,
+    "a": []
+   },
+   {
+    "n": "Vatican City",
+    "s": 175,
+    "a": []
+   },
+   {
+    "n": "Andorra la Vella",
+    "s": 174,
+    "a": []
+   },
+   {
+    "n": "Mogadishu",
+    "s": 173,
+    "a": []
+   },
+   {
+    "n": "Djibouti",
+    "s": 172,
+    "a": []
+   },
+   {
+    "n": "Asmara",
+    "s": 170,
+    "a": []
+   },
+   {
+    "n": "Kigali",
+    "s": 169,
+    "a": []
+   },
+   {
+    "n": "Bujumbura",
+    "s": 168,
+    "a": []
+   },
+   {
+    "n": "Juba",
+    "s": 166,
+    "a": []
+   },
+   {
+    "n": "N'Djamena",
+    "s": 165,
+    "a": [
+     "Ndjamena"
+    ]
+   },
+   {
+    "n": "Bamako",
+    "s": 164,
+    "a": []
+   },
+   {
+    "n": "Niamey",
+    "s": 162,
+    "a": []
+   },
+   {
+    "n": "Ouagadougou",
+    "s": 161,
+    "a": []
+   },
+   {
+    "n": "Abidjan",
+    "s": 160,
+    "a": []
+   },
+   {
+    "n": "Yamoussoukro",
+    "s": 159,
+    "a": []
+   },
+   {
+    "n": "Conakry",
+    "s": 157,
+    "a": []
+   },
+   {
+    "n": "Freetown",
+    "s": 156,
+    "a": []
+   },
+   {
+    "n": "Monrovia",
+    "s": 155,
+    "a": []
+   },
+   {
+    "n": "Banjul",
+    "s": 153,
+    "a": []
+   },
+   {
+    "n": "Bissau",
+    "s": 152,
+    "a": []
+   },
+   {
+    "n": "Nouakchott",
+    "s": 151,
+    "a": []
+   },
+   {
+    "n": "Lomé",
+    "s": 149,
+    "a": [
+     "Lome"
+    ]
+   },
+   {
+    "n": "Porto-Novo",
+    "s": 148,
+    "a": []
+   },
+   {
+    "n": "Yaoundé",
+    "s": 147,
+    "a": [
+     "Yaounde"
+    ]
+   },
+   {
+    "n": "Libreville",
+    "s": 146,
+    "a": []
+   },
+   {
+    "n": "Malabo",
+    "s": 144,
+    "a": []
+   },
+   {
+    "n": "Bangui",
+    "s": 143,
+    "a": []
+   },
+   {
+    "n": "Windhoek",
+    "s": 142,
+    "a": []
+   },
+   {
+    "n": "Gaborone",
+    "s": 140,
+    "a": []
+   },
+   {
+    "n": "Maputo",
+    "s": 139,
+    "a": []
+   },
+   {
+    "n": "Lilongwe",
+    "s": 138,
+    "a": []
+   },
+   {
+    "n": "Antananarivo",
+    "s": 136,
+    "a": []
+   },
+   {
+    "n": "Port Louis",
+    "s": 135,
+    "a": []
+   },
+   {
+    "n": "Victoria",
+    "s": 134,
+    "a": []
+   },
+   {
+    "n": "Moroni",
+    "s": 133,
+    "a": []
+   },
+   {
+    "n": "Maseru",
+    "s": 131,
+    "a": []
+   },
+   {
+    "n": "Mbabane",
+    "s": 130,
+    "a": []
+   },
+   {
+    "n": "Nassau",
+    "s": 129,
+    "a": []
+   },
+   {
+    "n": "Bridgetown",
+    "s": 127,
+    "a": []
+   },
+   {
+    "n": "Belmopan",
+    "s": 126,
+    "a": []
+   },
+   {
+    "n": "Georgetown",
+    "s": 125,
+    "a": []
+   },
+   {
+    "n": "Paramaribo",
+    "s": 123,
+    "a": []
+   },
+   {
+    "n": "Port of Spain",
+    "s": 122,
+    "a": []
+   },
+   {
+    "n": "Castries",
+    "s": 121,
+    "a": []
+   },
+   {
+    "n": "Kingstown",
+    "s": 120,
+    "a": []
+   },
+   {
+    "n": "St. George's",
+    "s": 118,
+    "a": [
+     "Saint George's"
+    ]
+   },
+   {
+    "n": "Roseau",
+    "s": 117,
+    "a": []
+   },
+   {
+    "n": "Basseterre",
+    "s": 116,
+    "a": []
+   },
+   {
+    "n": "Saint John's",
+    "s": 114,
+    "a": []
+   },
+   {
+    "n": "Praia",
+    "s": 113,
+    "a": []
+   },
+   {
+    "n": "São Tomé",
+    "s": 112,
+    "a": [
+     "Sao Tome"
+    ]
+   },
+   {
+    "n": "Majuro",
+    "s": 110,
+    "a": []
+   },
+   {
+    "n": "Palikir",
+    "s": 109,
+    "a": []
+   },
+   {
+    "n": "Tarawa",
+    "s": 108,
+    "a": []
+   },
+   {
+    "n": "Funafuti",
+    "s": 107,
+    "a": []
+   },
+   {
+    "n": "Ngerulmud",
+    "s": 105,
+    "a": []
+   },
+   {
+    "n": "Yaren",
+    "s": 104,
+    "a": []
+   }
+  ],
+  "removeNames": [
+   "Krasnodar",
+   "Cherrapunji",
+   "Avarga",
+   "Lintzoain",
+   "Wiryeseong",
+   "Papremi",
+   "Prasthala",
+   "Thinae",
+   "Alcanena",
+   "Shangjing Linhuangfu",
+   "Coroico",
+   "Asaba",
+   "Window Rock",
+   "San Andrés",
+   "La Guaira",
+   "Kangar",
+   "Garowe",
+   "Encarnación",
+   "Ciudad de la Paz",
+   "Mata-Utu",
+   "Stanley",
+   "La Plata",
+   "Jefferson City",
+   "Hobart",
+   "Adelaide",
+   "Bregenz",
+   "Saipan",
+   "Saigon",
+   "capital of the Netherlands",
+   "Establishment of the capital in Valladolid"
+  ]
+ },
+ "country": {
+  "aliasByName": {
+   "People's Republic of China": [
+    "China",
+    "PRC"
+   ],
+   "China": [
+    "PRC"
+   ],
+   "United States": [
+    "USA",
+    "US",
+    "America",
+    "United States of America",
+    "U.S.",
+    "U.S.A."
+   ],
+   "United Kingdom": [
+    "UK",
+    "U.K.",
+    "Britain",
+    "Great Britain",
+    "United Kingdom of Great Britain and Northern Ireland"
+   ],
+   "United Arab Emirates": [
+    "UAE",
+    "Emirates"
+   ],
+   "Czech Republic": [
+    "Czechia"
+   ],
+   "Czechia": [
+    "Czech Republic"
+   ],
+   "Eswatini": [
+    "Swaziland"
+   ],
+   "Myanmar": [
+    "Burma"
+   ],
+   "Turkey": [
+    "Türkiye",
+    "Turkiye"
+   ],
+   "Netherlands": [
+    "Holland"
+   ],
+   "Ivory Coast": [
+    "Côte d'Ivoire",
+    "Cote d Ivoire"
+   ],
+   "Côte d'Ivoire": [
+    "Ivory Coast"
+   ],
+   "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo Kinshasa"
+   ],
+   "Republic of the Congo": [
+    "Congo Brazzaville"
+   ],
+   "Russia": [
+    "Russian Federation"
+   ],
+   "South Korea": [
+    "Korea",
+    "Republic of Korea"
+   ],
+   "North Korea": [
+    "DPRK"
+   ],
+   "Vatican City": [
+    "Vatican",
+    "Holy See"
+   ],
+   "Cape Verde": [
+    "Cabo Verde"
+   ],
+   "East Timor": [
+    "Timor-Leste",
+    "Timor Leste"
+   ],
+   "Bahamas": [
+    "The Bahamas"
+   ],
+   "Gambia": [
+    "The Gambia"
+   ],
+   "Macedonia": [
+    "North Macedonia"
+   ],
+   "North Macedonia": [
+    "Macedonia"
+   ]
+  }
+ },
+ "country-asia": {
+  "aliasByName": {
+   "People's Republic of China": [
+    "China",
+    "PRC"
+   ],
+   "China": [
+    "PRC"
+   ],
+   "United States": [
+    "USA",
+    "US",
+    "America",
+    "United States of America",
+    "U.S.",
+    "U.S.A."
+   ],
+   "United Kingdom": [
+    "UK",
+    "U.K.",
+    "Britain",
+    "Great Britain",
+    "United Kingdom of Great Britain and Northern Ireland"
+   ],
+   "United Arab Emirates": [
+    "UAE",
+    "Emirates"
+   ],
+   "Czech Republic": [
+    "Czechia"
+   ],
+   "Czechia": [
+    "Czech Republic"
+   ],
+   "Eswatini": [
+    "Swaziland"
+   ],
+   "Myanmar": [
+    "Burma"
+   ],
+   "Turkey": [
+    "Türkiye",
+    "Turkiye"
+   ],
+   "Netherlands": [
+    "Holland"
+   ],
+   "Ivory Coast": [
+    "Côte d'Ivoire",
+    "Cote d Ivoire"
+   ],
+   "Côte d'Ivoire": [
+    "Ivory Coast"
+   ],
+   "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo Kinshasa"
+   ],
+   "Republic of the Congo": [
+    "Congo Brazzaville"
+   ],
+   "Russia": [
+    "Russian Federation"
+   ],
+   "South Korea": [
+    "Korea",
+    "Republic of Korea"
+   ],
+   "North Korea": [
+    "DPRK"
+   ],
+   "Vatican City": [
+    "Vatican",
+    "Holy See"
+   ],
+   "Cape Verde": [
+    "Cabo Verde"
+   ],
+   "East Timor": [
+    "Timor-Leste",
+    "Timor Leste"
+   ],
+   "Bahamas": [
+    "The Bahamas"
+   ],
+   "Gambia": [
+    "The Gambia"
+   ],
+   "Macedonia": [
+    "North Macedonia"
+   ],
+   "North Macedonia": [
+    "Macedonia"
+   ]
+  }
+ },
+ "country-europe": {
+  "aliasByName": {
+   "People's Republic of China": [
+    "China",
+    "PRC"
+   ],
+   "China": [
+    "PRC"
+   ],
+   "United States": [
+    "USA",
+    "US",
+    "America",
+    "United States of America",
+    "U.S.",
+    "U.S.A."
+   ],
+   "United Kingdom": [
+    "UK",
+    "U.K.",
+    "Britain",
+    "Great Britain",
+    "United Kingdom of Great Britain and Northern Ireland"
+   ],
+   "United Arab Emirates": [
+    "UAE",
+    "Emirates"
+   ],
+   "Czech Republic": [
+    "Czechia"
+   ],
+   "Czechia": [
+    "Czech Republic"
+   ],
+   "Eswatini": [
+    "Swaziland"
+   ],
+   "Myanmar": [
+    "Burma"
+   ],
+   "Turkey": [
+    "Türkiye",
+    "Turkiye"
+   ],
+   "Netherlands": [
+    "Holland"
+   ],
+   "Ivory Coast": [
+    "Côte d'Ivoire",
+    "Cote d Ivoire"
+   ],
+   "Côte d'Ivoire": [
+    "Ivory Coast"
+   ],
+   "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo Kinshasa"
+   ],
+   "Republic of the Congo": [
+    "Congo Brazzaville"
+   ],
+   "Russia": [
+    "Russian Federation"
+   ],
+   "South Korea": [
+    "Korea",
+    "Republic of Korea"
+   ],
+   "North Korea": [
+    "DPRK"
+   ],
+   "Vatican City": [
+    "Vatican",
+    "Holy See"
+   ],
+   "Cape Verde": [
+    "Cabo Verde"
+   ],
+   "East Timor": [
+    "Timor-Leste",
+    "Timor Leste"
+   ],
+   "Bahamas": [
+    "The Bahamas"
+   ],
+   "Gambia": [
+    "The Gambia"
+   ],
+   "Macedonia": [
+    "North Macedonia"
+   ],
+   "North Macedonia": [
+    "Macedonia"
+   ]
+  }
+ },
+ "country-africa": {
+  "aliasByName": {
+   "People's Republic of China": [
+    "China",
+    "PRC"
+   ],
+   "China": [
+    "PRC"
+   ],
+   "United States": [
+    "USA",
+    "US",
+    "America",
+    "United States of America",
+    "U.S.",
+    "U.S.A."
+   ],
+   "United Kingdom": [
+    "UK",
+    "U.K.",
+    "Britain",
+    "Great Britain",
+    "United Kingdom of Great Britain and Northern Ireland"
+   ],
+   "United Arab Emirates": [
+    "UAE",
+    "Emirates"
+   ],
+   "Czech Republic": [
+    "Czechia"
+   ],
+   "Czechia": [
+    "Czech Republic"
+   ],
+   "Eswatini": [
+    "Swaziland"
+   ],
+   "Myanmar": [
+    "Burma"
+   ],
+   "Turkey": [
+    "Türkiye",
+    "Turkiye"
+   ],
+   "Netherlands": [
+    "Holland"
+   ],
+   "Ivory Coast": [
+    "Côte d'Ivoire",
+    "Cote d Ivoire"
+   ],
+   "Côte d'Ivoire": [
+    "Ivory Coast"
+   ],
+   "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo Kinshasa"
+   ],
+   "Republic of the Congo": [
+    "Congo Brazzaville"
+   ],
+   "Russia": [
+    "Russian Federation"
+   ],
+   "South Korea": [
+    "Korea",
+    "Republic of Korea"
+   ],
+   "North Korea": [
+    "DPRK"
+   ],
+   "Vatican City": [
+    "Vatican",
+    "Holy See"
+   ],
+   "Cape Verde": [
+    "Cabo Verde"
+   ],
+   "East Timor": [
+    "Timor-Leste",
+    "Timor Leste"
+   ],
+   "Bahamas": [
+    "The Bahamas"
+   ],
+   "Gambia": [
+    "The Gambia"
+   ],
+   "Macedonia": [
+    "North Macedonia"
+   ],
+   "North Macedonia": [
+    "Macedonia"
+   ]
+  }
+ },
+ "country-north-america": {
+  "aliasByName": {
+   "People's Republic of China": [
+    "China",
+    "PRC"
+   ],
+   "China": [
+    "PRC"
+   ],
+   "United States": [
+    "USA",
+    "US",
+    "America",
+    "United States of America",
+    "U.S.",
+    "U.S.A."
+   ],
+   "United Kingdom": [
+    "UK",
+    "U.K.",
+    "Britain",
+    "Great Britain",
+    "United Kingdom of Great Britain and Northern Ireland"
+   ],
+   "United Arab Emirates": [
+    "UAE",
+    "Emirates"
+   ],
+   "Czech Republic": [
+    "Czechia"
+   ],
+   "Czechia": [
+    "Czech Republic"
+   ],
+   "Eswatini": [
+    "Swaziland"
+   ],
+   "Myanmar": [
+    "Burma"
+   ],
+   "Turkey": [
+    "Türkiye",
+    "Turkiye"
+   ],
+   "Netherlands": [
+    "Holland"
+   ],
+   "Ivory Coast": [
+    "Côte d'Ivoire",
+    "Cote d Ivoire"
+   ],
+   "Côte d'Ivoire": [
+    "Ivory Coast"
+   ],
+   "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo Kinshasa"
+   ],
+   "Republic of the Congo": [
+    "Congo Brazzaville"
+   ],
+   "Russia": [
+    "Russian Federation"
+   ],
+   "South Korea": [
+    "Korea",
+    "Republic of Korea"
+   ],
+   "North Korea": [
+    "DPRK"
+   ],
+   "Vatican City": [
+    "Vatican",
+    "Holy See"
+   ],
+   "Cape Verde": [
+    "Cabo Verde"
+   ],
+   "East Timor": [
+    "Timor-Leste",
+    "Timor Leste"
+   ],
+   "Bahamas": [
+    "The Bahamas"
+   ],
+   "Gambia": [
+    "The Gambia"
+   ],
+   "Macedonia": [
+    "North Macedonia"
+   ],
+   "North Macedonia": [
+    "Macedonia"
+   ]
+  }
+ },
+ "country-south-america": {
+  "aliasByName": {
+   "People's Republic of China": [
+    "China",
+    "PRC"
+   ],
+   "China": [
+    "PRC"
+   ],
+   "United States": [
+    "USA",
+    "US",
+    "America",
+    "United States of America",
+    "U.S.",
+    "U.S.A."
+   ],
+   "United Kingdom": [
+    "UK",
+    "U.K.",
+    "Britain",
+    "Great Britain",
+    "United Kingdom of Great Britain and Northern Ireland"
+   ],
+   "United Arab Emirates": [
+    "UAE",
+    "Emirates"
+   ],
+   "Czech Republic": [
+    "Czechia"
+   ],
+   "Czechia": [
+    "Czech Republic"
+   ],
+   "Eswatini": [
+    "Swaziland"
+   ],
+   "Myanmar": [
+    "Burma"
+   ],
+   "Turkey": [
+    "Türkiye",
+    "Turkiye"
+   ],
+   "Netherlands": [
+    "Holland"
+   ],
+   "Ivory Coast": [
+    "Côte d'Ivoire",
+    "Cote d Ivoire"
+   ],
+   "Côte d'Ivoire": [
+    "Ivory Coast"
+   ],
+   "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo Kinshasa"
+   ],
+   "Republic of the Congo": [
+    "Congo Brazzaville"
+   ],
+   "Russia": [
+    "Russian Federation"
+   ],
+   "South Korea": [
+    "Korea",
+    "Republic of Korea"
+   ],
+   "North Korea": [
+    "DPRK"
+   ],
+   "Vatican City": [
+    "Vatican",
+    "Holy See"
+   ],
+   "Cape Verde": [
+    "Cabo Verde"
+   ],
+   "East Timor": [
+    "Timor-Leste",
+    "Timor Leste"
+   ],
+   "Bahamas": [
+    "The Bahamas"
+   ],
+   "Gambia": [
+    "The Gambia"
+   ],
+   "Macedonia": [
+    "North Macedonia"
+   ],
+   "North Macedonia": [
+    "Macedonia"
+   ]
+  }
+ },
+ "country-oceania": {
+  "aliasByName": {
+   "People's Republic of China": [
+    "China",
+    "PRC"
+   ],
+   "China": [
+    "PRC"
+   ],
+   "United States": [
+    "USA",
+    "US",
+    "America",
+    "United States of America",
+    "U.S.",
+    "U.S.A."
+   ],
+   "United Kingdom": [
+    "UK",
+    "U.K.",
+    "Britain",
+    "Great Britain",
+    "United Kingdom of Great Britain and Northern Ireland"
+   ],
+   "United Arab Emirates": [
+    "UAE",
+    "Emirates"
+   ],
+   "Czech Republic": [
+    "Czechia"
+   ],
+   "Czechia": [
+    "Czech Republic"
+   ],
+   "Eswatini": [
+    "Swaziland"
+   ],
+   "Myanmar": [
+    "Burma"
+   ],
+   "Turkey": [
+    "Türkiye",
+    "Turkiye"
+   ],
+   "Netherlands": [
+    "Holland"
+   ],
+   "Ivory Coast": [
+    "Côte d'Ivoire",
+    "Cote d Ivoire"
+   ],
+   "Côte d'Ivoire": [
+    "Ivory Coast"
+   ],
+   "Democratic Republic of the Congo": [
+    "DRC",
+    "DR Congo",
+    "Congo Kinshasa"
+   ],
+   "Republic of the Congo": [
+    "Congo Brazzaville"
+   ],
+   "Russia": [
+    "Russian Federation"
+   ],
+   "South Korea": [
+    "Korea",
+    "Republic of Korea"
+   ],
+   "North Korea": [
+    "DPRK"
+   ],
+   "Vatican City": [
+    "Vatican",
+    "Holy See"
+   ],
+   "Cape Verde": [
+    "Cabo Verde"
+   ],
+   "East Timor": [
+    "Timor-Leste",
+    "Timor Leste"
+   ],
+   "Bahamas": [
+    "The Bahamas"
+   ],
+   "Gambia": [
+    "The Gambia"
+   ],
+   "Macedonia": [
+    "North Macedonia"
+   ],
+   "North Macedonia": [
+    "Macedonia"
+   ]
+  }
+ }
+}

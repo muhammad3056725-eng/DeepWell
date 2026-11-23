@@ -1,9 +1,10 @@
 import { readdir, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { normalizeDataName } from './data-quality.mjs';
+import { normalizeDataName, checkAnchors } from './data-quality.mjs';
+import { fromPack } from '../js/wikidata.js';
 import { CATALOG } from '../js/catalog.js';
 const errors=[],manifest=JSON.parse(await readFile('data/manifest.json','utf8')),block=JSON.parse(await readFile('data/blocklist.json','utf8')),anchors=JSON.parse(await readFile('data/anchors.json','utf8'));
-const catalog=new Set(CATALOG.map(e=>e.id)),files=(await readdir('data/packs')).filter(f=>f.endsWith('.json'));let total=0;
+const catalog=new Set(CATALOG.map(e=>e.id)),files=(await readdir('data/packs')).filter(f=>f.endsWith('.json'));let total=0,anchorTotal=0;
 for(const [id,meta] of Object.entries(manifest.packs)){
  try{
   const raw=await readFile('data/packs/'+id+'.json','utf8'),pack=JSON.parse(raw),items=pack.v===2?(pack.names||[]).map((n,i)=>({id:String(pack.ids?.[i]),n,s:+pack.sitelinks?.[i]||0,a:pack.aliases?.[i]||[]})):(pack.items||[]).map(([qid,n,s,a])=>({id:'Q'+qid,n,s,a:a||[]}));
@@ -19,13 +20,20 @@ for(const [id,meta] of Object.entries(manifest.packs)){
    if(i&&items[i].s>items[i-1].s)errors.push(id+': not popularity sorted');
    if((block.qids||[]).includes(x.id)||(block.words||[]).some(w=>String(x.n).toLowerCase().includes(String(w).toLowerCase()))){if(pack.v===2)errors.push(id+': blocklist violation '+x.n);else console.warn('Legacy v1 blocklist item to remove on rebuild:',id,x.n);}
   }
-  const rule=anchors[id]||{},present=new Set(items.flatMap(x=>[x.n,...x.a]).map(normalizeDataName));
-  for(const x of rule.anchors||[])if(!present.has(normalizeDataName(x))){if(pack.v===2)errors.push(id+': missing anchor '+x);else console.warn('Legacy v1 anchor not yet enforced:',id,x);}
-  for(const x of rule.mustNot||[])if(present.has(normalizeDataName(x))&&pack.v===2)errors.push(id+': mustNot answer found '+x);
+  // Anchors go through the REAL game matcher: the answer must be an exact hit, not merely present somewhere in the file.
+  // This applies to every pack (old v1 and new v2): a famous answer that the game rejects is a build failure.
+  const rule=anchors[id]||{};
+  if(rule.anchors?.length||rule.mustNot?.length){
+   const res=checkAnchors(fromPack(pack),rule);
+   for(const x of res.missing)errors.push(id+': ANCHOR REJECTED BY GAME MATCHER: '+x);
+   for(const x of res.forbidden)errors.push(id+': mustNot answer accepted: '+x);
+   anchorTotal+=(rule.anchors||[]).length;
+  }
  }catch(e){errors.push(id+': '+e.message);}
 }
 for(const file of files)if(!manifest.packs[file.slice(0,-5)])errors.push(file+': missing from manifest');
 if(total>60*1024*1024)errors.push('total pack bytes exceed 60 MiB budget');
 for(const id of Object.keys(anchors))if(!catalog.has(id))errors.push('anchor prompt is not in catalog: '+id);
 if(errors.length){console.error('Validation failed:\n'+errors.join('\n'));process.exit(1);}
+console.log(`Anchors checked through the game matcher: ${anchorTotal}`);
 console.log(`Validation passed: ${Object.keys(manifest.packs).length} packs, ${total.toLocaleString()} raw bytes, ${files.length} files.`);

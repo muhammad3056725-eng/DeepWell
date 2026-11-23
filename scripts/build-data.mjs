@@ -5,7 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
 import { buildQuery, buildLabelQuery, parseBindings, queryUrl, toPack, fromPack, mergePools } from '../js/wikidata.js';
-import { cleanPool, applyOverrides, meaningfulChange, normalizeDataName } from './data-quality.mjs';
+import { cleanPool, applyOverrides, meaningfulChange, normalizeDataName, ensureAnchors, checkAnchors } from './data-quality.mjs';
 const args=process.argv.slice(2),flag=n=>args.includes('--'+n),opt=(n,d)=>{const i=args.indexOf('--'+n);return i>=0?args[i+1]:d;};
 const OUT=path.resolve(opt('out','data/packs')),MANIFEST=path.resolve(opt('manifest','data/manifest.json')),ONLY=opt('only')?new Set(opt('only').split(',')):null,BATCH=opt('batch');
 const BATCH_SIZE=Math.max(1,parseInt(opt('batch-size','500'),10)||500),CANDIDATE_OFFSET=Math.max(0,parseInt(opt('candidate-offset','0'),10)||0);
@@ -44,14 +44,19 @@ async function main(){
   const file=path.join(OUT,e.id+'.json');let hadPrevious=false;try{
    const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);hadPrevious=Boolean(oldPack);
    const merged=mergePools(old,fresh.items,{...e,target:e.target??e.answerLimit??2000}),cleaned=cleanPool(merged,e,blocklist);
-   const items=applyOverrides(e.id,cleaned.items,overrides).slice(0,e.target??e.answerLimit??2000),min=Math.min(e.minPool||20,8);
-   if(items.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
-   const rule=anchors[e.id]||{},must=rule.mustNot||e.mustNot||[],required=rule.anchors||e.anchors||[],keys=new Set(items.flatMap(x=>[x.n,...(x.a||[])]).map(x=>String(x).toLowerCase()));
-   const missing=required.filter(x=>!keys.has(normalizeDataName(x))),forbidden=must.filter(x=>keys.has(normalizeDataName(x)));
-   if(missing.length||forbidden.length)console.warn(tag,'anchor warnings',JSON.stringify({missing,forbidden}));
+   const rule={...(e.anchors?{anchors:e.anchors}:{}),...(e.mustNot?{mustNot:e.mustNot}:{}),...(anchors[e.id]||{}),people:Boolean(e.people)};
+   const withOverrides=applyOverrides(e.id,cleaned.items,overrides),min=Math.min(e.minPool||20,8);
+   if(withOverrides.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
+   // Anchors are guaranteed: a famous answer the Wikidata query missed is added, and reported, because
+   // that means the class pattern for this prompt is too narrow.
+   const ensured=ensureAnchors(withOverrides,rule,e.id),items=ensured.items.slice(0,e.target??e.answerLimit??2000);
+   const final=checkAnchors(items,rule),missing=final.missing,forbidden=final.forbidden;
+   if(ensured.injected.length){report.anchorsInjected=report.anchorsInjected||{};report.anchorsInjected[e.id]=ensured.injected;console.warn(tag,'anchors added by hand (query missed them):',ensured.injected.map(x=>x.anchor).join(', '));}
+   if(missing.length||forbidden.length){report.failed.push(e.id+': anchor check failed '+JSON.stringify({missing,forbidden}));console.error(tag,'ANCHOR FAILURE, pack not written',JSON.stringify({missing,forbidden}));continue;}
+   const required=rule.anchors||[];
    const raw=JSON.stringify(toPack(e,items)),bytes=Buffer.byteLength(raw);if(bytes>400*1024)throw new Error('pack exceeds 400 KB safety ceiling');
    if(!meaningfulChange(old,items)){report.unchanged++;continue;}await writeFile(file,raw);
-   const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-missing.length,missingAnchors:missing,mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,querySplitFallback:fresh.errors.length>0,fallback:false};
+   const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-ensured.injected.length,missingAnchors:ensured.injected.map(x=>x.anchor),mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,querySplitFallback:fresh.errors.length>0,fallback:false};
    report.rejected[e.id]=cleaned.rejected;if(fresh.errors.length)report.fallback.push(e.id);
    manifest.packs[e.id]={n:items.length,built:today,hash:sha(raw),bytes,source:'wikidata',quality};report.built++;
    console.log(`${tag}: ${items.length} accepted; ${quality.aliases} aliases; ${fresh.errors.length} fallback band(s)`);

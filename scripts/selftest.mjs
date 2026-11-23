@@ -8,7 +8,8 @@ import {
 } from '../js/engine.js';
 import { SEED } from '../js/seed.js';
 import { parseSeed } from '../js/data.js';
-import { cleanPool, applyOverrides, meaningfulChange } from './data-quality.mjs';
+import { cleanPool, applyOverrides, meaningfulChange, rankAliases, ensureAnchors, checkAnchors } from './data-quality.mjs';
+import { readFileSync, existsSync } from 'node:fs';
 
 let failed = 0, passed = 0;
 function ok(cond, msg) { if (cond) passed++; else { failed++; console.error('  FAIL:', msg); } }
@@ -162,6 +163,42 @@ ok(overridePool.some(x=>x.n==='Vistula'&&x.a.includes('Wisla')),'manual add over
 ok(!overridePool.some(x=>x.id==='Q2')&&overridePool.find(x=>x.id==='Q1').a.includes('Rhein'),'manual remove and aliasAdd overrides');
 eq(meaningfulChange(overridePool,overridePool.map(x=>({...x,s:x.s+1}))),false,'small popularity drift does not rewrite a pack');
 eq(meaningfulChange(overridePool,[...overridePool,{id:'Q9',n:'New answer',s:1,a:[]}]),true,'added answers trigger a meaningful pack write');
+
+// ---- famous answers must never be rejected (regression for China / Paris / Tokyo / Madagascar / Kilimanjaro)
+{
+  const chinaPool = buildPool([{id:'Q148',n:"People's Republic of China",s:400,a:['cn','Red China']},{id:'Q30',n:'United States',s:430,a:[]}]);
+  ok(!matchAnswer('China', chinaPool)?.exact, 'sanity: before alias ranking "China" is not an alias');
+  const cleaned = cleanPool([{id:'Q148',n:"People's Republic of China",s:401,a:['cn','Red China','Communist China','China PR','P.R.C.','PR China','The PRC','a1','a2','a3','a4','a5']}], {cat:'Geography'});
+  const cn = buildPool(cleaned.items);
+  ok(matchAnswer('China', cn)?.exact, 'country: China is accepted even when the official name has many aliases');
+  ok(rankAliases("People's Republic of China", ['zzz long odd alias here', 'China'])[0] === 'China', 'short label variant outranks other aliases');
+  // fuzzy hardening: a short foreign alias must not capture a different famous answer
+  const pool = buildPool([{id:'Q90',n:'Paris',s:300,a:[]},{id:'Q1',n:'Poti',s:50,a:['Pasis']}]);
+  eq(matchAnswer('Paris', pool)?.item.n, 'Paris', 'Paris is an exact hit and never "Did you mean Poti"');
+  const pool2 = buildPool([{id:'Q1',n:'Poti',s:50,a:['Pasis']}]);
+  ok(!matchAnswer('Paris', pool2), 'short alias is ignored for fuzzy matching');
+  // anchors are enforced through the real matcher
+  const miss = checkAnchors([{id:'a',n:'Alpha',s:9,a:[]}], {anchors:['Alpha','Beta']});
+  eq(JSON.stringify(miss.missing), '["Beta"]', 'checkAnchors reports answers the game would reject');
+  const forced = ensureAnchors(Array.from({length:10},(_, i)=>({id:'x'+i,n:'Item '+i,s:50-i,a:[]})), {anchors:['Famous One']}, 't');
+  ok(checkAnchors(forced.items, {anchors:['Famous One']}).missing.length === 0 && forced.injected.length === 1, 'ensureAnchors adds and reports a missing anchor');
+  const dup = applyOverrides('t',[{id:'Q1',n:'Paris',s:300,a:[]}],{t:{add:[{n:'paris',a:['City of Light']}]}});
+  eq(dup.length, 1, 'override add never duplicates an existing answer');
+  ok(dup[0].a.includes('City of Light'), 'override add merges aliases into the existing answer');
+  eq(normalize('C++'), 'c++', 'C++ stays distinct from C');
+}
+// Real packs (when present): the answers every player would type first must be accepted.
+{
+  const MUST = [['country','China'],['country','United States'],['capital','Paris'],['capital','London'],['capital','Tokyo'],['city','Tokyo'],['city','Paris'],
+    ['island','Madagascar'],['mountain','Kilimanjaro'],['volcano','Mount Etna'],['volcano','Mount Fuji'],['river','Nile'],['university','Harvard University'],['tower','Eiffel Tower']];
+  for (const [id, answer] of MUST) {
+    const file = `data/packs/${id}.json`;
+    if (!existsSync(file)) continue;
+    const m = matchAnswer(answer, buildPool(fromPack(JSON.parse(readFileSync(file, 'utf8')))));
+    ok(m?.exact, `real pack ${id} accepts "${answer}" (exact match)`);
+    if (m?.exact) ok(m.item.r <= 25, `real pack ${id}: "${answer}" is a famous answer, so few points (${m.item.r})`);
+  }
+}
 
 console.log(`${passed} passed, ${failed} failed. ${CATALOG.length} prompts, ${Object.keys(SEED).length} seed lists.`);
 process.exit(failed ? 1 : 0);

@@ -76,12 +76,13 @@ export function buildPool(raw, opts = {}) {
   const items = raw.map(r => ({ id: r.id, n: r.n, a: r.a || [], s: r.s || 0, r: 0, p: 0, keys: [] }));
   assignRarity(items);
   const exact = new Map();
+  const labelKeys = new Set();
   const claim = (key, item) => {
     if (!key) return;
     if (!exact.has(key)) exact.set(key, item); // items are sorted by fame: the better known one keeps the key
     if (!item.keys.includes(key)) item.keys.push(key);
   };
-  for (const it of items) { claim(normalize(it.n), it); }
+  for (const it of items) { const k = normalize(it.n); if (k) labelKeys.add(k); claim(k, it); }
   for (const it of items) { for (const al of it.a) claim(normalize(al), it); }
   if (opts.people) {
     const tally = new Map();
@@ -96,7 +97,7 @@ export function buildPool(raw, opts = {}) {
     }
   }
   const keys = [...exact.entries()];
-  return { items, exact, keys, size: items.length, raw };
+  return { items, exact, keys, labelKeys, size: items.length, raw };
 }
 
 export const firstLetter = name => (normalize(name)[0] || '').toUpperCase();
@@ -131,10 +132,15 @@ export function matchAnswer(input, pool) {
   let best = null;
   for (const [key, item] of pool.keys) {
     if (key[0] !== value[0]) continue;
+    // Fuzzy ("Did you mean ...?") uses main labels, or longer aliases only: a short foreign alias
+    // such as "Pasis" must not pull "Paris" onto an unrelated answer.
+    const isLabel = pool.labelKeys ? pool.labelKeys.has(key) : true;
+    if (key.length < (isLabel ? 5 : 7)) continue;
     const limit = key.length < 8 ? 1 : key.length < 13 ? 2 : 3;
     if (Math.abs(key.length - value.length) > limit) continue;
     const d = distance(value, key, limit);
-    if (d <= limit && (!best || d < best.d || (d === best.d && item.s > best.item.s))) best = { item, d, key };
+    if (d > limit) continue;
+    if (!best || d < best.d || (d === best.d && isLabel && !best.isLabel) || (d === best.d && isLabel === best.isLabel && item.s > best.item.s)) best = { item, d, key, isLabel };
   }
   return best ? { item: best.item, near: true, key: best.key } : null;
 }
