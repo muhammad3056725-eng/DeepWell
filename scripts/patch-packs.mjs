@@ -32,3 +32,27 @@ for (const e of targets) {
 console.log(`Patched ${changed} of ${targets.length} packs.`);
 console.log('Anchors that had to be added by hand (the Wikidata query had missed them):');
 console.log(JSON.stringify(injectedAll, null, 1));
+
+// Second pass over EVERY pack: drop anything on the family-safety blocklist (old v1 packs still contain a few entries).
+{
+  const { readdir } = await import('node:fs/promises');
+  const words = (blocklist.words || []).map(x => String(x).toLowerCase()), qids = new Set(blocklist.qids || []);
+  let cleaned = 0;
+  for (const f of (await readdir('data/packs')).filter(x => x.endsWith('.json'))) {
+    const id = f.slice(0, -5), pack = JSON.parse(await readFile('data/packs/' + f, 'utf8')), items = fromPack(pack);
+    const keep = items.filter(i => !qids.has(i.id) && !words.some(w => w && String(i.n).toLowerCase().includes(w)));
+    if (keep.length === items.length) continue;
+    const e = CATALOG.find(c => c.id === id) || { id };
+    await writeFile('data/packs/' + f, JSON.stringify({ ...toPack(e, keep), built: pack.built }));
+    console.log('Removed', items.length - keep.length, 'blocklisted answer(s) from', id); cleaned++;
+  }
+  console.log(`Blocklist pass: ${cleaned} pack(s) changed.`);
+}
+
+// Packs changed, so bump the manifest version: the game uses it as the cache-buster for every pack URL.
+{
+  const m = JSON.parse(await readFile('data/manifest.json', 'utf8'));
+  m.version = (m.version || 0) + 1; m.built = new Date().toISOString().slice(0, 10);
+  await writeFile('data/manifest.json', JSON.stringify(m));
+  console.log('Manifest version is now', m.version, '(run scripts/backfill-manifest.mjs next to refresh hashes).');
+}

@@ -2,10 +2,11 @@
 // All visuals are generated live with Canvas 2D paths, gradients, lighting and particles.
 // No 3D engine, images, video, sprite sheets or downloaded models.
 import { CONFIG } from './config.js';
-import { predatorGulp, rareSparkle } from './audio.js?v=deepwell-mobilefix-20261122-1';
+import { predatorGulp, rareSparkle } from './audio.js?v=fixes-20261123-1';
 
 const canvas = document.getElementById('scene');
-const ctx = canvas?.getContext('2d', { alpha: false });
+const mainCtx = canvas?.getContext('2d', { alpha: false });
+let ctx = mainCtx; // temporarily points at an offscreen canvas while a cached layer is being baked
 let getDepth = () => 0;
 let getProgress = () => 0;
 let isStill = () => false;
@@ -32,12 +33,28 @@ let getColorSafe = () => false;
 let focusTimer = 0;
 let lowQuality = false;
 let graphicsTier = 'high';
-let tierLocked = false;
+let tierManual = false;   // the player picked High/Medium/Low in Settings: never change it
+let tierPicked = false;   // the starting tier has been chosen for this session
+let slowWindows = 0;      // consecutive slow 2-second windows (two in a row trigger a step down)
 let frameSampleStart = 0;
 let frameSampleCount = 0;
 let lastPerfTime = 0;
 let perfOverlay = null;
-const QUALITY = { high:{dpr:2,bubbles:40,plankton:100,fish:30,jellies:5}, medium:{dpr:1.5,bubbles:24,plankton:60,fish:18,jellies:3}, low:{dpr:1,bubbles:12,plankton:20,fish:10,jellies:2} };
+// One place that defines every tier. Each step down removes FIXED per-frame costs (not just creature counts):
+//  layer  = resolution of the cached water/surface layers (smaller = cheaper), sprites = fish drawn from cached
+//  images instead of live paths+gradients, caustics = animated surface light lines, fps = frame-rate cap.
+const QUALITY = {
+  high:  { dpr:2,    bubbles:40, plankton:100, fish:30, jellies:5, layer:0.5,  sprites:false, caustics:true,  kelp:24, kelpGlow:true,  fps:60 },
+  medium:{ dpr:1.25, bubbles:16, plankton:36,  fish:12, jellies:2, layer:0.35, sprites:true,  caustics:false, kelp:14, kelpGlow:false, fps:60 },
+  low:   { dpr:1,    bubbles:8,  plankton:14,  fish:8,  jellies:1, layer:0.25, sprites:true,  caustics:false, kelp:8,  kelpGlow:false, fps:30 }
+};
+const TIER_STORE = 'deepwell.graphicsTier';
+const qNow = () => QUALITY[graphicsTier] || QUALITY.medium;
+function syncTierClasses() {
+  const c = document.body?.classList; if (!c) return;
+  c.toggle('quality-med', graphicsTier === 'medium');
+  c.toggle('quality-low', graphicsTier === 'low');
+}
 let perfWindowStart = 0;
 let perfFrames = 0;
 
@@ -47,6 +64,31 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const mix = (a, b, t) => a + (b - a) * t;
 const smooth = t => { t = clamp(t, 0, 1); return t * t * (3 - 2 * t); };
 const easeOut = t => 1 - Math.pow(1 - clamp(t, 0, 1), 3.3);
+
+/* ------------------------------------------------------------ cached layers
+ * Slow-changing, full-screen layers (water, surface, rocks) are painted into a small offscreen canvas and blitted with
+ * one drawImage. They are repainted only when their key changes (depth step, size, tier), not every frame. */
+const layers = new Map();
+function cachedLayer(id, lw, lh, scale, key, paint) {
+  let L = layers.get(id);
+  if (!L) { L = { c: document.createElement('canvas'), key: null }; L.x = L.c.getContext('2d'); layers.set(id, L); }
+  const pw = Math.max(1, Math.ceil(lw * scale)), ph = Math.max(1, Math.ceil(lh * scale));
+  if (L.c.width !== pw || L.c.height !== ph) { L.c.width = pw; L.c.height = ph; L.key = null; }
+  if (L.key !== key) {
+    const main = ctx;
+    ctx = L.x; ctx.setTransform(pw / lw, 0, 0, ph / lh, 0, 0); ctx.clearRect(0, 0, lw, lh);
+    try { paint(); } finally { ctx = main; }
+    L.key = key;
+  }
+  return L.c;
+}
+/** Paint into a standalone small canvas once (sprites). */
+function bakeSprite(w, h, paint) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const main = ctx; ctx = c.getContext('2d');
+  try { paint(); } finally { ctx = main; }
+  return c;
+}
 
 const FISH_PALETTE = [
   ['#526e78','#b6c7c2','#1b303a'], ['#687b72','#c1c9b7','#263b39'],
@@ -70,13 +112,22 @@ function resize() {
   // High-detail drawing without allowing very high-DPI devices to allocate excessive memory.
   const touch = matchMedia('(hover:none) and (pointer:coarse)').matches || width < 700;
   const manual = document.body?.dataset.graphics || 'auto';
-  if (manual !== 'auto') { graphicsTier = manual; tierLocked = true; }
-  else if (!tierLocked) {
-    const hc = navigator.hardwareConcurrency || 8, mem = navigator.deviceMemory || 8;
-    graphicsTier = touch && (hc <= 4 || mem <= 4) ? 'low' : touch ? 'medium' : 'high';
+  if (manual !== 'auto' && QUALITY[manual]) { graphicsTier = manual; tierManual = true; tierPicked = true; }
+  else {
+    tierManual = false;
+    if (!tierPicked) {
+      // Start low-power phones on Low, other phones on Medium, desktops on High; remember what a past session settled on.
+      const hc = navigator.hardwareConcurrency || 8, mem = navigator.deviceMemory || 8;
+      graphicsTier = touch && (hc <= 4 || mem <= 4) ? 'low' : touch ? 'medium' : 'high';
+      try { const saved = localStorage.getItem(TIER_STORE); const rank = { low:0, medium:1, high:2 };
+        if (QUALITY[saved] && rank[saved] < rank[graphicsTier]) graphicsTier = saved; } catch { /* storage blocked: fine */ }
+      tierPicked = true;
+    }
   }
+  syncTierClasses();
+  layers.clear(); fishSprites.clear();
   const q = QUALITY[graphicsTier] || QUALITY.medium;
-  dpr = Math.min(q.dpr, Math.max(1, window.devicePixelRatio || 1));
+  dpr = Math.min(q.dpr, touch ? 1.5 : 2, Math.max(1, window.devicePixelRatio || 1));
   canvas.width = Math.floor(width * dpr);
   canvas.height = Math.floor(height * dpr);
   canvas.style.width = width + 'px';
@@ -85,6 +136,7 @@ function resize() {
 
   const mobile = width < 700;
   const quality = lowQuality ? 0.62 : 1;
+  slowWindows = 0; perfWindowStart = 0; perfFrames = 0;
   bubbles = Array.from({length:Math.round(q.bubbles*quality)},()=>({
     x:rand(0,width), y:rand(0,height), r:rand(0.8,4.2),
     speed:rand(0.18,0.92), drift:rand(0.35,1.9), phase:rand(0,TAU),
@@ -108,8 +160,8 @@ function resize() {
     u:rand(-0.08,1.08),v:rand(0.035,0.22),scale:rand(0.55,1.45),
     phase:rand(0,TAU),alpha:rand(0.24,0.54)
   }));
-  kelp = Array.from({length:24},(_,i)=>({
-    x:(i/23)*width+rand(-24,24),height:rand(75,260),width:rand(3,10),
+  kelp = Array.from({length:q.kelp},(_,i)=>({
+    x:(i/Math.max(1,q.kelp-1))*width+rand(-24,24),height:rand(75,260),width:rand(3,10),
     phase:rand(0,TAU),color:['#123f3d','#20594c','#2c6652','#426e55'][i%4],
     lean:rand(-1,1)
   }));
@@ -284,6 +336,14 @@ function waterPalette(depth) {
 }
 
 function drawWater(w,h,depth,time) {
+  const q=qNow();
+  // Baked at reduced resolution (gradients are smooth) and repainted only when depth moves a step or every 2.5 s.
+  const key=Math.round(depth*320)*10000+(Math.floor(time/2500)%10000);
+  ctx.drawImage(cachedLayer('water',w,h,q.layer,key,()=>paintWater(w,h,depth,time)),0,0,w,h);
+  if(q.caustics&&depth<0.18)drawCaustics(w,h,depth,time);
+}
+
+function paintWater(w,h,depth,time) {
   const colors=waterPalette(depth);
   const g=ctx.createLinearGradient(w*0.16,0,w*0.72,h);
   g.addColorStop(0,colors[0]);g.addColorStop(0.48,colors[1]);g.addColorStop(1,colors[2]);
@@ -318,8 +378,17 @@ function drawWater(w,h,depth,time) {
     ctx.restore();
   }
 
+  // Depth haze compresses contrast in the distance; at depth it becomes cold and dark.
+  const haze=ctx.createLinearGradient(0,0,0,h);
+  haze.addColorStop(0,'rgba(2,17,29,'+(0.015+depth*0.07)+')');
+  haze.addColorStop(0.54,'rgba(1,13,23,'+(0.08+depth*0.13)+')');
+  haze.addColorStop(1,'rgba(0,5,12,'+(0.35+depth*0.48)+')');
+  ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);
+}
+ 
+function drawCaustics(w,h,depth,time) {
   // Surface caustics are faint and disappear quickly below the reef.
-  if(depth<0.18){
+  {
     ctx.save();ctx.globalCompositeOperation='screen';
     ctx.globalAlpha=(0.018+(0.18-depth)*0.13);
     ctx.strokeStyle='#b5e7df';ctx.lineWidth=0.8;
@@ -336,17 +405,17 @@ function drawWater(w,h,depth,time) {
     ctx.restore();
   }
 
-  // Depth haze compresses contrast in the distance; at depth it becomes cold and dark.
-  const haze=ctx.createLinearGradient(0,0,0,h);
-  haze.addColorStop(0,'rgba(2,17,29,'+(0.015+depth*0.07)+')');
-  haze.addColorStop(0.54,'rgba(1,13,23,'+(0.08+depth*0.13)+')');
-  haze.addColorStop(1,'rgba(0,5,12,'+(0.35+depth*0.48)+')');
-  ctx.fillStyle=haze;ctx.fillRect(0,0,w,h);
 }
- 
+
 function drawSurfaceMoment(w,h,depth,time,still) {
   const strength=1-smooth(depth/0.235);
   if(strength<0.006) return;
+  const q=qNow(),key=Math.round(depth*500)*100000+(Math.floor(time/(q.sprites?220:90))%100000);
+  ctx.drawImage(cachedLayer('surface',w,h,Math.max(0.4,q.layer*1.4),key,()=>paintSurfaceMoment(w,h,depth,time,still)),0,0,w,h);
+}
+
+function paintSurfaceMoment(w,h,depth,time,still) {
+  const strength=1-smooth(depth/0.235);
   const waterline=h*(0.305-depth*0.78);
   ctx.save();
   ctx.globalAlpha=strength;
@@ -448,10 +517,8 @@ function drawBranchCoral(x,y,scale,color,phase,time) {
   ctx.restore();
 }
 
-function drawReefAndKelp(w,h,time,depth,still) {
-  const reefAlpha=clamp(1-depth*1.95,0,1);
-  if(reefAlpha>0.02){
-    ctx.save();ctx.globalAlpha=reefAlpha;
+function paintReefStatic(w,h) {
+  {
     // Foreground rock shelves frame the diver and provide a strong scale cue.
     for(let side of [-1,1]){
       const x=side<0?0:w;
@@ -467,17 +534,32 @@ function drawReefAndKelp(w,h,time,depth,still) {
     }
     for(const r of reef){
       drawRock(r.x,r.y,r.scale,r.phase);
-      if(r.type===0||r.type===2)drawBranchCoral(r.x,r.y-15*r.scale,r.scale*0.75,r.color,r.phase,time);
+      if(r.type===0||r.type===2)drawBranchCoral(r.x,r.y-15*r.scale,r.scale*0.75,r.color,r.phase,0);
     }
+  }
+}
+
+function drawReefAndKelp(w,h,time,depth,still) {
+  const reefAlpha=clamp(1-depth*1.95,0,1);
+  if(reefAlpha<=0.02)return;
+  const q=qNow();
+  // Rock shelves, rocks and coral never move: baked once per size/tier (their soft shadow is paid for once, not 60x a second).
+  const base=cachedLayer('reef',w,h,Math.min(dpr,1.25),'static',()=>paintReefStatic(w,h));
+  ctx.save();ctx.globalAlpha=reefAlpha;ctx.drawImage(base,0,0,w,h);
+  {
     for(const k of kelp){
       const sway=still?0:Math.sin(time*0.0009+k.phase)*22*k.lean;
-      ctx.strokeStyle=k.color;ctx.lineWidth=k.width;ctx.lineCap='round';
-      ctx.shadowColor=k.color;ctx.shadowBlur=8;
+      ctx.lineCap='round';
       ctx.beginPath();ctx.moveTo(k.x,h+15);
       ctx.bezierCurveTo(k.x-18+sway*0.3,h-k.height*0.25,k.x+20+sway,h-k.height*0.65,k.x+sway,h-k.height);
-      ctx.stroke();ctx.shadowBlur=0;
-      ctx.strokeStyle='rgba(176,255,211,0.18)';ctx.lineWidth=1.5;
-      ctx.beginPath();ctx.moveTo(k.x,h-3);ctx.quadraticCurveTo(k.x+sway*0.45,h-k.height*0.52,k.x+sway,h-k.height);ctx.stroke();
+      if(q.kelpGlow){ // cheap replacement for shadowBlur: one wider, faint stroke under the strand
+        ctx.globalAlpha=reefAlpha*0.22;ctx.strokeStyle=k.color;ctx.lineWidth=k.width*2.6;ctx.stroke();ctx.globalAlpha=reefAlpha;
+      }
+      ctx.strokeStyle=k.color;ctx.lineWidth=k.width;ctx.stroke();
+      if(q.kelpGlow){
+        ctx.strokeStyle='rgba(176,255,211,0.18)';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(k.x,h-3);ctx.quadraticCurveTo(k.x+sway*0.45,h-k.height*0.52,k.x+sway,h-k.height);ctx.stroke();
+      }
     }
     ctx.restore();
   }
@@ -524,14 +606,21 @@ function drawDepthWalls(w,h,depth,time) {
   ctx.restore();
 }
 
+let bubbleSprite=null;
 function drawBubble(x,y,r,alpha) {
-  ctx.save();ctx.globalAlpha=alpha;
-  const g=ctx.createRadialGradient(x-r*0.32,y-r*0.38,0,x,y,r);
-  g.addColorStop(0,'rgba(237,255,255,0.75)');g.addColorStop(0.22,'rgba(151,238,244,0.25)');
-  g.addColorStop(0.8,'rgba(100,212,233,0.08)');g.addColorStop(1,'rgba(202,255,255,0.48)');
-  ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();
-  ctx.strokeStyle='rgba(212,255,255,0.62)';ctx.lineWidth=Math.max(0.6,r*0.09);ctx.stroke();
-  ctx.restore();
+  if(!bubbleSprite){
+    const S=64;
+    bubbleSprite=bakeSprite(S,S,()=>{
+      const cx=S/2,rr=S/2-3;
+      const g=ctx.createRadialGradient(cx-rr*0.32,cx-rr*0.38,0,cx,cx,rr);
+      g.addColorStop(0,'rgba(237,255,255,0.75)');g.addColorStop(0.22,'rgba(151,238,244,0.25)');
+      g.addColorStop(0.8,'rgba(100,212,233,0.08)');g.addColorStop(1,'rgba(202,255,255,0.48)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cx,rr,0,TAU);ctx.fill();
+      ctx.strokeStyle='rgba(212,255,255,0.62)';ctx.lineWidth=2.2;ctx.stroke();
+    });
+  }
+  const prev=ctx.globalAlpha,d=r*2*(32/29);
+  ctx.globalAlpha=alpha;ctx.drawImage(bubbleSprite,x-d/2,y-d/2,d,d);ctx.globalAlpha=prev;
 }
 
 function drawParticles(w,h,time,still,depth) {
@@ -695,7 +784,28 @@ function drawUndulatingFish(x,y,scale,palette,phase,time,dir,alpha,kind,depth) {
   ctx.restore();
 }
 
+const FISH_FRAMES=10,SPR_W=300,SPR_H=130,SPR_OX=200,SPR_OY=65;
+const fishSprites=new Map();  // tint array -> Map(kind*100+frame -> canvas)
+const DEEP_TINT=['#335366','#8daab0','#1a3444'],DEEP_GLOW_TINT=['#244f61','#80aeb5','#153043'];
+function fishSpriteFrame(tint,kind,frame) {
+  let byKind=fishSprites.get(tint);if(!byKind){byKind=new Map();fishSprites.set(tint,byKind);}
+  const key=kind*100+frame;let c=byKind.get(key);
+  if(!c){
+    c=bakeSprite(SPR_W,SPR_H,()=>{ctx.translate(SPR_OX,SPR_OY);drawUndulatingFish(0,0,1,tint,frame/FISH_FRAMES*TAU,0,1,1,kind,0);});
+    byKind.set(key,c);
+  }
+  return c;
+}
+/** Same fish, drawn from a cached frame: one drawImage instead of ~3 gradients and ~40 path operations. */
+function drawFishSprite(x,y,size,tint,phase,time,dir,alpha,kind,depth) {
+  if(size>1.12){drawUndulatingFish(x,y,size,tint,phase,time,dir,alpha,kind,depth);return;}
+  const th=(((time*0.004+phase)%TAU)+TAU)%TAU,fr=Math.floor(th/TAU*FISH_FRAMES)%FISH_FRAMES;
+  ctx.save();ctx.translate(x,y);ctx.scale(dir*size,size);ctx.globalAlpha=alpha;
+  ctx.drawImage(fishSpriteFrame(tint,kind,fr),-SPR_OX,-SPR_OY);ctx.restore();
+}
+
 function drawFishSchools(w,h,time,still,depth,delta) {
+  const useSprites=qNow().sprites,drawFish=useSprites?drawFishSprite:drawUndulatingFish;
   const sunlight=1-smooth((depth-0.08)/0.2);
   const twilight=smooth((depth-0.06)/0.2)*(1-smooth((depth-0.39)/0.23));
   const midnight=smooth((depth-0.32)/0.2)*(1-smooth((depth-0.84)/0.16));
@@ -715,14 +825,12 @@ function drawFishSchools(w,h,time,still,depth,delta) {
     const scatter=eventScene?.kind==='predator'?(1-smooth((performance.now()-eventScene.start)/380)):0;
     if(scatter) x-=eventScene.direction*scatter*(14+f.group*5);
     const habitat=f.kind<=4?Math.max(sunlight,twilight*0.58):f.kind===5?Math.max(twilight,midnight):Math.max(twilight*0.72,midnight,abyss*0.65);
-    const tint=depth>0.34
-      ? (f.kind===5?['#244f61','#80aeb5','#153043']:['#335366','#8daab0','#1a3444'])
-      : f.palette;
+    const tint=depth>0.34?(f.kind===5?DEEP_GLOW_TINT:DEEP_TINT):f.palette;
     if(x>-100&&x<w+100&&y>-90&&y<h+90){
       const a=alpha*habitat;
       if(f.kind===6) drawManta(x,y,size*1.45,f.phase,time,a*0.68);
       else if(f.kind===7) drawJellyfish(x,y,size*0.46,f.phase,time,a*0.68);
-      else drawUndulatingFish(x,y,size,tint,f.phase,time,f.dir,a,f.kind,depth);
+      else drawFish(x,y,size,tint,f.phase,time,f.dir,a,f.kind,depth);
     }
   }
 
@@ -730,7 +838,7 @@ function drawFishSchools(w,h,time,still,depth,delta) {
   const sweep=(time*0.000023)%1;
   const x=mix(-155,w+155,sweep);
   const y=h*0.28+Math.sin(time*0.00055)*h*0.035;
-  drawUndulatingFish(x,y,0.78,FISH_PALETTE[4],1.3,time,1,0.14,1,depth);
+  drawFish(x,y,0.78,FISH_PALETTE[4],1.3,time,1,0.14,1,depth);
 
   const jellyBlend=twilight*0.75+midnight*0.9+abyss*0.25;
   for(const j of jellies){
@@ -1463,7 +1571,7 @@ function drawEventBackdrop(w,h,time) {
 
 function frame(time) {
   if(!ctx||!canvas||document.hidden){frameStarted=false;return;}
-  if(graphicsTier==='low' && lastPerfTime && time-lastPerfTime<33){rafHandle=requestAnimationFrame(frame);return;}
+  if(qNow().fps<60 && lastPerfTime && time-lastPerfTime<1000/qNow().fps-2){rafHandle=requestAnimationFrame(frame);return;}
   lastPerfTime=time;
   const w=width||window.innerWidth,h=height||window.innerHeight;
   const actualDepth=clamp((Number(getDepth())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
@@ -1479,9 +1587,15 @@ function frame(time) {
   if(!perfWindowStart)perfWindowStart=time;
   if(time-perfWindowStart>=2000){
     const fps=perfFrames*1000/(time-perfWindowStart);
-    if(fps<45&&!tierLocked && graphicsTier!=='low'){
-      graphicsTier=graphicsTier==='high'?'medium':'low'; tierLocked=true; lowQuality=false; document.body.classList.toggle('quality-med',graphicsTier==='medium'); document.body.classList.toggle('quality-low',graphicsTier==='low'); resize();
+    // Auto mode only: two slow 2-second windows in a row step ONE tier down (High -> Medium -> Low). Never back up,
+    // so quality cannot flip-flop. The result is remembered for the next visit.
+    slowWindows=(!tierManual&&!still&&graphicsTier!=='low'&&fps<45)?slowWindows+1:0;
+    if(slowWindows>=2){
+      graphicsTier=graphicsTier==='high'?'medium':'low';
+      try{localStorage.setItem(TIER_STORE,graphicsTier);}catch{/* storage blocked: fine */}
+      resize();
     }
+    syncTierClasses();
     perfWindowStart=time;perfFrames=0;
   }
   if(!still){
