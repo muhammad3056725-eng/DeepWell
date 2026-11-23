@@ -10,15 +10,19 @@ const args=process.argv.slice(2),flag=n=>args.includes('--'+n),opt=(n,d)=>{const
 const OUT=path.resolve(opt('out','data/packs')),MANIFEST=path.resolve(opt('manifest','data/manifest.json')),ONLY=opt('only')?new Set(opt('only').split(',')):null,BATCH=opt('batch');
 const MAX_MS=Math.max(0,parseFloat(opt('max-minutes','0'))||0)*60000,START=Math.max(0,parseInt(opt('start','0'),10)||0),T0=Date.now();
 const BATCH_SIZE=Math.max(1,parseInt(opt('batch-size','500'),10)||500),CANDIDATE_OFFSET=Math.max(0,parseInt(opt('candidate-offset','0'),10)||0);
-const ENDPOINT='https://query.wikidata.org/sparql',UA='DeepwellDatasetBuilder/3.0 (https://deepwell.games; static trivia data maintenance)';
+const ENDPOINT=process.env.WDQS_ENDPOINT||'https://query.wikidata.org/sparql',UA='DeepwellDatasetBuilder/3.0 (https://deepwell.games; static trivia data maintenance)';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),sha=v=>createHash('sha256').update(v).digest('hex');
 const BANDS=[{min:200},{min:100,max:199},{min:60,max:99},{min:40,max:59},{min:25,max:39},{min:15,max:24},{min:10,max:14},{min:6,max:9},{min:4,max:5},{min:3,max:3},{min:2,max:2},{min:1,max:1}];
 function retryDelay(value,attempt){if(!value)return 8000*attempt;const n=Number(value);if(Number.isFinite(n))return Math.max(1000,n*1000);const d=Date.parse(value);return Number.isFinite(d)?Math.max(1000,d-Date.now()):8000*attempt;}
-async function sparql(query,tries=4){
- for(let t=1;t<=tries;t++){const c=new AbortController(),timer=setTimeout(()=>c.abort(),55000);try{
+// One slow question must never eat the whole run: each prompt gets a wall-clock cap (--prompt-minutes, default 8).
+let promptDeadline=Infinity;const PROMPT_MS=Math.max(1,parseFloat(opt('prompt-minutes','8'))||8)*60000;
+class PromptTimeout extends Error{constructor(){super('prompt time cap reached');this.name='PromptTimeout';}}
+const checkDeadline=()=>{if(Date.now()>promptDeadline)throw new PromptTimeout();};
+async function sparql(query,tries=3){
+ for(let t=1;t<=tries;t++){checkDeadline();const c=new AbortController(),timer=setTimeout(()=>c.abort(),55000);try{
   const r=await fetch(queryUrl(ENDPOINT,query).replace('&origin=*',''),{signal:c.signal,headers:{Accept:'application/sparql-results+json','User-Agent':UA}});clearTimeout(timer);
-  if(r.status===429||r.status>=500){await sleep(retryDelay(r.headers.get('retry-after'),t));continue;}if(!r.ok)throw new Error('Wikidata HTTP '+r.status);return await r.json();
- }catch(e){clearTimeout(timer);if(t===tries)throw e;await sleep(4000*t);}}
+  if(r.status===429||r.status>=500){await sleep(Math.min(retryDelay(r.headers.get('retry-after'),t),Math.max(0,promptDeadline-Date.now())));continue;}if(!r.ok)throw new Error('Wikidata HTTP '+r.status);return await r.json();
+ }catch(e){clearTimeout(timer);if(e instanceof PromptTimeout||t===tries)throw e;await sleep(4000*t);}}
  throw new Error('Wikidata retry limit reached');
 }
 async function readJson(file,fallback){try{return JSON.parse(await readFile(file,'utf8'));}catch{return fallback;}}
@@ -26,9 +30,9 @@ async function verifyIds(){const ids=[...ENTITY_LABELS.keys()],labels=new Map();
 async function buildBands(entry){
  const target=Math.max(1,Math.min(Number(entry.target??entry.answerLimit)||2000,2000)),floor=Math.max(1,Number(entry.floor??2),Number(entry.minSL??1)),merged=new Map(),errors=[];
  const accept=rows=>{for(const x of rows){const old=merged.get(x.id);if(!old)merged.set(x.id,x);else{old.s=Math.max(old.s,x.s);old.a=[...new Set([...old.a,...x.a])];}}};
- for(const band of BANDS){if(band.min<floor||merged.size>=target)continue;try{
+ for(const band of BANDS){if(band.min<floor||merged.size>=target)continue;if(Date.now()>promptDeadline){errors.push({band,message:'prompt time cap reached; kept the most popular bands found so far'});break;}try{
   const j=await sparql(buildQuery(entry,{limit:5000,minSL:Math.max(floor,band.min),maxSL:band.max,target,offset:CANDIDATE_OFFSET}));accept(parseBindings(j,entry));
- }catch(e){errors.push({band,message:e.message});for(const letter of 'abcdefghijklmnopqrstuvwxyz'){if(merged.size>=target)break;const j=await sparql(buildQuery(entry,{limit:5000,minSL:Math.max(floor,band.min),maxSL:band.max,target,offset:CANDIDATE_OFFSET,startsWith:letter}));accept(parseBindings(j,{...entry,startsWith:letter}));await sleep(1500);}}
+ }catch(e){errors.push({band,message:e.message});if(e instanceof PromptTimeout)break;for(const letter of 'abcdefghijklmnopqrstuvwxyz'){if(merged.size>=target)break;const j=await sparql(buildQuery(entry,{limit:5000,minSL:Math.max(floor,band.min),maxSL:band.max,target,offset:CANDIDATE_OFFSET,startsWith:letter}));accept(parseBindings(j,{...entry,startsWith:letter}));await sleep(1500);}}
  await sleep(1500);}
  return {items:[...merged.values()].sort((a,b)=>b.s-a.s).slice(0,target),errors};
 }
@@ -47,7 +51,7 @@ async function main(){
   const e=todo[i],tag=`[${i+1}/${todo.length}] ${e.id}`;if(entityIdsOf(e).some(q=>bad.has(q))){report.skipped.push(e.id+' (bad registered Q-id)');continue;}
   const meta=manifest.packs[e.id];if(flag('resume')&&meta?.built&&(Date.parse(today)-Date.parse(meta.built))<6*864e5){report.skipped.push(e.id+' (fresh resume)');continue;}
   const file=path.join(OUT,e.id+'.json');let hadPrevious=false;try{
-   const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);hadPrevious=Boolean(oldPack);
+   promptDeadline=Date.now()+PROMPT_MS;const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);hadPrevious=Boolean(oldPack);
    const merged=mergePools(old,fresh.items,{...e,target:e.target??e.answerLimit??2000}),cleaned=cleanPool(merged,e,blocklist);
    const rule={...(e.anchors?{anchors:e.anchors}:{}),...(e.mustNot?{mustNot:e.mustNot}:{}),...(anchors[e.id]||{}),people:Boolean(e.people)};
    const withOverrides=applyOverrides(e.id,cleaned.items,overrides),min=Math.min(e.minPool||20,8);
