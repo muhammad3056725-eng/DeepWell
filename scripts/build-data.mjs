@@ -8,6 +8,7 @@ import { buildQuery, buildLabelQuery, parseBindings, queryUrl, toPack, fromPack,
 import { cleanPool, applyOverrides, meaningfulChange, normalizeDataName, ensureAnchors, checkAnchors } from './data-quality.mjs';
 const args=process.argv.slice(2),flag=n=>args.includes('--'+n),opt=(n,d)=>{const i=args.indexOf('--'+n);return i>=0?args[i+1]:d;};
 const OUT=path.resolve(opt('out','data/packs')),MANIFEST=path.resolve(opt('manifest','data/manifest.json')),ONLY=opt('only')?new Set(opt('only').split(',')):null,BATCH=opt('batch');
+const MAX_MS=Math.max(0,parseFloat(opt('max-minutes','0'))||0)*60000,START=Math.max(0,parseInt(opt('start','0'),10)||0),T0=Date.now();
 const BATCH_SIZE=Math.max(1,parseInt(opt('batch-size','500'),10)||500),CANDIDATE_OFFSET=Math.max(0,parseInt(opt('candidate-offset','0'),10)||0);
 const ENDPOINT='https://query.wikidata.org/sparql',UA='DeepwellDatasetBuilder/3.0 (https://deepwell.games; static trivia data maintenance)';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),sha=v=>createHash('sha256').update(v).digest('hex');
@@ -36,10 +37,14 @@ async function main(){
  const bad=await verifyIds();if(flag('verify-only'))process.exit(bad.size?1:0);
  const manifest=await readJson(MANIFEST,{version:0,built:null,packs:{}}),overrides=await readJson('data/overrides.json',{}),blocklist=await readJson('data/blocklist.json',{qids:[],words:[]}),anchors=await readJson('data/anchors.json',{});
  for(const meta of Object.values(manifest.packs))if(meta.quality){meta.quality.added=0;meta.quality.removed=0;meta.quality.fallback=false;meta.quality.querySplitFallback=false;}
- const report={skipped:[],failed:[],built:0,unchanged:0,fallback:[],previousRetained:[],rejected:{}},today=new Date().toISOString().slice(0,10);
+ const report={stoppedAt:null,skipped:[],failed:[],built:0,unchanged:0,fallback:[],previousRetained:[],rejected:{}},today=new Date().toISOString().slice(0,10);
  const all=CATALOG.filter(e=>!ONLY||ONLY.has(e.id));let todo=all;if(BATCH!==undefined&&BATCH!=='all'){const b=parseInt(BATCH,10);if(!Number.isInteger(b)||b<0)throw new Error('Invalid batch index');todo=all.slice(b*BATCH_SIZE,(b+1)*BATCH_SIZE);}
- if(!todo.length){console.log('No prompts in this batch.');return;}
- for(let i=0;i<todo.length;i++){const e=todo[i],tag=`[${i+1}/${todo.length}] ${e.id}`;if(entityIdsOf(e).some(q=>bad.has(q))){report.skipped.push(e.id+' (bad registered Q-id)');continue;}
+ todo=todo.slice(START);if(!todo.length){console.log('No prompts left in this batch.');await writeFile('data/BUILD-REPORT.json',JSON.stringify({built:0,stoppedAt:null,note:'nothing to do'},null,2)+'\n');return;}
+ for(let i=0;i<todo.length;i++){
+  // Stop cleanly before the CI time limit so everything built so far is saved and committed. The workflow then
+  // queues the same batch again from `stoppedAt`. (Without this, a timeout throws away hours of work.)
+  if(MAX_MS&&Date.now()-T0>MAX_MS){report.stoppedAt=START+i;console.log(`Time budget of ${MAX_MS/60000} min reached after ${i} prompts; stopping cleanly at batch position ${START+i}.`);break;}
+  const e=todo[i],tag=`[${i+1}/${todo.length}] ${e.id}`;if(entityIdsOf(e).some(q=>bad.has(q))){report.skipped.push(e.id+' (bad registered Q-id)');continue;}
   const meta=manifest.packs[e.id];if(flag('resume')&&meta?.built&&(Date.parse(today)-Date.parse(meta.built))<6*864e5){report.skipped.push(e.id+' (fresh resume)');continue;}
   const file=path.join(OUT,e.id+'.json');let hadPrevious=false;try{
    const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);hadPrevious=Boolean(oldPack);

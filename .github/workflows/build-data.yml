@@ -11,7 +11,7 @@ on:
         description: 'Optional: comma-separated prompt ids to rebuild (blank = all)'
         required: false
       wide:
-        description: 'Search up to 5,000 candidates; save at most 1,000 answers per prompt'
+        description: 'Search up to 5,000 candidates; save at most 2,000 answers per prompt'
         required: false
         default: 'true'
       batch:
@@ -19,9 +19,17 @@ on:
         required: false
         default: '0'
       batch_size:
-        description: 'Number of prompts to build in this run'
+        description: 'Prompts per batch (the run stops cleanly at the time budget and continues itself)'
         required: false
         default: '500'
+      start:
+        description: 'Position inside the batch to start from (used by the automatic continuation)'
+        required: false
+        default: '0'
+      max_minutes:
+        description: 'Stop cleanly after this many minutes, save, and continue in a new run'
+        required: false
+        default: '140'
       candidate_offset:
         description: 'Wikidata candidate page offset; advances every 20-day cycle'
         required: false
@@ -41,7 +49,7 @@ jobs:
   build:
     if: github.event_name != 'push' || contains(github.event.head_commit.message, 'Bootstrap DeepWell batches')
     runs-on: ubuntu-latest
-    timeout-minutes: 170
+    timeout-minutes: 175
     steps:
       - uses: actions/checkout@v4
         with:
@@ -61,8 +69,10 @@ jobs:
           BATCH: ${{ github.event.inputs.batch }}
           BATCH_SIZE: ${{ github.event.inputs.batch_size }}
           CANDIDATE_OFFSET: ${{ github.event.inputs.candidate_offset }}
+          START: ${{ github.event.inputs.start }}
+          MAX_MINUTES: ${{ github.event.inputs.max_minutes }}
         run: |
-          ARGS=()
+          ARGS=(--max-minutes "${MAX_MINUTES:-140}" --start "${START:-0}")
           if [ -n "$ONLY" ]; then ARGS+=(--only "$ONLY"); fi
           if [ "$WIDE" != "false" ]; then ARGS+=(--wide); fi
           if [ -z "$BATCH" ]; then
@@ -80,8 +90,8 @@ jobs:
             fi
           fi
           CANDIDATE_OFFSET=${CANDIDATE_OFFSET:-0}
-          echo "BATCH=$BATCH" >> "$GITHUB_ENV"
-          echo "CANDIDATE_OFFSET=$CANDIDATE_OFFSET" >> "$GITHUB_ENV"
+          echo "BUILT_BATCH=$BATCH" >> "$GITHUB_ENV"
+          echo "BUILT_OFFSET=$CANDIDATE_OFFSET" >> "$GITHUB_ENV"
           if [ "$BATCH" != "all" ]; then ARGS+=(--batch "$BATCH" --batch-size "${BATCH_SIZE:-500}"); fi
           ARGS+=(--candidate-offset "$CANDIDATE_OFFSET")
           node scripts/build-data.mjs "${ARGS[@]}"
@@ -128,26 +138,24 @@ jobs:
           echo "::error::Push failed after 3 attempts. No force-push was attempted."
           exit 1
 
-      - name: Queue next question-data batch
-        if: success() && github.event_name != 'schedule'
+      - name: Queue next question-data run
+        if: success()
         env:
           GH_TOKEN: ${{ github.token }}
           ONLY: ${{ github.event.inputs.only }}
           BATCH: ${{ github.event.inputs.batch }}
           BATCH_SIZE: ${{ github.event.inputs.batch_size }}
           CANDIDATE_OFFSET: ${{ github.event.inputs.candidate_offset }}
+          MAX_MINUTES: ${{ github.event.inputs.max_minutes }}
         run: |
           if [ -n "$ONLY" ]; then
-            echo "Targeted build requested; automatic batch chaining is disabled."
+            echo "Targeted build requested; automatic chaining is disabled."
             exit 0
           fi
-          if [ -z "$BATCH" ]; then
-            if [ "$GITHUB_EVENT_NAME" = "push" ]; then
-              BATCH=0
-            else
-              BATCH=$(( ($(date -u +%s) / 604800) % 20 ))
-            fi
-          fi
+          # Where did the build stop? (null = the batch finished)
+          STOPPED=$(node -e "try{const r=JSON.parse(require('fs').readFileSync('data/BUILD-REPORT.json','utf8'));console.log(r.stoppedAt??'')}catch{console.log('')}")
+          BATCH="${BATCH:-$BUILT_BATCH}"
+          CANDIDATE_OFFSET="${CANDIDATE_OFFSET:-$BUILT_OFFSET}"
           if [ "$BATCH" = "all" ]; then
             echo "All-at-once build requested; automatic chaining is disabled."
             exit 0
@@ -156,17 +164,29 @@ jobs:
             echo "::error::Invalid batch index: $BATCH"
             exit 1
           fi
-          NEXT_BATCH=$((BATCH + 1))
-          if [ "$NEXT_BATCH" -ge 20 ]; then
-            echo "Completed the final batch (19)."
+          if [ -n "$STOPPED" ]; then
+            echo "Batch $BATCH stopped at position $STOPPED (time budget). Continuing the same batch."
+            NEXT_BATCH=$BATCH
+            NEXT_START=$STOPPED
+          elif [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+            echo "Scheduled run finished its batch."
             exit 0
+          else
+            NEXT_BATCH=$((BATCH + 1))
+            NEXT_START=0
+            if [ "$NEXT_BATCH" -ge 20 ]; then
+              echo "Completed the final batch (19)."
+              exit 0
+            fi
           fi
-          echo "Queueing batch $NEXT_BATCH of 19."
+          echo "Queueing batch $NEXT_BATCH from position $NEXT_START."
           gh api --method POST \
             -H "Accept: application/vnd.github+json" \
             "/repos/$GITHUB_REPOSITORY/actions/workflows/build-data.yml/dispatches" \
             -f ref=main \
             -f 'inputs[wide]=true' \
             -f "inputs[batch]=$NEXT_BATCH" \
+            -f "inputs[start]=$NEXT_START" \
+            -f "inputs[max_minutes]=${MAX_MINUTES:-140}" \
             -f "inputs[batch_size]=${BATCH_SIZE:-500}" \
             -f "inputs[candidate_offset]=${CANDIDATE_OFFSET:-0}"
