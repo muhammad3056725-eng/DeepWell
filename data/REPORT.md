@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-23 · Manifest version: 26
-Packs: 580 · Answers: 351,855 · Pack bytes: 21,371,541 (20.38 MiB) / 60 MiB
+Built: 2026-11-23 · Manifest version: 27
+Packs: 580 · Answers: 352,476 · Pack bytes: 21,428,772 (20.44 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -19,7 +19,7 @@ Packs: 580 · Answers: 351,855 · Pack bytes: 21,371,541 (20.38 MiB) / 60 MiB
 | Literature | 12 | 10463 | 971 |
 | Music | 14 | 13589 | 983.5 |
 | Mythology | 5 | 2912 | 586 |
-| Nature | 131 | 42394 | 226 |
+| Nature | 131 | 43015 | 226 |
 | People | 114 | 98207 | 989 |
 | Science | 10 | 4569 | 189 |
 | Space | 14 | 5467 | 306.5 |
@@ -57,7 +57,9 @@ Packs: 580 · Answers: 351,855 · Pack bytes: 21,371,541 (20.38 MiB) / 60 MiB
 | Prompt | Rejected | Rate |
 |---|---:|---:|
 | capital | 2 | 0.9% |
+| bird-starts-a | 1 | 0.2% |
 | desert | 1 | 0.1% |
+| bird-starts-c | 1 | 0.1% |
 | strait | 1 | 0.1% |
 | volcano | 1 | 0.1% |
 | waterfall | 1 | 0.1% |
@@ -74,8 +76,6 @@ Packs: 580 · Answers: 351,855 · Pack bytes: 21,371,541 (20.38 MiB) / 60 MiB
 | bay | 0 | 0.0% |
 | glacier | 0 | 0.0% |
 | canyon | 0 | 0.0% |
-| archipelago | 0 | 0.0% |
-| world-heritage | 0 | 0.0% |
 
 ## Fallback packs
 
@@ -85,15 +85,10 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| volcano | 796 | 5 |
-| desert | 37 | 1 |
-| sea | 48 | 1 |
-| waterfall | 990 | 0 |
-| national-park | 997 | 1 |
-| mountain-range | 994 | 0 |
-| peninsula | 1011 | 11 |
-| strait | 318 | 1 |
+| bird-starts-c | 25 | 1 |
+| bird-starts-b | 598 | 0 |
+| bird-starts-a | 0 | 1 |
 
 ## Repository size check
 
-Raw data/packs size: 21,371,541 bytes (20.38 MiB); budget 60 MiB.
+Raw data/packs size: 21,428,772 bytes (20.44 MiB); budget 60 MiB.
