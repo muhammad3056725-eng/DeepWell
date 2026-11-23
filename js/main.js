@@ -1,16 +1,16 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
-import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=ten-thousand-prompts-20261121';
-import { loadManifest } from './data.js?v=ten-thousand-prompts-20261121';
+import { CONFIG } from './config.js?v=fixes-20261123-1';
+import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=fixes-20261123-1';
+import { loadManifest } from './data.js?v=fixes-20261123-1';
 import { prepareDive, examples } from './game.js?v=random-no-repeat-questions-20261121';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=deepwell-mobilefix-20261122-1';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=deepwell-mobilefix-20261122-1';
-import { wake, tone, buzz } from './audio.js?v=deepwell-mobilefix-20261122-1';
+import * as S from './state.js?v=fixes-20261123-1';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=fixes-20261123-1';
+import { wake, tone, buzz } from './audio.js?v=fixes-20261123-1';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=deepwell-mobilefix-20261122-1';
+} from './ui.js?v=fixes-20261123-1';
 
 let run = null; // the dive in progress
 let timerRaf = 0;

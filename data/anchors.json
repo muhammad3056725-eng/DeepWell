@@ -1,1028 +1,3462 @@
 {
-  "country": {
-    "anchors": [
-      "United States",
-      "India",
-      "China"
-    ],
-    "mustNot": []
-  },
-  "capital": {
-    "anchors": [
-      "London",
-      "Paris",
-      "Tokyo"
-    ],
-    "mustNot": []
-  },
-  "city": {
-    "anchors": [
-      "Tokyo",
-      "Paris",
-      "London"
-    ],
-    "mustNot": []
-  },
-  "island": {
-    "anchors": [
-      "Greenland",
-      "Madagascar",
-      "Borneo"
-    ],
-    "mustNot": []
-  },
-  "river": {
-    "anchors": [
-      "Nile",
-      "Amazon River",
-      "Yangtze"
-    ],
-    "mustNot": [
-      "Atlantis"
-    ]
-  },
-  "mountain": {
-    "anchors": [
-      "Mount Everest",
-      "K2",
-      "Kilimanjaro"
-    ],
-    "mustNot": []
-  },
-  "lake": {
-    "anchors": [
-      "Lake Superior",
-      "Lake Victoria"
-    ],
-    "mustNot": []
-  },
-  "volcano": {
-    "anchors": [
-      "Mount Etna",
-      "Mount Fuji",
-      "Vesuvius"
-    ],
-    "mustNot": []
-  },
-  "desert": {
-    "anchors": [
-      "Sahara",
-      "Gobi Desert"
-    ],
-    "mustNot": []
-  },
-  "sea": {
-    "anchors": [
-      "Mediterranean Sea",
-      "Caribbean Sea"
-    ],
-    "mustNot": []
-  },
-  "waterfall": {
-    "anchors": [
-      "Niagara Falls"
-    ],
-    "mustNot": []
-  },
-  "national-park": {
-    "anchors": [
-      "Yellowstone National Park"
-    ],
-    "mustNot": []
-  },
-  "mountain-range": {
-    "anchors": [
-      "Himalayas",
-      "Andes",
-      "Alps"
-    ],
-    "mustNot": []
-  },
-  "peninsula": {
-    "anchors": [
-      "Arabian Peninsula",
-      "Iberian Peninsula"
-    ],
-    "mustNot": []
-  },
-  "strait": {
-    "anchors": [
-      "Strait of Gibraltar",
-      "Strait of Malacca"
-    ],
-    "mustNot": []
-  },
-  "bay": {
-    "anchors": [
-      "Bay of Bengal",
-      "Hudson Bay"
-    ],
-    "mustNot": []
-  },
-  "glacier": {
-    "anchors": [
-      "Aletsch Glacier"
-    ],
-    "mustNot": []
-  },
-  "canyon": {
-    "anchors": [
-      "Grand Canyon"
-    ],
-    "mustNot": []
-  },
-  "archipelago": {
-    "anchors": [
-      "Hawaiian Islands"
-    ],
-    "mustNot": []
-  },
-  "us-state": {
-    "anchors": [
-      "California",
-      "Texas"
-    ],
-    "mustNot": []
-  },
-  "indian-state": {
-    "anchors": [
-      "Maharashtra",
-      "Uttar Pradesh"
-    ],
-    "mustNot": []
-  },
-  "world-heritage": {
-    "anchors": [
-      "Taj Mahal",
-      "Great Wall of China"
-    ],
-    "mustNot": []
-  },
-  "museum": {
-    "anchors": [
-      "Louvre Museum",
-      "British Museum"
-    ],
-    "mustNot": []
-  },
-  "airport": {
-    "anchors": [
-      "London Heathrow Airport"
-    ],
-    "mustNot": []
-  },
-  "stadium": {
-    "anchors": [
-      "Wembley Stadium"
-    ],
-    "mustNot": []
-  },
-  "bridge": {
-    "anchors": [
-      "Golden Gate Bridge"
-    ],
-    "mustNot": []
-  },
-  "castle": {
-    "anchors": [
-      "Windsor Castle"
-    ],
-    "mustNot": []
-  },
-  "skyscraper": {
-    "anchors": [
-      "Burj Khalifa"
-    ],
-    "mustNot": []
-  },
-  "cathedral": {
-    "anchors": [
-      "Notre-Dame de Paris"
-    ],
-    "mustNot": []
-  },
-  "mosque": {
-    "anchors": [
-      "Masjid al-Haram"
-    ],
-    "mustNot": []
-  },
-  "lighthouse": {
-    "anchors": [
-      "Tower of Hercules"
-    ],
-    "mustNot": []
-  },
-  "dam": {
-    "anchors": [
-      "Three Gorges Dam"
-    ],
-    "mustNot": []
-  },
-  "tower": {
-    "anchors": [
-      "Eiffel Tower"
-    ],
-    "mustNot": []
-  },
-  "university": {
-    "anchors": [
-      "Harvard University",
-      "University of Oxford"
-    ],
-    "mustNot": []
-  },
-  "zoo": {
-    "anchors": [
-      "San Diego Zoo"
-    ],
-    "mustNot": []
-  },
-  "amusement-park": {
-    "anchors": [
-      "Disneyland"
-    ],
-    "mustNot": []
-  },
-  "railway-station": {
-    "anchors": [
-      "Grand Central Terminal"
-    ],
-    "mustNot": []
-  },
-  "historical-country": {
-    "anchors": [
-      "Prussia",
-      "Ottoman Empire"
-    ],
-    "mustNot": []
-  },
-  "country-africa": {
-    "anchors": [
-      "Nigeria",
-      "Egypt"
-    ],
-    "mustNot": []
-  },
-  "country-europe": {
-    "anchors": [
-      "Germany",
-      "France"
-    ],
-    "mustNot": []
-  },
-  "country-asia": {
-    "anchors": [
-      "India",
-      "China"
-    ],
-    "mustNot": []
-  },
-  "country-south-america": {
-    "anchors": [
-      "Brazil",
-      "Argentina"
-    ],
-    "mustNot": []
-  },
-  "country-north-america": {
-    "anchors": [
-      "United States",
-      "Canada"
-    ],
-    "mustNot": []
-  },
-  "country-oceania": {
-    "anchors": [
-      "Australia",
-      "New Zealand"
-    ],
-    "mustNot": []
-  },
-  "city-in-united-states": {
-    "anchors": [
-      "New York City"
-    ],
-    "mustNot": []
-  },
-  "city-in-canada": {
-    "anchors": [
-      "Toronto"
-    ],
-    "mustNot": []
-  },
-  "city-in-united-kingdom": {
-    "anchors": [
-      "London"
-    ],
-    "mustNot": []
-  },
-  "city-in-australia": {
-    "anchors": [
-      "Sydney"
-    ],
-    "mustNot": []
-  },
-  "city-in-india": {
-    "anchors": [
-      "Mumbai"
-    ],
-    "mustNot": []
-  },
-  "city-in-germany": {
-    "anchors": [
-      "Berlin"
-    ],
-    "mustNot": []
-  },
-  "city-in-france": {
-    "anchors": [
-      "Paris"
-    ],
-    "mustNot": []
-  },
-  "city-in-italy": {
-    "anchors": [
-      "Rome"
-    ],
-    "mustNot": []
-  },
-  "city-in-spain": {
-    "anchors": [
-      "Madrid"
-    ],
-    "mustNot": []
-  },
-  "city-in-china": {
-    "anchors": [
-      "Beijing"
-    ],
-    "mustNot": []
-  },
-  "city-in-mexico": {
-    "anchors": [
-      "Mexico City"
-    ],
-    "mustNot": []
-  },
-  "city-in-russia": {
-    "anchors": [
-      "Moscow"
-    ],
-    "mustNot": []
-  },
-  "city-in-pakistan": {
-    "anchors": [
-      "Karachi"
-    ],
-    "mustNot": []
-  },
-  "city-in-turkey": {
-    "anchors": [
-      "Istanbul"
-    ],
-    "mustNot": []
-  },
-  "city-in-egypt": {
-    "anchors": [
-      "Cairo"
-    ],
-    "mustNot": []
-  },
-  "city-in-nigeria": {
-    "anchors": [
-      "Lagos"
-    ],
-    "mustNot": []
-  },
-  "city-in-argentina": {
-    "anchors": [
-      "Buenos Aires"
-    ],
-    "mustNot": []
-  },
-  "city-in-netherlands": {
-    "anchors": [
-      "Amsterdam"
-    ],
-    "mustNot": []
-  },
-  "city-in-poland": {
-    "anchors": [
-      "Warsaw"
-    ],
-    "mustNot": []
-  },
-  "city-in-sweden": {
-    "anchors": [
-      "Stockholm"
-    ],
-    "mustNot": []
-  },
-  "city-in-iran": {
-    "anchors": [
-      "Tehran"
-    ],
-    "mustNot": []
-  },
-  "city-in-saudi-arabia": {
-    "anchors": [
-      "Riyadh"
-    ],
-    "mustNot": []
-  },
-  "city-in-new-zealand": {
-    "anchors": [
-      "Auckland"
-    ],
-    "mustNot": []
-  },
-  "city-in-greece": {
-    "anchors": [
-      "Athens"
-    ],
-    "mustNot": []
-  },
-  "city-in-ukraine": {
-    "anchors": [
-      "Kyiv"
-    ],
-    "mustNot": []
-  },
-  "city-in-chile": {
-    "anchors": [
-      "Santiago"
-    ],
-    "mustNot": []
-  },
-  "city-in-peru": {
-    "anchors": [
-      "Lima"
-    ],
-    "mustNot": []
-  },
-  "city-in-kenya": {
-    "anchors": [
-      "Nairobi"
-    ],
-    "mustNot": []
-  },
-  "city-in-morocco": {
-    "anchors": [
-      "Casablanca"
-    ],
-    "mustNot": []
-  },
-  "city-in-bangladesh": {
-    "anchors": [
-      "Dhaka"
-    ],
-    "mustNot": []
-  },
-  "river-in-united-states": {
-    "anchors": [
-      "Mississippi River"
-    ],
-    "mustNot": []
-  },
-  "river-in-canada": {
-    "anchors": [
-      "Mackenzie River"
-    ],
-    "mustNot": []
-  },
-  "river-in-germany": {
-    "anchors": [
-      "Rhine"
-    ],
-    "mustNot": []
-  },
-  "river-in-france": {
-    "anchors": [
-      "Seine"
-    ],
-    "mustNot": []
-  },
-  "river-in-india": {
-    "anchors": [
-      "Ganges"
-    ],
-    "mustNot": []
-  },
-  "river-in-china": {
-    "anchors": [
-      "Yangtze"
-    ],
-    "mustNot": []
-  },
-  "river-in-russia": {
-    "anchors": [
-      "Volga"
-    ],
-    "mustNot": []
-  },
-  "river-in-brazil": {
-    "anchors": [
-      "Amazon River"
-    ],
-    "mustNot": []
-  },
-  "river-in-australia": {
-    "anchors": [
-      "Murray River"
-    ],
-    "mustNot": []
-  },
-  "river-in-italy": {
-    "anchors": [
-      "Po"
-    ],
-    "mustNot": []
-  },
-  "river-in-spain": {
-    "anchors": [
-      "Ebro"
-    ],
-    "mustNot": []
-  },
-  "river-in-poland": {
-    "anchors": [
-      "Vistula"
-    ],
-    "mustNot": []
-  },
-  "river-in-pakistan": {
-    "anchors": [
-      "Indus River"
-    ],
-    "mustNot": []
-  },
-  "river-in-united-kingdom": {
-    "anchors": [
-      "River Thames"
-    ],
-    "mustNot": []
-  },
-  "river-in-japan": {
-    "anchors": [
-      "Shinano River"
-    ],
-    "mustNot": []
-  },
-  "river-in-turkey": {
-    "anchors": [
-      "Kızılırmak River"
-    ],
-    "mustNot": []
-  },
-  "river-in-mexico": {
-    "anchors": [
-      "Rio Grande"
-    ],
-    "mustNot": []
-  },
-  "river-in-argentina": {
-    "anchors": [
-      "Paraná River"
-    ],
-    "mustNot": []
-  },
-  "river-in-ukraine": {
-    "anchors": [
-      "Dnieper"
-    ],
-    "mustNot": []
-  },
-  "river-in-sweden": {
-    "anchors": [
-      "Göta älv"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-united-states": {
-    "anchors": [
-      "Denali"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-canada": {
-    "anchors": [
-      "Mount Logan"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-germany": {
-    "anchors": [
-      "Zugspitze"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-france": {
-    "anchors": [
-      "Mont Blanc"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-india": {
-    "anchors": [
-      "Kangchenjunga"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-china": {
-    "anchors": [
-      "Mount Everest"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-russia": {
-    "anchors": [
-      "Mount Elbrus"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-italy": {
-    "anchors": [
-      "Mont Blanc"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-japan": {
-    "anchors": [
-      "Mount Fuji"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-pakistan": {
-    "anchors": [
-      "K2"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-new-zealand": {
-    "anchors": [
-      "Aoraki / Mount Cook"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-australia": {
-    "anchors": [
-      "Mount Kosciuszko"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-spain": {
-    "anchors": [
-      "Mulhacén"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-peru": {
-    "anchors": [
-      "Huascarán"
-    ],
-    "mustNot": []
-  },
-  "mountain-in-kenya": {
-    "anchors": [
-      "Mount Kenya"
-    ],
-    "mustNot": []
-  },
-  "lake-in-united-states": {
-    "anchors": [
-      "Lake Superior"
-    ],
-    "mustNot": []
-  },
-  "lake-in-canada": {
-    "anchors": [
-      "Great Bear Lake"
-    ],
-    "mustNot": []
-  },
-  "lake-in-germany": {
-    "anchors": [
-      "Lake Constance"
-    ],
-    "mustNot": []
-  },
-  "lake-in-france": {
-    "anchors": [
-      "Lake Geneva"
-    ],
-    "mustNot": []
-  },
-  "lake-in-italy": {
-    "anchors": [
-      "Lake Garda"
-    ],
-    "mustNot": []
-  },
-  "lake-in-russia": {
-    "anchors": [
-      "Lake Baikal"
-    ],
-    "mustNot": []
-  },
-  "lake-in-sweden": {
-    "anchors": [
-      "Lake Vänern"
-    ],
-    "mustNot": []
-  },
-  "lake-in-india": {
-    "anchors": [
-      "Vembanad Lake"
-    ],
-    "mustNot": []
-  },
-  "lake-in-china": {
-    "anchors": [
-      "Poyang Lake"
-    ],
-    "mustNot": []
-  },
-  "lake-in-pakistan": {
-    "anchors": [
-      "Manchar Lake"
-    ],
-    "mustNot": []
-  },
-  "lake-in-australia": {
-    "anchors": [
-      "Lake Eyre"
-    ],
-    "mustNot": []
-  },
-  "lake-in-switzerland": {
-    "anchors": [
-      "Lake Geneva"
-    ],
-    "mustNot": []
-  },
-  "university-in-united-states": {
-    "anchors": [
-      "Harvard University"
-    ],
-    "mustNot": []
-  },
-  "university-in-united-kingdom": {
-    "anchors": [
-      "University of Oxford"
-    ],
-    "mustNot": []
-  },
-  "university-in-canada": {
-    "anchors": [
-      "University of Toronto"
-    ],
-    "mustNot": []
-  },
-  "university-in-australia": {
-    "anchors": [
-      "University of Melbourne"
-    ],
-    "mustNot": []
-  },
-  "university-in-india": {
-    "anchors": [
-      "University of Delhi"
-    ],
-    "mustNot": []
-  },
-  "university-in-pakistan": {
-    "anchors": [
-      "University of the Punjab"
-    ],
-    "mustNot": []
-  },
-  "university-in-germany": {
-    "anchors": [
-      "Heidelberg University"
-    ],
-    "mustNot": []
-  },
-  "university-in-france": {
-    "anchors": [
-      "Sorbonne University"
-    ],
-    "mustNot": []
-  },
-  "university-in-china": {
-    "anchors": [
-      "Peking University"
-    ],
-    "mustNot": []
-  },
-  "university-in-japan": {
-    "anchors": [
-      "University of Tokyo"
-    ],
-    "mustNot": []
-  },
-  "university-in-italy": {
-    "anchors": [
-      "University of Bologna"
-    ],
-    "mustNot": []
-  },
-  "university-in-spain": {
-    "anchors": [
-      "University of Barcelona"
-    ],
-    "mustNot": []
-  },
-  "university-in-brazil": {
-    "anchors": [
-      "University of São Paulo"
-    ],
-    "mustNot": []
-  },
-  "university-in-turkey": {
-    "anchors": [
-      "Istanbul University"
-    ],
-    "mustNot": []
-  },
-  "university-in-iran": {
-    "anchors": [
-      "University of Tehran"
-    ],
-    "mustNot": []
-  },
-  "university-in-egypt": {
-    "anchors": [
-      "Cairo University"
-    ],
-    "mustNot": []
-  },
-  "museum-in-united-states": {
-    "anchors": [
-      "Metropolitan Museum of Art"
-    ],
-    "mustNot": []
-  },
-  "museum-in-united-kingdom": {
-    "anchors": [
-      "British Museum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-france": {
-    "anchors": [
-      "Louvre Museum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-germany": {
-    "anchors": [
-      "Pergamon Museum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-italy": {
-    "anchors": [
-      "Uffizi"
-    ],
-    "mustNot": []
-  },
-  "museum-in-spain": {
-    "anchors": [
-      "Prado Museum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-russia": {
-    "anchors": [
-      "Hermitage Museum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-japan": {
-    "anchors": [
-      "Tokyo National Museum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-china": {
-    "anchors": [
-      "National Museum of China"
-    ],
-    "mustNot": []
-  },
-  "museum-in-netherlands": {
-    "anchors": [
-      "Rijksmuseum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-canada": {
-    "anchors": [
-      "Royal Ontario Museum"
-    ],
-    "mustNot": []
-  },
-  "museum-in-india": {
-    "anchors": [
-      "Indian Museum"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-united-kingdom": {
-    "anchors": [
-      "Manchester United F.C."
-    ],
-    "mustNot": []
-  },
-  "football-club-in-germany": {
-    "anchors": [
-      "FC Bayern Munich"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-italy": {
-    "anchors": [
-      "Juventus FC"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-spain": {
-    "anchors": [
-      "Real Madrid CF"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-france": {
-    "anchors": [
-      "Paris Saint-Germain F.C."
-    ],
-    "mustNot": []
-  },
-  "football-club-in-brazil": {
-    "anchors": [
-      "Santos FC"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-argentina": {
-    "anchors": [
-      "Boca Juniors"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-netherlands": {
-    "anchors": [
-      "AFC Ajax"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-portugal": {
-    "anchors": [
-      "SL Benfica"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-turkey": {
-    "anchors": [
-      "Galatasaray S.K."
-    ],
-    "mustNot": []
-  },
-  "football-club-in-mexico": {
-    "anchors": [
-      "Club América"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-united-states": {
-    "anchors": [
-      "Inter Miami CF"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-russia": {
-    "anchors": [
-      "FC Spartak Moscow"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-ukraine": {
-    "anchors": [
-      "FC Dynamo Kyiv"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-poland": {
-    "anchors": [
-      "Legia Warsaw"
-    ],
-    "mustNot": []
-  },
-  "football-club-in-greece": {
-    "anchors": [
-      "Olympiacos F.C."
-    ],
-    "mustNot": []
-  }
+ "country": {
+  "anchors": [
+   "United States",
+   "India",
+   "China"
+  ],
+  "mustNot": []
+ },
+ "capital": {
+  "anchors": [
+   "London",
+   "Paris",
+   "Tokyo"
+  ],
+  "mustNot": []
+ },
+ "city": {
+  "anchors": [
+   "Tokyo",
+   "Paris",
+   "London"
+  ],
+  "mustNot": []
+ },
+ "island": {
+  "anchors": [
+   "Greenland",
+   "Madagascar",
+   "Borneo"
+  ],
+  "mustNot": []
+ },
+ "river": {
+  "anchors": [
+   "Nile",
+   "Amazon River",
+   "Yangtze"
+  ],
+  "mustNot": [
+   "Atlantis"
+  ]
+ },
+ "mountain": {
+  "anchors": [
+   "Mount Everest",
+   "K2",
+   "Kilimanjaro"
+  ],
+  "mustNot": []
+ },
+ "lake": {
+  "anchors": [
+   "Lake Superior",
+   "Lake Victoria"
+  ],
+  "mustNot": []
+ },
+ "volcano": {
+  "anchors": [
+   "Mount Etna",
+   "Mount Fuji",
+   "Vesuvius"
+  ],
+  "mustNot": []
+ },
+ "desert": {
+  "anchors": [
+   "Sahara",
+   "Gobi Desert"
+  ],
+  "mustNot": []
+ },
+ "sea": {
+  "anchors": [
+   "Mediterranean Sea",
+   "Caribbean Sea"
+  ],
+  "mustNot": []
+ },
+ "waterfall": {
+  "anchors": [
+   "Niagara Falls"
+  ],
+  "mustNot": []
+ },
+ "national-park": {
+  "anchors": [
+   "Yellowstone National Park"
+  ],
+  "mustNot": []
+ },
+ "mountain-range": {
+  "anchors": [
+   "Himalayas",
+   "Andes",
+   "Alps"
+  ],
+  "mustNot": []
+ },
+ "peninsula": {
+  "anchors": [
+   "Arabian Peninsula",
+   "Iberian Peninsula"
+  ],
+  "mustNot": []
+ },
+ "strait": {
+  "anchors": [
+   "Strait of Gibraltar",
+   "Strait of Malacca"
+  ],
+  "mustNot": []
+ },
+ "bay": {
+  "anchors": [
+   "Bay of Bengal",
+   "Hudson Bay"
+  ],
+  "mustNot": []
+ },
+ "glacier": {
+  "anchors": [
+   "Aletsch Glacier"
+  ],
+  "mustNot": []
+ },
+ "canyon": {
+  "anchors": [
+   "Grand Canyon"
+  ],
+  "mustNot": []
+ },
+ "archipelago": {
+  "anchors": [
+   "Hawaiian Islands"
+  ],
+  "mustNot": []
+ },
+ "us-state": {
+  "anchors": [
+   "California",
+   "Texas"
+  ],
+  "mustNot": []
+ },
+ "indian-state": {
+  "anchors": [
+   "Maharashtra",
+   "Uttar Pradesh"
+  ],
+  "mustNot": []
+ },
+ "world-heritage": {
+  "anchors": [
+   "Taj Mahal",
+   "Great Wall of China"
+  ],
+  "mustNot": []
+ },
+ "museum": {
+  "anchors": [
+   "Louvre Museum",
+   "British Museum"
+  ],
+  "mustNot": []
+ },
+ "airport": {
+  "anchors": [
+   "London Heathrow Airport"
+  ],
+  "mustNot": []
+ },
+ "stadium": {
+  "anchors": [
+   "Wembley Stadium"
+  ],
+  "mustNot": []
+ },
+ "bridge": {
+  "anchors": [
+   "Golden Gate Bridge"
+  ],
+  "mustNot": []
+ },
+ "castle": {
+  "anchors": [
+   "Windsor Castle"
+  ],
+  "mustNot": []
+ },
+ "skyscraper": {
+  "anchors": [
+   "Burj Khalifa"
+  ],
+  "mustNot": []
+ },
+ "cathedral": {
+  "anchors": [
+   "Notre-Dame de Paris"
+  ],
+  "mustNot": []
+ },
+ "mosque": {
+  "anchors": [
+   "Masjid al-Haram"
+  ],
+  "mustNot": []
+ },
+ "lighthouse": {
+  "anchors": [
+   "Tower of Hercules"
+  ],
+  "mustNot": []
+ },
+ "dam": {
+  "anchors": [
+   "Three Gorges Dam"
+  ],
+  "mustNot": []
+ },
+ "tower": {
+  "anchors": [
+   "Eiffel Tower"
+  ],
+  "mustNot": []
+ },
+ "university": {
+  "anchors": [
+   "Harvard University",
+   "University of Oxford"
+  ],
+  "mustNot": []
+ },
+ "zoo": {
+  "anchors": [
+   "San Diego Zoo"
+  ],
+  "mustNot": []
+ },
+ "amusement-park": {
+  "anchors": [
+   "Disneyland"
+  ],
+  "mustNot": []
+ },
+ "railway-station": {
+  "anchors": [
+   "Grand Central Terminal"
+  ],
+  "mustNot": []
+ },
+ "historical-country": {
+  "anchors": [
+   "Prussia",
+   "Ottoman Empire"
+  ],
+  "mustNot": []
+ },
+ "country-africa": {
+  "anchors": [
+   "Nigeria",
+   "Egypt"
+  ],
+  "mustNot": []
+ },
+ "country-europe": {
+  "anchors": [
+   "Germany",
+   "France"
+  ],
+  "mustNot": []
+ },
+ "country-asia": {
+  "anchors": [
+   "India",
+   "China"
+  ],
+  "mustNot": []
+ },
+ "country-south-america": {
+  "anchors": [
+   "Brazil",
+   "Argentina"
+  ],
+  "mustNot": []
+ },
+ "country-north-america": {
+  "anchors": [
+   "United States",
+   "Canada"
+  ],
+  "mustNot": []
+ },
+ "country-oceania": {
+  "anchors": [
+   "Australia",
+   "New Zealand"
+  ],
+  "mustNot": []
+ },
+ "city-in-united-states": {
+  "anchors": [
+   "New York City"
+  ],
+  "mustNot": []
+ },
+ "city-in-canada": {
+  "anchors": [
+   "Toronto"
+  ],
+  "mustNot": []
+ },
+ "city-in-united-kingdom": {
+  "anchors": [
+   "London"
+  ],
+  "mustNot": []
+ },
+ "city-in-australia": {
+  "anchors": [
+   "Sydney"
+  ],
+  "mustNot": []
+ },
+ "city-in-india": {
+  "anchors": [
+   "Mumbai"
+  ],
+  "mustNot": []
+ },
+ "city-in-germany": {
+  "anchors": [
+   "Berlin"
+  ],
+  "mustNot": []
+ },
+ "city-in-france": {
+  "anchors": [
+   "Paris"
+  ],
+  "mustNot": []
+ },
+ "city-in-italy": {
+  "anchors": [
+   "Rome"
+  ],
+  "mustNot": []
+ },
+ "city-in-spain": {
+  "anchors": [
+   "Madrid"
+  ],
+  "mustNot": []
+ },
+ "city-in-china": {
+  "anchors": [
+   "Beijing"
+  ],
+  "mustNot": []
+ },
+ "city-in-mexico": {
+  "anchors": [
+   "Mexico City"
+  ],
+  "mustNot": []
+ },
+ "city-in-russia": {
+  "anchors": [
+   "Moscow"
+  ],
+  "mustNot": []
+ },
+ "city-in-pakistan": {
+  "anchors": [
+   "Karachi"
+  ],
+  "mustNot": []
+ },
+ "city-in-turkey": {
+  "anchors": [
+   "Istanbul"
+  ],
+  "mustNot": []
+ },
+ "city-in-egypt": {
+  "anchors": [
+   "Cairo"
+  ],
+  "mustNot": []
+ },
+ "city-in-nigeria": {
+  "anchors": [
+   "Lagos"
+  ],
+  "mustNot": []
+ },
+ "city-in-argentina": {
+  "anchors": [
+   "Buenos Aires"
+  ],
+  "mustNot": []
+ },
+ "city-in-netherlands": {
+  "anchors": [
+   "Amsterdam"
+  ],
+  "mustNot": []
+ },
+ "city-in-poland": {
+  "anchors": [
+   "Warsaw"
+  ],
+  "mustNot": []
+ },
+ "city-in-sweden": {
+  "anchors": [
+   "Stockholm"
+  ],
+  "mustNot": []
+ },
+ "city-in-iran": {
+  "anchors": [
+   "Tehran"
+  ],
+  "mustNot": []
+ },
+ "city-in-saudi-arabia": {
+  "anchors": [
+   "Riyadh"
+  ],
+  "mustNot": []
+ },
+ "city-in-new-zealand": {
+  "anchors": [
+   "Auckland"
+  ],
+  "mustNot": []
+ },
+ "city-in-greece": {
+  "anchors": [
+   "Athens"
+  ],
+  "mustNot": []
+ },
+ "city-in-ukraine": {
+  "anchors": [
+   "Kyiv"
+  ],
+  "mustNot": []
+ },
+ "city-in-chile": {
+  "anchors": [
+   "Santiago"
+  ],
+  "mustNot": []
+ },
+ "city-in-peru": {
+  "anchors": [
+   "Lima"
+  ],
+  "mustNot": []
+ },
+ "city-in-kenya": {
+  "anchors": [
+   "Nairobi"
+  ],
+  "mustNot": []
+ },
+ "city-in-morocco": {
+  "anchors": [
+   "Casablanca"
+  ],
+  "mustNot": []
+ },
+ "city-in-bangladesh": {
+  "anchors": [
+   "Dhaka"
+  ],
+  "mustNot": []
+ },
+ "river-in-united-states": {
+  "anchors": [
+   "Mississippi River"
+  ],
+  "mustNot": []
+ },
+ "river-in-canada": {
+  "anchors": [
+   "Mackenzie River"
+  ],
+  "mustNot": []
+ },
+ "river-in-germany": {
+  "anchors": [
+   "Rhine"
+  ],
+  "mustNot": []
+ },
+ "river-in-france": {
+  "anchors": [
+   "Seine"
+  ],
+  "mustNot": []
+ },
+ "river-in-india": {
+  "anchors": [
+   "Ganges"
+  ],
+  "mustNot": []
+ },
+ "river-in-china": {
+  "anchors": [
+   "Yangtze"
+  ],
+  "mustNot": []
+ },
+ "river-in-russia": {
+  "anchors": [
+   "Volga"
+  ],
+  "mustNot": []
+ },
+ "river-in-brazil": {
+  "anchors": [
+   "Amazon River"
+  ],
+  "mustNot": []
+ },
+ "river-in-australia": {
+  "anchors": [
+   "Murray River"
+  ],
+  "mustNot": []
+ },
+ "river-in-italy": {
+  "anchors": [
+   "Po"
+  ],
+  "mustNot": []
+ },
+ "river-in-spain": {
+  "anchors": [
+   "Ebro"
+  ],
+  "mustNot": []
+ },
+ "river-in-poland": {
+  "anchors": [
+   "Vistula"
+  ],
+  "mustNot": []
+ },
+ "river-in-pakistan": {
+  "anchors": [
+   "Indus River"
+  ],
+  "mustNot": []
+ },
+ "river-in-united-kingdom": {
+  "anchors": [
+   "River Thames"
+  ],
+  "mustNot": []
+ },
+ "river-in-japan": {
+  "anchors": [
+   "Shinano River"
+  ],
+  "mustNot": []
+ },
+ "river-in-turkey": {
+  "anchors": [
+   "Kızılırmak River"
+  ],
+  "mustNot": []
+ },
+ "river-in-mexico": {
+  "anchors": [
+   "Rio Grande"
+  ],
+  "mustNot": []
+ },
+ "river-in-argentina": {
+  "anchors": [
+   "Paraná River"
+  ],
+  "mustNot": []
+ },
+ "river-in-ukraine": {
+  "anchors": [
+   "Dnieper"
+  ],
+  "mustNot": []
+ },
+ "river-in-sweden": {
+  "anchors": [
+   "Göta älv"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-united-states": {
+  "anchors": [
+   "Denali"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-canada": {
+  "anchors": [
+   "Mount Logan"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-germany": {
+  "anchors": [
+   "Zugspitze"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-france": {
+  "anchors": [
+   "Mont Blanc"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-india": {
+  "anchors": [
+   "Kangchenjunga"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-china": {
+  "anchors": [
+   "Mount Everest"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-russia": {
+  "anchors": [
+   "Mount Elbrus"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-italy": {
+  "anchors": [
+   "Mont Blanc"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-japan": {
+  "anchors": [
+   "Mount Fuji"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-pakistan": {
+  "anchors": [
+   "K2"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-new-zealand": {
+  "anchors": [
+   "Aoraki / Mount Cook"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-australia": {
+  "anchors": [
+   "Mount Kosciuszko"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-spain": {
+  "anchors": [
+   "Mulhacén"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-peru": {
+  "anchors": [
+   "Huascarán"
+  ],
+  "mustNot": []
+ },
+ "mountain-in-kenya": {
+  "anchors": [
+   "Mount Kenya"
+  ],
+  "mustNot": []
+ },
+ "lake-in-united-states": {
+  "anchors": [
+   "Lake Superior"
+  ],
+  "mustNot": []
+ },
+ "lake-in-canada": {
+  "anchors": [
+   "Great Bear Lake"
+  ],
+  "mustNot": []
+ },
+ "lake-in-germany": {
+  "anchors": [
+   "Lake Constance"
+  ],
+  "mustNot": []
+ },
+ "lake-in-france": {
+  "anchors": [
+   "Lake Geneva"
+  ],
+  "mustNot": []
+ },
+ "lake-in-italy": {
+  "anchors": [
+   "Lake Garda"
+  ],
+  "mustNot": []
+ },
+ "lake-in-russia": {
+  "anchors": [
+   "Lake Baikal"
+  ],
+  "mustNot": []
+ },
+ "lake-in-sweden": {
+  "anchors": [
+   "Lake Vänern"
+  ],
+  "mustNot": []
+ },
+ "lake-in-india": {
+  "anchors": [
+   "Vembanad Lake"
+  ],
+  "mustNot": []
+ },
+ "lake-in-china": {
+  "anchors": [
+   "Poyang Lake"
+  ],
+  "mustNot": []
+ },
+ "lake-in-pakistan": {
+  "anchors": [
+   "Manchar Lake"
+  ],
+  "mustNot": []
+ },
+ "lake-in-australia": {
+  "anchors": [
+   "Lake Eyre"
+  ],
+  "mustNot": []
+ },
+ "lake-in-switzerland": {
+  "anchors": [
+   "Lake Geneva"
+  ],
+  "mustNot": []
+ },
+ "university-in-united-states": {
+  "anchors": [
+   "Harvard University"
+  ],
+  "mustNot": []
+ },
+ "university-in-united-kingdom": {
+  "anchors": [
+   "University of Oxford"
+  ],
+  "mustNot": []
+ },
+ "university-in-canada": {
+  "anchors": [
+   "University of Toronto"
+  ],
+  "mustNot": []
+ },
+ "university-in-australia": {
+  "anchors": [
+   "University of Melbourne"
+  ],
+  "mustNot": []
+ },
+ "university-in-india": {
+  "anchors": [
+   "University of Delhi"
+  ],
+  "mustNot": []
+ },
+ "university-in-pakistan": {
+  "anchors": [
+   "University of the Punjab"
+  ],
+  "mustNot": []
+ },
+ "university-in-germany": {
+  "anchors": [
+   "Heidelberg University"
+  ],
+  "mustNot": []
+ },
+ "university-in-france": {
+  "anchors": [
+   "Sorbonne University"
+  ],
+  "mustNot": []
+ },
+ "university-in-china": {
+  "anchors": [
+   "Peking University"
+  ],
+  "mustNot": []
+ },
+ "university-in-japan": {
+  "anchors": [
+   "University of Tokyo"
+  ],
+  "mustNot": []
+ },
+ "university-in-italy": {
+  "anchors": [
+   "University of Bologna"
+  ],
+  "mustNot": []
+ },
+ "university-in-spain": {
+  "anchors": [
+   "University of Barcelona"
+  ],
+  "mustNot": []
+ },
+ "university-in-brazil": {
+  "anchors": [
+   "University of São Paulo"
+  ],
+  "mustNot": []
+ },
+ "university-in-turkey": {
+  "anchors": [
+   "Istanbul University"
+  ],
+  "mustNot": []
+ },
+ "university-in-iran": {
+  "anchors": [
+   "University of Tehran"
+  ],
+  "mustNot": []
+ },
+ "university-in-egypt": {
+  "anchors": [
+   "Cairo University"
+  ],
+  "mustNot": []
+ },
+ "museum-in-united-states": {
+  "anchors": [
+   "Metropolitan Museum of Art"
+  ],
+  "mustNot": []
+ },
+ "museum-in-united-kingdom": {
+  "anchors": [
+   "British Museum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-france": {
+  "anchors": [
+   "Louvre Museum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-germany": {
+  "anchors": [
+   "Pergamon Museum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-italy": {
+  "anchors": [
+   "Uffizi"
+  ],
+  "mustNot": []
+ },
+ "museum-in-spain": {
+  "anchors": [
+   "Prado Museum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-russia": {
+  "anchors": [
+   "Hermitage Museum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-japan": {
+  "anchors": [
+   "Tokyo National Museum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-china": {
+  "anchors": [
+   "National Museum of China"
+  ],
+  "mustNot": []
+ },
+ "museum-in-netherlands": {
+  "anchors": [
+   "Rijksmuseum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-canada": {
+  "anchors": [
+   "Royal Ontario Museum"
+  ],
+  "mustNot": []
+ },
+ "museum-in-india": {
+  "anchors": [
+   "Indian Museum"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-united-kingdom": {
+  "anchors": [
+   "Manchester United F.C."
+  ],
+  "mustNot": []
+ },
+ "football-club-in-germany": {
+  "anchors": [
+   "FC Bayern Munich"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-italy": {
+  "anchors": [
+   "Juventus FC"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-spain": {
+  "anchors": [
+   "Real Madrid CF"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-france": {
+  "anchors": [
+   "Paris Saint-Germain F.C."
+  ],
+  "mustNot": []
+ },
+ "football-club-in-brazil": {
+  "anchors": [
+   "Santos FC"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-argentina": {
+  "anchors": [
+   "Boca Juniors"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-netherlands": {
+  "anchors": [
+   "AFC Ajax"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-portugal": {
+  "anchors": [
+   "SL Benfica"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-turkey": {
+  "anchors": [
+   "Galatasaray S.K."
+  ],
+  "mustNot": []
+ },
+ "football-club-in-mexico": {
+  "anchors": [
+   "Club América"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-united-states": {
+  "anchors": [
+   "Inter Miami CF"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-russia": {
+  "anchors": [
+   "FC Spartak Moscow"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-ukraine": {
+  "anchors": [
+   "FC Dynamo Kyiv"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-poland": {
+  "anchors": [
+   "Legia Warsaw"
+  ],
+  "mustNot": []
+ },
+ "football-club-in-greece": {
+  "anchors": [
+   "Olympiacos F.C."
+  ],
+  "mustNot": []
+ },
+ "city-in-brazil": {
+  "anchors": [
+   "São Paulo",
+   "Rio de Janeiro",
+   "Brasília"
+  ],
+  "mustNot": []
+ },
+ "city-in-japan": {
+  "anchors": [
+   "Tokyo",
+   "Osaka",
+   "Kyoto"
+  ],
+  "mustNot": []
+ },
+ "city-in-south-africa": {
+  "anchors": [
+   "Johannesburg",
+   "Cape Town",
+   "Durban"
+  ],
+  "mustNot": []
+ },
+ "city-in-indonesia": {
+  "anchors": [
+   "Jakarta",
+   "Surabaya",
+   "Bandung"
+  ],
+  "mustNot": []
+ },
+ "city-in-vietnam": {
+  "anchors": [
+   "Hanoi",
+   "Ho Chi Minh City",
+   "Da Nang"
+  ],
+  "mustNot": []
+ },
+ "city-in-thailand": {
+  "anchors": [
+   "Bangkok",
+   "Chiang Mai",
+   "Phuket"
+  ],
+  "mustNot": []
+ },
+ "city-in-south-korea": {
+  "anchors": [
+   "Seoul",
+   "Busan",
+   "Incheon"
+  ],
+  "mustNot": []
+ },
+ "city-in-ireland": {
+  "anchors": [
+   "Dublin",
+   "Cork",
+   "Galway"
+  ],
+  "mustNot": []
+ },
+ "city-in-colombia": {
+  "anchors": [
+   "Bogotá",
+   "Medellín",
+   "Cali"
+  ],
+  "mustNot": []
+ },
+ "moon": {
+  "anchors": [
+   "Moon",
+   "Europa",
+   "Titan",
+   "Phobos"
+  ],
+  "mustNot": []
+ },
+ "constellation": {
+  "anchors": [
+   "Orion",
+   "Ursa Major",
+   "Scorpius",
+   "Cassiopeia"
+  ],
+  "mustNot": []
+ },
+ "star": {
+  "anchors": [
+   "Sun",
+   "Sirius",
+   "Betelgeuse",
+   "Polaris"
+  ],
+  "mustNot": []
+ },
+ "galaxy": {
+  "anchors": [
+   "Milky Way",
+   "Andromeda Galaxy",
+   "Triangulum Galaxy"
+  ],
+  "mustNot": []
+ },
+ "asteroid": {
+  "anchors": [
+   "Ceres",
+   "Vesta",
+   "Pallas"
+  ],
+  "mustNot": []
+ },
+ "comet": {
+  "anchors": [
+   "Halley's Comet",
+   "Hale-Bopp"
+  ],
+  "mustNot": []
+ },
+ "dwarf-planet": {
+  "anchors": [
+   "Pluto",
+   "Ceres",
+   "Eris"
+  ],
+  "mustNot": []
+ },
+ "space-probe": {
+  "anchors": [
+   "Voyager 1",
+   "Voyager 2",
+   "Cassini–Huygens"
+  ],
+  "mustNot": []
+ },
+ "spacecraft": {
+  "anchors": [
+   "Apollo 11",
+   "Sputnik 1",
+   "Space Shuttle Columbia"
+  ],
+  "mustNot": []
+ },
+ "space-telescope": {
+  "anchors": [
+   "Hubble Space Telescope",
+   "James Webb Space Telescope",
+   "Kepler space telescope"
+  ],
+  "mustNot": []
+ },
+ "exoplanet": {
+  "anchors": [
+   "Proxima Centauri b",
+   "51 Pegasi b"
+  ],
+  "mustNot": []
+ },
+ "nebula": {
+  "anchors": [
+   "Orion Nebula",
+   "Crab Nebula"
+  ],
+  "mustNot": []
+ },
+ "astronaut": {
+  "anchors": [
+   "Neil Armstrong",
+   "Buzz Aldrin",
+   "Yuri Gagarin",
+   "Valentina Tereshkova"
+  ],
+  "mustNot": []
+ },
+ "observatory": {
+  "anchors": [
+   "Mauna Kea Observatories",
+   "Greenwich Observatory"
+  ],
+  "mustNot": []
+ },
+ "chemical-element": {
+  "anchors": [
+   "Hydrogen",
+   "Oxygen",
+   "Gold",
+   "Iron",
+   "Carbon"
+  ],
+  "mustNot": []
+ },
+ "mineral": {
+  "anchors": [
+   "Quartz",
+   "Calcite",
+   "Diamond",
+   "Gypsum"
+  ],
+  "mustNot": []
+ },
+ "rock": {
+  "anchors": [
+   "Granite",
+   "Basalt",
+   "Marble",
+   "Limestone"
+  ],
+  "mustNot": []
+ },
+ "chemical-compound": {
+  "anchors": [
+   "Water",
+   "Carbon dioxide",
+   "Sodium chloride",
+   "Methane"
+  ],
+  "mustNot": []
+ },
+ "unit": {
+  "anchors": [
+   "Metre",
+   "Kilogram",
+   "Second",
+   "Ampere"
+  ],
+  "mustNot": []
+ },
+ "discipline": {
+  "anchors": [
+   "Physics",
+   "Chemistry",
+   "Biology",
+   "Mathematics"
+  ],
+  "mustNot": []
+ },
+ "enzyme": {
+  "anchors": [
+   "Amylase",
+   "Lipase",
+   "Pepsin",
+   "Catalase"
+  ],
+  "mustNot": []
+ },
+ "theory": {
+  "anchors": [
+   "Theory of relativity",
+   "Atomic theory",
+   "Germ theory of disease"
+  ],
+  "mustNot": []
+ },
+ "unit-of-time": {
+  "anchors": [
+   "Second",
+   "Minute",
+   "Hour",
+   "Day"
+  ],
+  "mustNot": []
+ },
+ "mammal": {
+  "anchors": [
+   "Lion",
+   "Elephant",
+   "Dog",
+   "Blue whale",
+   "Tiger"
+  ],
+  "mustNot": []
+ },
+ "bird": {
+  "anchors": [
+   "Bald eagle",
+   "Penguin",
+   "Ostrich",
+   "Owl"
+  ],
+  "mustNot": []
+ },
+ "reptile": {
+  "anchors": [
+   "Crocodile",
+   "Komodo dragon",
+   "Green iguana"
+  ],
+  "mustNot": []
+ },
+ "amphibian": {
+  "anchors": [
+   "Axolotl",
+   "Common frog",
+   "Cane toad"
+  ],
+  "mustNot": []
+ },
+ "dinosaur": {
+  "anchors": [
+   "Tyrannosaurus",
+   "Velociraptor",
+   "Triceratops",
+   "Stegosaurus"
+  ],
+  "mustNot": []
+ },
+ "shark": {
+  "anchors": [
+   "Great white shark",
+   "Hammerhead shark",
+   "Tiger shark",
+   "Whale shark"
+  ],
+  "mustNot": []
+ },
+ "dog-breed": {
+  "anchors": [
+   "Labrador Retriever",
+   "German Shepherd",
+   "Golden Retriever",
+   "Poodle"
+  ],
+  "mustNot": []
+ },
+ "cat-breed": {
+  "anchors": [
+   "Siamese",
+   "Persian",
+   "Maine Coon",
+   "Bengal"
+  ],
+  "mustNot": []
+ },
+ "food": {
+  "anchors": [
+   "Pizza",
+   "Bread",
+   "Rice",
+   "Cheese"
+  ],
+  "mustNot": []
+ },
+ "dish": {
+  "anchors": [
+   "Pizza",
+   "Sushi",
+   "Lasagne",
+   "Paella"
+  ],
+  "mustNot": []
+ },
+ "cheese": {
+  "anchors": [
+   "Cheddar",
+   "Mozzarella",
+   "Brie",
+   "Parmesan"
+  ],
+  "mustNot": []
+ },
+ "cocktail": {
+  "anchors": [
+   "Mojito",
+   "Margarita",
+   "Martini",
+   "Cosmopolitan"
+  ],
+  "mustNot": []
+ },
+ "bread": {
+  "anchors": [
+   "Baguette",
+   "Sourdough",
+   "Naan",
+   "Ciabatta"
+  ],
+  "mustNot": []
+ },
+ "pasta": {
+  "anchors": [
+   "Spaghetti",
+   "Penne",
+   "Lasagne",
+   "Fusilli"
+  ],
+  "mustNot": []
+ },
+ "sauce": {
+  "anchors": [
+   "Ketchup",
+   "Mayonnaise",
+   "Pesto",
+   "Soy sauce"
+  ],
+  "mustNot": []
+ },
+ "cuisine": {
+  "anchors": [
+   "Italian cuisine",
+   "Chinese cuisine",
+   "Mexican cuisine",
+   "Indian cuisine"
+  ],
+  "mustNot": []
+ },
+ "fruit": {
+  "anchors": [
+   "Apple",
+   "Banana",
+   "Orange",
+   "Mango"
+  ],
+  "mustNot": []
+ },
+ "vegetable": {
+  "anchors": [
+   "Carrot",
+   "Potato",
+   "Tomato",
+   "Broccoli"
+  ],
+  "mustNot": []
+ },
+ "spice": {
+  "anchors": [
+   "Cinnamon",
+   "Pepper",
+   "Turmeric",
+   "Saffron"
+  ],
+  "mustNot": []
+ },
+ "dessert": {
+  "anchors": [
+   "Ice cream",
+   "Tiramisu",
+   "Cheesecake",
+   "Apple pie"
+  ],
+  "mustNot": []
+ },
+ "beer-style": {
+  "anchors": [
+   "Lager",
+   "Stout",
+   "India pale ale",
+   "Pilsner"
+  ],
+  "mustNot": []
+ },
+ "soft-drink": {
+  "anchors": [
+   "Coca-Cola",
+   "Pepsi",
+   "Sprite",
+   "Fanta"
+  ],
+  "mustNot": []
+ },
+ "instrument": {
+  "anchors": [
+   "Piano",
+   "Guitar",
+   "Violin",
+   "Drum"
+  ],
+  "mustNot": []
+ },
+ "music-genre": {
+  "anchors": [
+   "Rock music",
+   "Jazz",
+   "Hip hop",
+   "Pop music"
+  ],
+  "mustNot": []
+ },
+ "band": {
+  "anchors": [
+   "The Beatles",
+   "Queen",
+   "Pink Floyd",
+   "Led Zeppelin"
+  ],
+  "mustNot": []
+ },
+ "rock-band": {
+  "anchors": [
+   "The Beatles",
+   "Queen",
+   "Led Zeppelin",
+   "Nirvana"
+  ],
+  "mustNot": []
+ },
+ "album": {
+  "anchors": [
+   "Thriller",
+   "Abbey Road",
+   "The Dark Side of the Moon"
+  ],
+  "mustNot": []
+ },
+ "song": {
+  "anchors": [
+   "Bohemian Rhapsody",
+   "Imagine",
+   "Hey Jude"
+  ],
+  "mustNot": []
+ },
+ "singer": {
+  "anchors": [
+   "Michael Jackson",
+   "Madonna",
+   "Elvis Presley",
+   "Beyoncé"
+  ],
+  "mustNot": []
+ },
+ "rapper": {
+  "anchors": [
+   "Eminem",
+   "Jay-Z",
+   "Kendrick Lamar",
+   "Snoop Dogg"
+  ],
+  "mustNot": []
+ },
+ "composer": {
+  "anchors": [
+   "Ludwig van Beethoven",
+   "Wolfgang Amadeus Mozart",
+   "Johann Sebastian Bach"
+  ],
+  "mustNot": []
+ },
+ "guitarist": {
+  "anchors": [
+   "Jimi Hendrix",
+   "Eric Clapton",
+   "Jimmy Page"
+  ],
+  "mustNot": []
+ },
+ "pianist": {
+  "anchors": [
+   "Frédéric Chopin",
+   "Franz Liszt",
+   "Sergei Rachmaninoff"
+  ],
+  "mustNot": []
+ },
+ "film": {
+  "anchors": [
+   "The Godfather",
+   "Titanic",
+   "Star Wars",
+   "Casablanca"
+  ],
+  "mustNot": []
+ },
+ "animated-film": {
+  "anchors": [
+   "The Lion King",
+   "Toy Story",
+   "Frozen",
+   "Shrek"
+  ],
+  "mustNot": []
+ },
+ "documentary": {
+  "anchors": [
+   "March of the Penguins",
+   "An Inconvenient Truth"
+  ],
+  "mustNot": []
+ },
+ "tv-series": {
+  "anchors": [
+   "Breaking Bad",
+   "Friends",
+   "Game of Thrones",
+   "The Simpsons"
+  ],
+  "mustNot": []
+ },
+ "anime": {
+  "anchors": [
+   "Naruto",
+   "One Piece",
+   "Dragon Ball",
+   "Death Note"
+  ],
+  "mustNot": []
+ },
+ "film-director": {
+  "anchors": [
+   "Steven Spielberg",
+   "Martin Scorsese",
+   "Alfred Hitchcock",
+   "Quentin Tarantino"
+  ],
+  "mustNot": []
+ },
+ "actor": {
+  "anchors": [
+   "Tom Hanks",
+   "Brad Pitt",
+   "Leonardo DiCaprio",
+   "Robert De Niro"
+  ],
+  "mustNot": []
+ },
+ "comedian": {
+  "anchors": [
+   "Charlie Chaplin",
+   "Robin Williams",
+   "Eddie Murphy"
+  ],
+  "mustNot": []
+ },
+ "film-studio": {
+  "anchors": [
+   "Walt Disney Pictures",
+   "Warner Bros.",
+   "Universal Pictures",
+   "Paramount Pictures"
+  ],
+  "mustNot": []
+ },
+ "tv-network": {
+  "anchors": [
+   "BBC",
+   "CNN",
+   "NBC",
+   "HBO"
+  ],
+  "mustNot": []
+ },
+ "play": {
+  "anchors": [
+   "Hamlet",
+   "Romeo and Juliet",
+   "Macbeth",
+   "Othello"
+  ],
+  "mustNot": []
+ },
+ "book-series": {
+  "anchors": [
+   "Harry Potter",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "mustNot": []
+ },
+ "literary-genre": {
+  "anchors": [
+   "Fantasy",
+   "Science fiction",
+   "Novel",
+   "Poetry"
+  ],
+  "mustNot": []
+ },
+ "comic-series": {
+  "anchors": [
+   "Batman",
+   "Spider-Man",
+   "Superman",
+   "Asterix"
+  ],
+  "mustNot": []
+ },
+ "manga": {
+  "anchors": [
+   "Naruto",
+   "One Piece",
+   "Dragon Ball",
+   "Death Note"
+  ],
+  "mustNot": []
+ },
+ "newspaper": {
+  "anchors": [
+   "The New York Times",
+   "The Guardian",
+   "The Times",
+   "Le Monde"
+  ],
+  "mustNot": []
+ },
+ "magazine": {
+  "anchors": [
+   "Time",
+   "National Geographic",
+   "Vogue",
+   "Forbes"
+  ],
+  "mustNot": []
+ },
+ "fictional-character": {
+  "anchors": [
+   "Sherlock Holmes",
+   "Harry Potter",
+   "Mickey Mouse",
+   "Batman"
+  ],
+  "mustNot": []
+ },
+ "writer": {
+  "anchors": [
+   "William Shakespeare",
+   "Charles Dickens",
+   "Mark Twain",
+   "Leo Tolstoy"
+  ],
+  "mustNot": []
+ },
+ "novelist": {
+  "anchors": [
+   "Charles Dickens",
+   "Jane Austen",
+   "Leo Tolstoy",
+   "Ernest Hemingway"
+  ],
+  "mustNot": []
+ },
+ "poet": {
+  "anchors": [
+   "William Shakespeare",
+   "Homer",
+   "Dante Alighieri",
+   "Rumi"
+  ],
+  "mustNot": []
+ },
+ "playwright": {
+  "anchors": [
+   "William Shakespeare",
+   "Anton Chekhov",
+   "Henrik Ibsen",
+   "Oscar Wilde"
+  ],
+  "mustNot": []
+ },
+ "painting": {
+  "anchors": [
+   "Mona Lisa",
+   "The Starry Night",
+   "The Last Supper",
+   "Guernica"
+  ],
+  "mustNot": []
+ },
+ "sculpture": {
+  "anchors": [
+   "David",
+   "The Thinker",
+   "Venus de Milo",
+   "Pietà"
+  ],
+  "mustNot": []
+ },
+ "art-movement": {
+  "anchors": [
+   "Impressionism",
+   "Cubism",
+   "Surrealism",
+   "Baroque"
+  ],
+  "mustNot": []
+ },
+ "architectural-style": {
+  "anchors": [
+   "Gothic architecture",
+   "Baroque architecture",
+   "Art Deco",
+   "Modern architecture"
+  ],
+  "mustNot": []
+ },
+ "art-museum": {
+  "anchors": [
+   "Louvre",
+   "Metropolitan Museum of Art",
+   "Museum of Modern Art"
+  ],
+  "mustNot": []
+ },
+ "painter": {
+  "anchors": [
+   "Leonardo da Vinci",
+   "Pablo Picasso",
+   "Vincent van Gogh",
+   "Claude Monet"
+  ],
+  "mustNot": []
+ },
+ "sculptor": {
+  "anchors": [
+   "Michelangelo",
+   "Auguste Rodin",
+   "Donatello"
+  ],
+  "mustNot": []
+ },
+ "photographer": {
+  "anchors": [
+   "Ansel Adams",
+   "Henri Cartier-Bresson",
+   "Annie Leibovitz"
+  ],
+  "mustNot": []
+ },
+ "architect": {
+  "anchors": [
+   "Frank Lloyd Wright",
+   "Le Corbusier",
+   "Zaha Hadid",
+   "Antoni Gaudí"
+  ],
+  "mustNot": []
+ },
+ "fashion-designer": {
+  "anchors": [
+   "Coco Chanel",
+   "Giorgio Armani",
+   "Christian Dior",
+   "Gianni Versace"
+  ],
+  "mustNot": []
+ },
+ "war": {
+  "anchors": [
+   "World War I",
+   "World War II",
+   "Vietnam War",
+   "Korean War"
+  ],
+  "mustNot": []
+ },
+ "battle": {
+  "anchors": [
+   "Battle of Waterloo",
+   "Battle of Hastings",
+   "Battle of Gettysburg"
+  ],
+  "mustNot": []
+ },
+ "empire": {
+  "anchors": [
+   "Roman Empire",
+   "Ottoman Empire",
+   "British Empire",
+   "Mongol Empire"
+  ],
+  "mustNot": []
+ },
+ "dynasty": {
+  "anchors": [
+   "Ming dynasty",
+   "Tang dynasty",
+   "Han dynasty",
+   "Habsburg"
+  ],
+  "mustNot": []
+ },
+ "revolution": {
+  "anchors": [
+   "French Revolution",
+   "Russian Revolution",
+   "American Revolution"
+  ],
+  "mustNot": []
+ },
+ "treaty": {
+  "anchors": [
+   "Treaty of Versailles",
+   "Treaty of Tordesillas"
+  ],
+  "mustNot": []
+ },
+ "archaeological-site": {
+  "anchors": [
+   "Machu Picchu",
+   "Pompeii",
+   "Stonehenge",
+   "Petra"
+  ],
+  "mustNot": []
+ },
+ "ideology": {
+  "anchors": [
+   "Capitalism",
+   "Socialism",
+   "Communism",
+   "Liberalism"
+  ],
+  "mustNot": []
+ },
+ "monarch": {
+  "anchors": [
+   "Elizabeth II",
+   "Napoleon",
+   "Louis XIV",
+   "Henry VIII"
+  ],
+  "mustNot": []
+ },
+ "us-president": {
+  "anchors": [
+   "Abraham Lincoln",
+   "George Washington",
+   "Barack Obama",
+   "Franklin D. Roosevelt"
+  ],
+  "mustNot": []
+ },
+ "uk-prime-minister": {
+  "anchors": [
+   "Winston Churchill",
+   "Margaret Thatcher",
+   "Tony Blair"
+  ],
+  "mustNot": []
+ },
+ "pope": {
+  "anchors": [
+   "Pope Francis",
+   "Pope John Paul II",
+   "Pope Benedict XVI"
+  ],
+  "mustNot": []
+ },
+ "explorer": {
+  "anchors": [
+   "Christopher Columbus",
+   "Marco Polo",
+   "Ferdinand Magellan",
+   "James Cook"
+  ],
+  "mustNot": []
+ },
+ "politician": {
+  "anchors": [
+   "Barack Obama",
+   "Winston Churchill",
+   "Angela Merkel",
+   "Nelson Mandela"
+  ],
+  "mustNot": []
+ },
+ "philosopher": {
+  "anchors": [
+   "Aristotle",
+   "Plato",
+   "Socrates",
+   "Immanuel Kant"
+  ],
+  "mustNot": []
+ },
+ "inventor": {
+  "anchors": [
+   "Thomas Edison",
+   "Nikola Tesla",
+   "Alexander Graham Bell",
+   "Leonardo da Vinci"
+  ],
+  "mustNot": []
+ },
+ "holiday": {
+  "anchors": [
+   "Christmas",
+   "Easter",
+   "Halloween",
+   "Thanksgiving"
+  ],
+  "mustNot": []
+ },
+ "festival": {
+  "anchors": [
+   "Diwali",
+   "Oktoberfest",
+   "Holi",
+   "Carnival"
+  ],
+  "mustNot": []
+ },
+ "sport": {
+  "anchors": [
+   "Football",
+   "Basketball",
+   "Tennis",
+   "Cricket"
+  ],
+  "mustNot": []
+ },
+ "football-club-world": {
+  "anchors": [
+   "Real Madrid CF",
+   "FC Barcelona",
+   "Manchester United F.C.",
+   "Liverpool F.C."
+  ],
+  "mustNot": []
+ },
+ "national-football-team": {
+  "anchors": [
+   "Brazil national football team",
+   "Germany national football team",
+   "Argentina national football team"
+  ],
+  "mustNot": []
+ },
+ "footballer": {
+  "anchors": [
+   "Lionel Messi",
+   "Cristiano Ronaldo",
+   "Pelé",
+   "Diego Maradona"
+  ],
+  "mustNot": []
+ },
+ "tennis-player": {
+  "anchors": [
+   "Roger Federer",
+   "Rafael Nadal",
+   "Novak Djokovic",
+   "Serena Williams"
+  ],
+  "mustNot": []
+ },
+ "cricketer": {
+  "anchors": [
+   "Sachin Tendulkar",
+   "Virat Kohli",
+   "Don Bradman",
+   "Brian Lara"
+  ],
+  "mustNot": []
+ },
+ "basketball-player": {
+  "anchors": [
+   "Michael Jordan",
+   "LeBron James",
+   "Kobe Bryant",
+   "Magic Johnson"
+  ],
+  "mustNot": []
+ },
+ "f1-driver": {
+  "anchors": [
+   "Michael Schumacher",
+   "Lewis Hamilton",
+   "Ayrton Senna",
+   "Sebastian Vettel"
+  ],
+  "mustNot": []
+ },
+ "chess-player": {
+  "anchors": [
+   "Garry Kasparov",
+   "Magnus Carlsen",
+   "Bobby Fischer",
+   "Anatoly Karpov"
+  ],
+  "mustNot": []
+ },
+ "boxer": {
+  "anchors": [
+   "Muhammad Ali",
+   "Mike Tyson",
+   "Joe Frazier",
+   "Floyd Mayweather Jr."
+  ],
+  "mustNot": []
+ },
+ "golfer": {
+  "anchors": [
+   "Tiger Woods",
+   "Jack Nicklaus",
+   "Arnold Palmer",
+   "Rory McIlroy"
+  ],
+  "mustNot": []
+ },
+ "cricketer-from-india": {
+  "anchors": [
+   "Sachin Tendulkar",
+   "Virat Kohli",
+   "MS Dhoni",
+   "Kapil Dev"
+  ],
+  "mustNot": []
+ },
+ "cricketer-from-pakistan": {
+  "anchors": [
+   "Imran Khan",
+   "Wasim Akram",
+   "Babar Azam",
+   "Shahid Afridi"
+  ],
+  "mustNot": []
+ },
+ "cricketer-from-australia": {
+  "anchors": [
+   "Don Bradman",
+   "Ricky Ponting",
+   "Shane Warne",
+   "Steve Smith"
+  ],
+  "mustNot": []
+ },
+ "cricketer-from-united-kingdom": {
+  "anchors": [
+   "Ian Botham",
+   "Joe Root",
+   "Ben Stokes"
+  ],
+  "mustNot": []
+ },
+ "cricketer-from-south-africa": {
+  "anchors": [
+   "AB de Villiers",
+   "Jacques Kallis",
+   "Dale Steyn"
+  ],
+  "mustNot": []
+ },
+ "cricketer-from-new-zealand": {
+  "anchors": [
+   "Kane Williamson",
+   "Richard Hadlee",
+   "Brendon McCullum"
+  ],
+  "mustNot": []
+ },
+ "cricketer-from-bangladesh": {
+  "anchors": [
+   "Shakib Al Hasan",
+   "Tamim Iqbal",
+   "Mushfiqur Rahim"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-brazil": {
+  "anchors": [
+   "Pelé",
+   "Neymar",
+   "Ronaldo",
+   "Ronaldinho"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-argentina": {
+  "anchors": [
+   "Lionel Messi",
+   "Diego Maradona",
+   "Gabriel Batistuta"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-france": {
+  "anchors": [
+   "Zinedine Zidane",
+   "Kylian Mbappé",
+   "Thierry Henry",
+   "Michel Platini"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-germany": {
+  "anchors": [
+   "Franz Beckenbauer",
+   "Gerd Müller",
+   "Miroslav Klose"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-italy": {
+  "anchors": [
+   "Roberto Baggio",
+   "Paolo Maldini",
+   "Andrea Pirlo"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-spain": {
+  "anchors": [
+   "Andrés Iniesta",
+   "Xavi",
+   "Iker Casillas"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-united-kingdom": {
+  "anchors": [
+   "David Beckham",
+   "Wayne Rooney",
+   "Bobby Charlton",
+   "Steven Gerrard"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-portugal": {
+  "anchors": [
+   "Cristiano Ronaldo",
+   "Eusébio",
+   "Luís Figo"
+  ],
+  "mustNot": []
+ },
+ "footballer-from-nigeria": {
+  "anchors": [
+   "Jay-Jay Okocha",
+   "Nwankwo Kanu"
+  ],
+  "mustNot": []
+ },
+ "actor-from-united-states": {
+  "anchors": [
+   "Tom Hanks",
+   "Brad Pitt",
+   "Leonardo DiCaprio",
+   "Robert De Niro"
+  ],
+  "mustNot": []
+ },
+ "actor-from-united-kingdom": {
+  "anchors": [
+   "Daniel Radcliffe",
+   "Anthony Hopkins",
+   "Michael Caine",
+   "Daniel Day-Lewis"
+  ],
+  "mustNot": []
+ },
+ "actor-from-india": {
+  "anchors": [
+   "Shah Rukh Khan",
+   "Amitabh Bachchan",
+   "Aamir Khan",
+   "Salman Khan"
+  ],
+  "mustNot": []
+ },
+ "actor-from-france": {
+  "anchors": [
+   "Gérard Depardieu",
+   "Alain Delon",
+   "Jean Reno"
+  ],
+  "mustNot": []
+ },
+ "actor-from-japan": {
+  "anchors": [
+   "Toshiro Mifune",
+   "Ken Watanabe"
+  ],
+  "mustNot": []
+ },
+ "actor-from-italy": {
+  "anchors": [
+   "Marcello Mastroianni",
+   "Roberto Benigni",
+   "Sophia Loren"
+  ],
+  "mustNot": []
+ },
+ "actor-from-germany": {
+  "anchors": [
+   "Christoph Waltz",
+   "Klaus Kinski",
+   "Marlene Dietrich"
+  ],
+  "mustNot": []
+ },
+ "actor-from-south-korea": {
+  "anchors": [
+   "Lee Byung-hun",
+   "Song Kang-ho",
+   "Lee Min-ho"
+  ],
+  "mustNot": []
+ },
+ "actor-from-pakistan": {
+  "anchors": [
+   "Fawad Khan",
+   "Mahira Khan",
+   "Imran Abbas"
+  ],
+  "mustNot": []
+ },
+ "actor-from-turkey": {
+  "anchors": [
+   "Kıvanç Tatlıtuğ",
+   "Haluk Bilginer"
+  ],
+  "mustNot": []
+ },
+ "singer-from-united-states": {
+  "anchors": [
+   "Michael Jackson",
+   "Madonna",
+   "Elvis Presley",
+   "Taylor Swift"
+  ],
+  "mustNot": []
+ },
+ "singer-from-united-kingdom": {
+  "anchors": [
+   "Adele",
+   "Elton John",
+   "David Bowie",
+   "Freddie Mercury"
+  ],
+  "mustNot": []
+ },
+ "singer-from-india": {
+  "anchors": [
+   "Lata Mangeshkar",
+   "Arijit Singh",
+   "Kishore Kumar",
+   "Mohammed Rafi"
+  ],
+  "mustNot": []
+ },
+ "singer-from-pakistan": {
+  "anchors": [
+   "Nusrat Fateh Ali Khan",
+   "Atif Aslam",
+   "Abida Parveen",
+   "Rahat Fateh Ali Khan"
+  ],
+  "mustNot": []
+ },
+ "singer-from-france": {
+  "anchors": [
+   "Édith Piaf",
+   "Charles Aznavour",
+   "Johnny Hallyday"
+  ],
+  "mustNot": []
+ },
+ "singer-from-south-korea": {
+  "anchors": [
+   "Psy",
+   "IU",
+   "Rain"
+  ],
+  "mustNot": []
+ },
+ "singer-from-japan": {
+  "anchors": [
+   "Hikaru Utada",
+   "Ayumi Hamasaki"
+  ],
+  "mustNot": []
+ },
+ "singer-from-brazil": {
+  "anchors": [
+   "Caetano Veloso",
+   "Gilberto Gil",
+   "Anitta"
+  ],
+  "mustNot": []
+ },
+ "singer-from-germany": {
+  "anchors": [
+   "Rammstein",
+   "Nena"
+  ],
+  "mustNot": []
+ },
+ "singer-from-mexico": {
+  "anchors": [
+   "Luis Miguel",
+   "Thalía",
+   "Juan Gabriel"
+  ],
+  "mustNot": []
+ },
+ "singer-from-turkey": {
+  "anchors": [
+   "Tarkan",
+   "Sezen Aksu",
+   "Ajda Pekkan"
+  ],
+  "mustNot": []
+ },
+ "writer-from-united-kingdom": {
+  "anchors": [
+   "William Shakespeare",
+   "Charles Dickens",
+   "Jane Austen",
+   "J. K. Rowling"
+  ],
+  "mustNot": []
+ },
+ "writer-from-france": {
+  "anchors": [
+   "Victor Hugo",
+   "Albert Camus",
+   "Jules Verne",
+   "Alexandre Dumas"
+  ],
+  "mustNot": []
+ },
+ "writer-from-russia": {
+  "anchors": [
+   "Leo Tolstoy",
+   "Fyodor Dostoevsky",
+   "Anton Chekhov",
+   "Alexander Pushkin"
+  ],
+  "mustNot": []
+ },
+ "writer-from-germany": {
+  "anchors": [
+   "Johann Wolfgang von Goethe",
+   "Franz Kafka",
+   "Thomas Mann"
+  ],
+  "mustNot": []
+ },
+ "writer-from-united-states": {
+  "anchors": [
+   "Mark Twain",
+   "Ernest Hemingway",
+   "Edgar Allan Poe",
+   "F. Scott Fitzgerald"
+  ],
+  "mustNot": []
+ },
+ "writer-from-japan": {
+  "anchors": [
+   "Haruki Murakami",
+   "Yukio Mishima",
+   "Natsume Sōseki"
+  ],
+  "mustNot": []
+ },
+ "writer-from-india": {
+  "anchors": [
+   "Rabindranath Tagore",
+   "Salman Rushdie",
+   "R. K. Narayan"
+  ],
+  "mustNot": []
+ },
+ "writer-from-pakistan": {
+  "anchors": [
+   "Muhammad Iqbal",
+   "Faiz Ahmad Faiz",
+   "Saadat Hasan Manto"
+  ],
+  "mustNot": []
+ },
+ "writer-from-italy": {
+  "anchors": [
+   "Dante Alighieri",
+   "Umberto Eco",
+   "Italo Calvino"
+  ],
+  "mustNot": []
+ },
+ "writer-from-spain": {
+  "anchors": [
+   "Miguel de Cervantes",
+   "Federico García Lorca"
+  ],
+  "mustNot": []
+ },
+ "writer-from-argentina": {
+  "anchors": [
+   "Jorge Luis Borges",
+   "Julio Cortázar"
+  ],
+  "mustNot": []
+ },
+ "writer-from-nigeria": {
+  "anchors": [
+   "Chinua Achebe",
+   "Wole Soyinka",
+   "Chimamanda Ngozi Adichie"
+  ],
+  "mustNot": []
+ },
+ "writer-from-egypt": {
+  "anchors": [
+   "Naguib Mahfouz",
+   "Taha Hussein"
+  ],
+  "mustNot": []
+ },
+ "writer-from-turkey": {
+  "anchors": [
+   "Orhan Pamuk",
+   "Elif Shafak",
+   "Nâzım Hikmet"
+  ],
+  "mustNot": []
+ },
+ "writer-from-iran": {
+  "anchors": [
+   "Omar Khayyam",
+   "Rumi",
+   "Hafez"
+  ],
+  "mustNot": []
+ },
+ "poet-from-pakistan": {
+  "anchors": [
+   "Muhammad Iqbal",
+   "Faiz Ahmad Faiz",
+   "Mirza Ghalib"
+  ],
+  "mustNot": []
+ },
+ "poet-from-india": {
+  "anchors": [
+   "Rabindranath Tagore",
+   "Kabir",
+   "Mirza Ghalib"
+  ],
+  "mustNot": []
+ },
+ "poet-from-iran": {
+  "anchors": [
+   "Rumi",
+   "Hafez",
+   "Omar Khayyam",
+   "Ferdowsi"
+  ],
+  "mustNot": []
+ },
+ "poet-from-russia": {
+  "anchors": [
+   "Alexander Pushkin",
+   "Anna Akhmatova",
+   "Vladimir Mayakovsky"
+  ],
+  "mustNot": []
+ },
+ "poet-from-france": {
+  "anchors": [
+   "Charles Baudelaire",
+   "Arthur Rimbaud",
+   "Victor Hugo"
+  ],
+  "mustNot": []
+ },
+ "poet-from-germany": {
+  "anchors": [
+   "Johann Wolfgang von Goethe",
+   "Friedrich Schiller",
+   "Heinrich Heine"
+  ],
+  "mustNot": []
+ },
+ "poet-from-united-kingdom": {
+  "anchors": [
+   "William Shakespeare",
+   "William Wordsworth",
+   "John Keats",
+   "Lord Byron"
+  ],
+  "mustNot": []
+ },
+ "poet-from-united-states": {
+  "anchors": [
+   "Walt Whitman",
+   "Emily Dickinson",
+   "Robert Frost",
+   "Edgar Allan Poe"
+  ],
+  "mustNot": []
+ },
+ "poet-from-turkey": {
+  "anchors": [
+   "Nâzım Hikmet",
+   "Yunus Emre"
+  ],
+  "mustNot": []
+ },
+ "poet-from-egypt": {
+  "anchors": [
+   "Ahmed Shawqi"
+  ],
+  "mustNot": []
+ },
+ "poet-from-spain": {
+  "anchors": [
+   "Federico García Lorca",
+   "Antonio Machado"
+  ],
+  "mustNot": []
+ },
+ "poet-from-italy": {
+  "anchors": [
+   "Dante Alighieri",
+   "Petrarch",
+   "Giacomo Leopardi"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-germany": {
+  "anchors": [
+   "Albert Einstein",
+   "Max Planck",
+   "Werner Heisenberg"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-united-kingdom": {
+  "anchors": [
+   "Isaac Newton",
+   "Stephen Hawking",
+   "Michael Faraday"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-united-states": {
+  "anchors": [
+   "Richard Feynman",
+   "Robert Oppenheimer",
+   "Albert Michelson"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-france": {
+  "anchors": [
+   "Marie Curie",
+   "Blaise Pascal",
+   "Henri Becquerel"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-italy": {
+  "anchors": [
+   "Galileo Galilei",
+   "Enrico Fermi",
+   "Alessandro Volta"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-russia": {
+  "anchors": [
+   "Lev Landau",
+   "Andrei Sakharov",
+   "Pyotr Kapitsa"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-india": {
+  "anchors": [
+   "C. V. Raman",
+   "Satyendra Nath Bose",
+   "Jagadish Chandra Bose"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-pakistan": {
+  "anchors": [
+   "Abdus Salam"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-japan": {
+  "anchors": [
+   "Hideki Yukawa",
+   "Shin'ichirō Tomonaga"
+  ],
+  "mustNot": []
+ },
+ "physicist-from-china": {
+  "anchors": [
+   "Chen Ning Yang",
+   "Tsung-Dao Lee"
+  ],
+  "mustNot": []
+ },
+ "painter-from-france": {
+  "anchors": [
+   "Claude Monet",
+   "Édouard Manet",
+   "Paul Cézanne",
+   "Edgar Degas"
+  ],
+  "mustNot": []
+ },
+ "painter-from-italy": {
+  "anchors": [
+   "Leonardo da Vinci",
+   "Raphael",
+   "Michelangelo",
+   "Caravaggio"
+  ],
+  "mustNot": []
+ },
+ "painter-from-spain": {
+  "anchors": [
+   "Pablo Picasso",
+   "Salvador Dalí",
+   "Francisco Goya",
+   "Diego Velázquez"
+  ],
+  "mustNot": []
+ },
+ "painter-from-netherlands": {
+  "anchors": [
+   "Rembrandt",
+   "Vincent van Gogh",
+   "Johannes Vermeer"
+  ],
+  "mustNot": []
+ },
+ "painter-from-germany": {
+  "anchors": [
+   "Albrecht Dürer",
+   "Caspar David Friedrich",
+   "Hans Holbein the Younger"
+  ],
+  "mustNot": []
+ },
+ "painter-from-united-kingdom": {
+  "anchors": [
+   "J. M. W. Turner",
+   "John Constable",
+   "Francis Bacon"
+  ],
+  "mustNot": []
+ },
+ "painter-from-united-states": {
+  "anchors": [
+   "Jackson Pollock",
+   "Andy Warhol",
+   "Edward Hopper"
+  ],
+  "mustNot": []
+ },
+ "painter-from-russia": {
+  "anchors": [
+   "Wassily Kandinsky",
+   "Marc Chagall",
+   "Ilya Repin"
+  ],
+  "mustNot": []
+ },
+ "painter-from-japan": {
+  "anchors": [
+   "Katsushika Hokusai",
+   "Yayoi Kusama",
+   "Takashi Murakami"
+  ],
+  "mustNot": []
+ },
+ "painter-from-mexico": {
+  "anchors": [
+   "Frida Kahlo",
+   "Diego Rivera"
+  ],
+  "mustNot": []
+ },
+ "painter-from-india": {
+  "anchors": [
+   "Raja Ravi Varma",
+   "M. F. Husain"
+  ],
+  "mustNot": []
+ },
+ "painter-from-pakistan": {
+  "anchors": [
+   "Sadequain",
+   "Abdur Rahman Chughtai"
+  ],
+  "mustNot": []
+ },
+ "politician-from-united-states": {
+  "anchors": [
+   "Abraham Lincoln",
+   "Barack Obama",
+   "George Washington",
+   "John F. Kennedy"
+  ],
+  "mustNot": []
+ },
+ "politician-from-united-kingdom": {
+  "anchors": [
+   "Winston Churchill",
+   "Margaret Thatcher",
+   "Tony Blair"
+  ],
+  "mustNot": []
+ },
+ "politician-from-india": {
+  "anchors": [
+   "Mahatma Gandhi",
+   "Jawaharlal Nehru",
+   "Narendra Modi",
+   "Indira Gandhi"
+  ],
+  "mustNot": []
+ },
+ "politician-from-pakistan": {
+  "anchors": [
+   "Muhammad Ali Jinnah",
+   "Benazir Bhutto",
+   "Imran Khan",
+   "Nawaz Sharif"
+  ],
+  "mustNot": []
+ },
+ "politician-from-france": {
+  "anchors": [
+   "Charles de Gaulle",
+   "Napoleon",
+   "Emmanuel Macron"
+  ],
+  "mustNot": []
+ },
+ "politician-from-germany": {
+  "anchors": [
+   "Angela Merkel",
+   "Otto von Bismarck",
+   "Adolf Hitler"
+  ],
+  "mustNot": []
+ },
+ "politician-from-russia": {
+  "anchors": [
+   "Vladimir Putin",
+   "Vladimir Lenin",
+   "Joseph Stalin"
+  ],
+  "mustNot": []
+ },
+ "politician-from-turkey": {
+  "anchors": [
+   "Mustafa Kemal Atatürk",
+   "Recep Tayyip Erdoğan"
+  ],
+  "mustNot": []
+ },
+ "politician-from-iran": {
+  "anchors": [
+   "Ali Khamenei",
+   "Mohammad Mosaddegh",
+   "Ruhollah Khomeini"
+  ],
+  "mustNot": []
+ },
+ "politician-from-egypt": {
+  "anchors": [
+   "Gamal Abdel Nasser",
+   "Anwar Sadat",
+   "Hosni Mubarak"
+  ],
+  "mustNot": []
+ },
+ "politician-from-brazil": {
+  "anchors": [
+   "Luiz Inácio Lula da Silva",
+   "Getúlio Vargas",
+   "Dilma Rousseff"
+  ],
+  "mustNot": []
+ },
+ "politician-from-south-africa": {
+  "anchors": [
+   "Nelson Mandela",
+   "Jacob Zuma",
+   "Thabo Mbeki"
+  ],
+  "mustNot": []
+ },
+ "physicist": {
+  "anchors": [
+   "Albert Einstein",
+   "Isaac Newton",
+   "Stephen Hawking",
+   "Marie Curie"
+  ],
+  "mustNot": []
+ },
+ "chemist": {
+  "anchors": [
+   "Marie Curie",
+   "Antoine Lavoisier",
+   "Dmitri Mendeleev",
+   "Linus Pauling"
+  ],
+  "mustNot": []
+ },
+ "mathematician": {
+  "anchors": [
+   "Euclid",
+   "Carl Friedrich Gauss",
+   "Leonhard Euler",
+   "Isaac Newton"
+  ],
+  "mustNot": []
+ },
+ "biologist": {
+  "anchors": [
+   "Charles Darwin",
+   "Gregor Mendel",
+   "Louis Pasteur"
+  ],
+  "mustNot": []
+ },
+ "astronomer": {
+  "anchors": [
+   "Galileo Galilei",
+   "Nicolaus Copernicus",
+   "Johannes Kepler",
+   "Carl Sagan"
+  ],
+  "mustNot": []
+ },
+ "computer-scientist": {
+  "anchors": [
+   "Alan Turing",
+   "Tim Berners-Lee",
+   "Ada Lovelace",
+   "Grace Hopper"
+  ],
+  "mustNot": []
+ },
+ "economist": {
+  "anchors": [
+   "Adam Smith",
+   "John Maynard Keynes",
+   "Karl Marx",
+   "Milton Friedman"
+  ],
+  "mustNot": []
+ },
+ "psychologist": {
+  "anchors": [
+   "Sigmund Freud",
+   "Carl Jung",
+   "B. F. Skinner",
+   "Jean Piaget"
+  ],
+  "mustNot": []
+ },
+ "engineer": {
+  "anchors": [
+   "Isambard Kingdom Brunel",
+   "Nikola Tesla",
+   "Gustave Eiffel"
+  ],
+  "mustNot": []
+ },
+ "chef": {
+  "anchors": [
+   "Gordon Ramsay",
+   "Julia Child",
+   "Jamie Oliver"
+  ],
+  "mustNot": []
+ },
+ "nobel-physics": {
+  "anchors": [
+   "Albert Einstein",
+   "Marie Curie",
+   "Niels Bohr",
+   "Richard Feynman"
+  ],
+  "mustNot": []
+ },
+ "nobel-chemistry": {
+  "anchors": [
+   "Marie Curie",
+   "Linus Pauling",
+   "Frederick Sanger"
+  ],
+  "mustNot": []
+ },
+ "nobel-medicine": {
+  "anchors": [
+   "Alexander Fleming",
+   "Ivan Pavlov",
+   "Robert Koch"
+  ],
+  "mustNot": []
+ },
+ "nobel-literature": {
+  "anchors": [
+   "Ernest Hemingway",
+   "Gabriel García Márquez",
+   "Rabindranath Tagore",
+   "Toni Morrison"
+  ],
+  "mustNot": []
+ },
+ "nobel-peace": {
+  "anchors": [
+   "Mother Teresa",
+   "Nelson Mandela",
+   "Martin Luther King Jr.",
+   "Malala Yousafzai"
+  ],
+  "mustNot": []
+ },
+ "nobel-economics": {
+  "anchors": [
+   "Milton Friedman",
+   "Paul Krugman",
+   "Amartya Sen"
+  ],
+  "mustNot": []
+ },
+ "language": {
+  "anchors": [
+   "English",
+   "Spanish",
+   "French",
+   "German",
+   "Mandarin Chinese"
+  ],
+  "mustNot": []
+ },
+ "writing-system": {
+  "anchors": [
+   "Latin script",
+   "Arabic script",
+   "Cyrillic script",
+   "Devanagari"
+  ],
+  "mustNot": []
+ },
+ "currency": {
+  "anchors": [
+   "United States dollar",
+   "Euro",
+   "Japanese yen",
+   "Pound sterling"
+  ],
+  "mustNot": []
+ },
+ "religion": {
+  "anchors": [
+   "Christianity",
+   "Islam",
+   "Hinduism",
+   "Buddhism",
+   "Judaism"
+  ],
+  "mustNot": []
+ },
+ "ethnic-group": {
+  "anchors": [
+   "Han Chinese",
+   "Arabs",
+   "Hungarians"
+  ],
+  "mustNot": []
+ },
+ "profession": {
+  "anchors": [
+   "Teacher",
+   "Doctor",
+   "Engineer",
+   "Lawyer"
+  ],
+  "mustNot": []
+ },
+ "emotion": {
+  "anchors": [
+   "Anger",
+   "Fear",
+   "Joy",
+   "Sadness"
+  ],
+  "mustNot": []
+ },
+ "dance": {
+  "anchors": [
+   "Ballet",
+   "Salsa",
+   "Tango",
+   "Waltz"
+  ],
+  "mustNot": []
+ },
+ "martial-art": {
+  "anchors": [
+   "Karate",
+   "Judo",
+   "Taekwondo",
+   "Kung fu"
+  ],
+  "mustNot": []
+ },
+ "logical-fallacy": {
+  "anchors": [
+   "Ad hominem",
+   "Straw man",
+   "Slippery slope"
+  ],
+  "mustNot": []
+ },
+ "deity": {
+  "anchors": [
+   "Zeus",
+   "Odin",
+   "Thor",
+   "Ra",
+   "Vishnu"
+  ],
+  "mustNot": []
+ },
+ "legendary-creature": {
+  "anchors": [
+   "Dragon",
+   "Unicorn",
+   "Phoenix",
+   "Mermaid"
+  ],
+  "mustNot": []
+ },
+ "mythological-character": {
+  "anchors": [
+   "Hercules",
+   "Achilles",
+   "Odysseus"
+  ],
+  "mustNot": []
+ },
+ "prophet": {
+  "anchors": [
+   "Muhammad",
+   "Moses",
+   "Abraham",
+   "Jesus"
+  ],
+  "mustNot": []
+ },
+ "religious-text": {
+  "anchors": [
+   "Bible",
+   "Quran",
+   "Bhagavad Gita",
+   "Torah"
+  ],
+  "mustNot": []
+ },
+ "disease": {
+  "anchors": [
+   "Influenza",
+   "Malaria",
+   "Tuberculosis",
+   "Diabetes mellitus"
+  ],
+  "mustNot": []
+ },
+ "mental-disorder": {
+  "anchors": [
+   "Depression",
+   "Schizophrenia",
+   "Anxiety disorder"
+  ],
+  "mustNot": []
+ },
+ "medication": {
+  "anchors": [
+   "Aspirin",
+   "Paracetamol",
+   "Ibuprofen",
+   "Penicillin"
+  ],
+  "mustNot": []
+ },
+ "medical-specialty": {
+  "anchors": [
+   "Cardiology",
+   "Neurology",
+   "Pediatrics",
+   "Surgery"
+  ],
+  "mustNot": []
+ },
+ "symptom": {
+  "anchors": [
+   "Fever",
+   "Cough",
+   "Headache",
+   "Fatigue"
+  ],
+  "mustNot": []
+ },
+ "video-game": {
+  "anchors": [
+   "Tetris",
+   "Minecraft",
+   "Super Mario Bros.",
+   "The Legend of Zelda"
+  ],
+  "mustNot": []
+ },
+ "video-game-genre": {
+  "anchors": [
+   "Role-playing video game",
+   "First-person shooter",
+   "Platform game"
+  ],
+  "mustNot": []
+ },
+ "board-game": {
+  "anchors": [
+   "Chess",
+   "Monopoly",
+   "Scrabble",
+   "Go"
+  ],
+  "mustNot": []
+ },
+ "card-game": {
+  "anchors": [
+   "Poker",
+   "Bridge",
+   "Blackjack",
+   "Solitaire"
+  ],
+  "mustNot": []
+ },
+ "video-game-developer": {
+  "anchors": [
+   "Nintendo",
+   "Electronic Arts",
+   "Ubisoft",
+   "Valve Corporation"
+  ],
+  "mustNot": []
+ },
+ "toy": {
+  "anchors": [
+   "Lego",
+   "Barbie",
+   "Teddy bear",
+   "Rubik's Cube"
+  ],
+  "mustNot": []
+ },
+ "programming-language": {
+  "anchors": [
+   "Python",
+   "JavaScript",
+   "Java",
+   "C++"
+  ],
+  "mustNot": []
+ },
+ "operating-system": {
+  "anchors": [
+   "Microsoft Windows",
+   "Linux",
+   "Android",
+   "macOS"
+  ],
+  "mustNot": []
+ },
+ "file-format": {
+  "anchors": [
+   "PDF",
+   "JPEG",
+   "MP3",
+   "HTML"
+  ],
+  "mustNot": []
+ },
+ "website": {
+  "anchors": [
+   "Google",
+   "Wikipedia",
+   "YouTube",
+   "Facebook"
+  ],
+  "mustNot": []
+ },
+ "mobile-app": {
+  "anchors": [
+   "WhatsApp",
+   "Instagram",
+   "TikTok",
+   "Snapchat"
+  ],
+  "mustNot": []
+ },
+ "web-browser": {
+  "anchors": [
+   "Google Chrome",
+   "Mozilla Firefox",
+   "Safari",
+   "Microsoft Edge"
+  ],
+  "mustNot": []
+ },
+ "programming-paradigm": {
+  "anchors": [
+   "Object-oriented programming",
+   "Functional programming"
+  ],
+  "mustNot": []
+ },
+ "software-company": {
+  "anchors": [
+   "Microsoft",
+   "Apple Inc.",
+   "Google",
+   "Oracle Corporation"
+  ],
+  "mustNot": []
+ },
+ "search-engine": {
+  "anchors": [
+   "Google Search",
+   "Bing",
+   "DuckDuckGo"
+  ],
+  "mustNot": []
+ },
+ "invention": {
+  "anchors": [
+   "Printing press",
+   "Telephone",
+   "Light bulb",
+   "Wheel"
+  ],
+  "mustNot": []
+ },
+ "brand": {
+  "anchors": [
+   "Coca-Cola",
+   "Nike",
+   "Apple Inc.",
+   "Toyota"
+  ],
+  "mustNot": []
+ },
+ "company": {
+  "anchors": [
+   "Apple Inc.",
+   "Microsoft",
+   "Amazon",
+   "Google"
+  ],
+  "mustNot": []
+ },
+ "bank": {
+  "anchors": [
+   "HSBC",
+   "JPMorgan Chase",
+   "Goldman Sachs"
+  ],
+  "mustNot": []
+ },
+ "car-manufacturer": {
+  "anchors": [
+   "Toyota",
+   "Ford Motor Company",
+   "Volkswagen",
+   "BMW"
+  ],
+  "mustNot": []
+ },
+ "car-model": {
+  "anchors": [
+   "Ford Model T",
+   "Volkswagen Beetle",
+   "Toyota Corolla"
+  ],
+  "mustNot": []
+ },
+ "restaurant-chain": {
+  "anchors": [
+   "McDonald's",
+   "KFC",
+   "Burger King",
+   "Subway"
+  ],
+  "mustNot": []
+ },
+ "supermarket-chain": {
+  "anchors": [
+   "Walmart",
+   "Tesco",
+   "Carrefour",
+   "Aldi"
+  ],
+  "mustNot": []
+ },
+ "airline": {
+  "anchors": [
+   "Emirates",
+   "Lufthansa",
+   "Qatar Airways",
+   "British Airways"
+  ],
+  "mustNot": []
+ },
+ "aircraft-model": {
+  "anchors": [
+   "Boeing 747",
+   "Airbus A380",
+   "Concorde"
+  ],
+  "mustNot": []
+ },
+ "ship-type": {
+  "anchors": [
+   "Aircraft carrier",
+   "Submarine",
+   "Frigate",
+   "Galleon"
+  ],
+  "mustNot": []
+ },
+ "motorcycle-manufacturer": {
+  "anchors": [
+   "Harley-Davidson",
+   "Honda",
+   "Yamaha",
+   "Ducati"
+  ],
+  "mustNot": []
+ }
 }

@@ -1,10 +1,10 @@
 // Dive preparation: choose prompts, load their answer pools, apply letter variants.
-import { CONFIG } from './config.js?v=ten-thousand-prompts-20261121';
-import { CATALOG, loadRawPool, stableEntries } from './data.js?v=ten-thousand-prompts-20261121';
+import { CONFIG } from './config.js?v=fixes-20261123-1';
+import { CATALOG, loadRawPool, stableEntries } from './data.js?v=fixes-20261123-1';
 import {
   pickEntries, mulberry32, hashString, buildPool, deriveLetterPool, chooseVariant,
   promptKey, promptText, utcDate,
-} from './engine.js?v=ten-thousand-prompts-20261121';
+} from './engine.js?v=fixes-20261123-1';
 
 const historyKey = text => `question:${String(text || '').toLowerCase().replace(/\s+/g, ' ').trim()}`;
 

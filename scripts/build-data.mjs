@@ -5,9 +5,10 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
 import { buildQuery, buildLabelQuery, parseBindings, queryUrl, toPack, fromPack, mergePools } from '../js/wikidata.js';
-import { cleanPool, applyOverrides, meaningfulChange, normalizeDataName } from './data-quality.mjs';
+import { cleanPool, applyOverrides, meaningfulChange, normalizeDataName, ensureAnchors, checkAnchors } from './data-quality.mjs';
 const args=process.argv.slice(2),flag=n=>args.includes('--'+n),opt=(n,d)=>{const i=args.indexOf('--'+n);return i>=0?args[i+1]:d;};
 const OUT=path.resolve(opt('out','data/packs')),MANIFEST=path.resolve(opt('manifest','data/manifest.json')),ONLY=opt('only')?new Set(opt('only').split(',')):null,BATCH=opt('batch');
+const MAX_MS=Math.max(0,parseFloat(opt('max-minutes','0'))||0)*60000,START=Math.max(0,parseInt(opt('start','0'),10)||0),T0=Date.now();
 const BATCH_SIZE=Math.max(1,parseInt(opt('batch-size','500'),10)||500),CANDIDATE_OFFSET=Math.max(0,parseInt(opt('candidate-offset','0'),10)||0);
 const ENDPOINT='https://query.wikidata.org/sparql',UA='DeepwellDatasetBuilder/3.0 (https://deepwell.games; static trivia data maintenance)';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms)),sha=v=>createHash('sha256').update(v).digest('hex');
@@ -36,22 +37,31 @@ async function main(){
  const bad=await verifyIds();if(flag('verify-only'))process.exit(bad.size?1:0);
  const manifest=await readJson(MANIFEST,{version:0,built:null,packs:{}}),overrides=await readJson('data/overrides.json',{}),blocklist=await readJson('data/blocklist.json',{qids:[],words:[]}),anchors=await readJson('data/anchors.json',{});
  for(const meta of Object.values(manifest.packs))if(meta.quality){meta.quality.added=0;meta.quality.removed=0;meta.quality.fallback=false;meta.quality.querySplitFallback=false;}
- const report={skipped:[],failed:[],built:0,unchanged:0,fallback:[],previousRetained:[],rejected:{}},today=new Date().toISOString().slice(0,10);
+ const report={stoppedAt:null,skipped:[],failed:[],built:0,unchanged:0,fallback:[],previousRetained:[],rejected:{}},today=new Date().toISOString().slice(0,10);
  const all=CATALOG.filter(e=>!ONLY||ONLY.has(e.id));let todo=all;if(BATCH!==undefined&&BATCH!=='all'){const b=parseInt(BATCH,10);if(!Number.isInteger(b)||b<0)throw new Error('Invalid batch index');todo=all.slice(b*BATCH_SIZE,(b+1)*BATCH_SIZE);}
- if(!todo.length){console.log('No prompts in this batch.');return;}
- for(let i=0;i<todo.length;i++){const e=todo[i],tag=`[${i+1}/${todo.length}] ${e.id}`;if(entityIdsOf(e).some(q=>bad.has(q))){report.skipped.push(e.id+' (bad registered Q-id)');continue;}
+ todo=todo.slice(START);if(!todo.length){console.log('No prompts left in this batch.');await writeFile('data/BUILD-REPORT.json',JSON.stringify({built:0,stoppedAt:null,note:'nothing to do'},null,2)+'\n');return;}
+ for(let i=0;i<todo.length;i++){
+  // Stop cleanly before the CI time limit so everything built so far is saved and committed. The workflow then
+  // queues the same batch again from `stoppedAt`. (Without this, a timeout throws away hours of work.)
+  if(MAX_MS&&Date.now()-T0>MAX_MS){report.stoppedAt=START+i;console.log(`Time budget of ${MAX_MS/60000} min reached after ${i} prompts; stopping cleanly at batch position ${START+i}.`);break;}
+  const e=todo[i],tag=`[${i+1}/${todo.length}] ${e.id}`;if(entityIdsOf(e).some(q=>bad.has(q))){report.skipped.push(e.id+' (bad registered Q-id)');continue;}
   const meta=manifest.packs[e.id];if(flag('resume')&&meta?.built&&(Date.parse(today)-Date.parse(meta.built))<6*864e5){report.skipped.push(e.id+' (fresh resume)');continue;}
   const file=path.join(OUT,e.id+'.json');let hadPrevious=false;try{
    const oldPack=await readJson(file,null),old=oldPack?fromPack(oldPack):[],fresh=await buildBands(e);hadPrevious=Boolean(oldPack);
    const merged=mergePools(old,fresh.items,{...e,target:e.target??e.answerLimit??2000}),cleaned=cleanPool(merged,e,blocklist);
-   const items=applyOverrides(e.id,cleaned.items,overrides).slice(0,e.target??e.answerLimit??2000),min=Math.min(e.minPool||20,8);
-   if(items.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
-   const rule=anchors[e.id]||{},must=rule.mustNot||e.mustNot||[],required=rule.anchors||e.anchors||[],keys=new Set(items.flatMap(x=>[x.n,...(x.a||[])]).map(x=>String(x).toLowerCase()));
-   const missing=required.filter(x=>!keys.has(normalizeDataName(x))),forbidden=must.filter(x=>keys.has(normalizeDataName(x)));
-   if(missing.length||forbidden.length)console.warn(tag,'anchor warnings',JSON.stringify({missing,forbidden}));
+   const rule={...(e.anchors?{anchors:e.anchors}:{}),...(e.mustNot?{mustNot:e.mustNot}:{}),...(anchors[e.id]||{}),people:Boolean(e.people)};
+   const withOverrides=applyOverrides(e.id,cleaned.items,overrides),min=Math.min(e.minPool||20,8);
+   if(withOverrides.length<min){report.skipped.push(e.id+' (pool too small; previous retained)');continue;}
+   // Anchors are guaranteed: a famous answer the Wikidata query missed is added, and reported, because
+   // that means the class pattern for this prompt is too narrow.
+   const ensured=ensureAnchors(withOverrides,rule,e.id),items=ensured.items.slice(0,e.target??e.answerLimit??2000);
+   const final=checkAnchors(items,rule),missing=final.missing,forbidden=final.forbidden;
+   if(ensured.injected.length){report.anchorsInjected=report.anchorsInjected||{};report.anchorsInjected[e.id]=ensured.injected;console.warn(tag,'anchors added by hand (query missed them):',ensured.injected.map(x=>x.anchor).join(', '));}
+   if(missing.length||forbidden.length){report.failed.push(e.id+': anchor check failed '+JSON.stringify({missing,forbidden}));console.error(tag,'ANCHOR FAILURE, pack not written',JSON.stringify({missing,forbidden}));continue;}
+   const required=rule.anchors||[];
    const raw=JSON.stringify(toPack(e,items)),bytes=Buffer.byteLength(raw);if(bytes>400*1024)throw new Error('pack exceeds 400 KB safety ceiling');
    if(!meaningfulChange(old,items)){report.unchanged++;continue;}await writeFile(file,raw);
-   const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-missing.length,missingAnchors:missing,mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,querySplitFallback:fresh.errors.length>0,fallback:false};
+   const quality={rejected:cleaned.rejected,aliases:items.reduce((n,x)=>n+(x.a?.length||0),0),anchors:required.length-ensured.injected.length,missingAnchors:ensured.injected.map(x=>x.anchor),mustNotFailures:forbidden,added:items.filter(x=>!old.some(y=>y.id===x.id)).length,removed:old.filter(x=>!items.some(y=>y.id===x.id)).length,querySplitFallback:fresh.errors.length>0,fallback:false};
    report.rejected[e.id]=cleaned.rejected;if(fresh.errors.length)report.fallback.push(e.id);
    manifest.packs[e.id]={n:items.length,built:today,hash:sha(raw),bytes,source:'wikidata',quality};report.built++;
    console.log(`${tag}: ${items.length} accepted; ${quality.aliases} aliases; ${fresh.errors.length} fallback band(s)`);

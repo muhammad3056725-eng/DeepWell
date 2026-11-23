@@ -1,0 +1,917 @@
+{
+ "note": "Famous answers that the old Wikidata queries missed. They were added by scripts/patch-packs.mjs so the game never rejects them. A future full rebuild with the fixed class patterns should find most of them by itself; check data/BUILD-REPORT.json -> anchorsInjected after the rebuild.",
+ "prompts": {
+  "city": [
+   "Tokyo",
+   "Paris"
+  ],
+  "island": [
+   "Madagascar"
+  ],
+  "mountain": [
+   "Kilimanjaro"
+  ],
+  "volcano": [
+   "Mount Etna",
+   "Mount Fuji",
+   "Vesuvius"
+  ],
+  "sea": [
+   "Mediterranean Sea"
+  ],
+  "bay": [
+   "Hudson Bay"
+  ],
+  "glacier": [
+   "Aletsch Glacier"
+  ],
+  "world-heritage": [
+   "Great Wall of China"
+  ],
+  "museum": [
+   "Louvre Museum"
+  ],
+  "airport": [
+   "London Heathrow Airport"
+  ],
+  "bridge": [
+   "Golden Gate Bridge"
+  ],
+  "cathedral": [
+   "Notre-Dame de Paris"
+  ],
+  "mosque": [
+   "Masjid al-Haram"
+  ],
+  "dam": [
+   "Three Gorges Dam"
+  ],
+  "tower": [
+   "Eiffel Tower"
+  ],
+  "university": [
+   "Harvard University",
+   "University of Oxford"
+  ],
+  "amusement-park": [
+   "Disneyland"
+  ],
+  "railway-station": [
+   "Grand Central Terminal"
+  ],
+  "city-in-germany": [
+   "Berlin"
+  ],
+  "city-in-france": [
+   "Paris"
+  ],
+  "city-in-italy": [
+   "Rome"
+  ],
+  "city-in-spain": [
+   "Madrid"
+  ],
+  "city-in-brazil": [
+   "Rio de Janeiro",
+   "Brasília"
+  ],
+  "city-in-russia": [
+   "Moscow"
+  ],
+  "city-in-pakistan": [
+   "Karachi"
+  ],
+  "city-in-turkey": [
+   "Istanbul"
+  ],
+  "city-in-egypt": [
+   "Cairo"
+  ],
+  "city-in-south-africa": [
+   "Cape Town"
+  ],
+  "city-in-argentina": [
+   "Buenos Aires"
+  ],
+  "city-in-indonesia": [
+   "Jakarta",
+   "Surabaya",
+   "Bandung"
+  ],
+  "city-in-iran": [
+   "Tehran"
+  ],
+  "city-in-saudi-arabia": [
+   "Riyadh"
+  ],
+  "city-in-vietnam": [
+   "Hanoi",
+   "Ho Chi Minh City"
+  ],
+  "city-in-thailand": [
+   "Chiang Mai"
+  ],
+  "city-in-south-korea": [
+   "Incheon"
+  ],
+  "city-in-ireland": [
+   "Dublin"
+  ],
+  "city-in-greece": [
+   "Athens"
+  ],
+  "city-in-ukraine": [
+   "Kyiv"
+  ],
+  "city-in-colombia": [
+   "Bogotá"
+  ],
+  "city-in-chile": [
+   "Santiago"
+  ],
+  "city-in-kenya": [
+   "Nairobi"
+  ],
+  "city-in-bangladesh": [
+   "Dhaka"
+  ],
+  "mountain-in-united-states": [
+   "Denali"
+  ],
+  "lake-in-germany": [
+   "Lake Constance"
+  ],
+  "lake-in-france": [
+   "Lake Geneva"
+  ],
+  "lake-in-sweden": [
+   "Lake Vänern"
+  ],
+  "lake-in-india": [
+   "Vembanad Lake"
+  ],
+  "lake-in-switzerland": [
+   "Lake Geneva"
+  ],
+  "university-in-united-states": [
+   "Harvard University"
+  ],
+  "university-in-united-kingdom": [
+   "University of Oxford"
+  ],
+  "university-in-canada": [
+   "University of Toronto"
+  ],
+  "university-in-australia": [
+   "University of Melbourne"
+  ],
+  "university-in-pakistan": [
+   "University of the Punjab"
+  ],
+  "university-in-germany": [
+   "Heidelberg University"
+  ],
+  "university-in-france": [
+   "Sorbonne University"
+  ],
+  "university-in-china": [
+   "Peking University"
+  ],
+  "university-in-japan": [
+   "University of Tokyo"
+  ],
+  "university-in-italy": [
+   "University of Bologna"
+  ],
+  "university-in-spain": [
+   "University of Barcelona"
+  ],
+  "university-in-turkey": [
+   "Istanbul University"
+  ],
+  "university-in-iran": [
+   "University of Tehran"
+  ],
+  "university-in-egypt": [
+   "Cairo University"
+  ],
+  "museum-in-united-states": [
+   "Metropolitan Museum of Art"
+  ],
+  "museum-in-france": [
+   "Louvre Museum"
+  ],
+  "museum-in-italy": [
+   "Uffizi"
+  ],
+  "museum-in-spain": [
+   "Prado Museum"
+  ],
+  "museum-in-japan": [
+   "Tokyo National Museum"
+  ],
+  "museum-in-china": [
+   "National Museum of China"
+  ],
+  "museum-in-netherlands": [
+   "Rijksmuseum"
+  ],
+  "museum-in-canada": [
+   "Royal Ontario Museum"
+  ],
+  "museum-in-india": [
+   "Indian Museum"
+  ],
+  "football-club-in-spain": [
+   "Real Madrid CF"
+  ],
+  "football-club-in-france": [
+   "Paris Saint-Germain F.C."
+  ],
+  "football-club-in-argentina": [
+   "Boca Juniors"
+  ],
+  "football-club-in-greece": [
+   "Olympiacos F.C."
+  ],
+  "moon": [
+   "Moon",
+   "Europa",
+   "Titan",
+   "Phobos"
+  ],
+  "star": [
+   "Sun",
+   "Sirius",
+   "Betelgeuse",
+   "Polaris"
+  ],
+  "galaxy": [
+   "Milky Way",
+   "Andromeda Galaxy",
+   "Triangulum Galaxy"
+  ],
+  "comet": [
+   "Halley's Comet",
+   "Hale-Bopp"
+  ],
+  "space-probe": [
+   "Voyager 1",
+   "Voyager 2",
+   "Cassini–Huygens"
+  ],
+  "spacecraft": [
+   "Apollo 11",
+   "Sputnik 1",
+   "Space Shuttle Columbia"
+  ],
+  "nebula": [
+   "Orion Nebula",
+   "Crab Nebula"
+  ],
+  "observatory": [
+   "Mauna Kea Observatories",
+   "Greenwich Observatory"
+  ],
+  "rock": [
+   "Granite",
+   "Basalt",
+   "Marble",
+   "Limestone"
+  ],
+  "chemical-compound": [
+   "Water",
+   "Carbon dioxide",
+   "Sodium chloride",
+   "Methane"
+  ],
+  "unit": [
+   "Metre",
+   "Kilogram",
+   "Second",
+   "Ampere"
+  ],
+  "enzyme": [
+   "Amylase",
+   "Lipase",
+   "Pepsin",
+   "Catalase"
+  ],
+  "theory": [
+   "Theory of relativity",
+   "Atomic theory",
+   "Germ theory of disease"
+  ],
+  "mammal": [
+   "Elephant",
+   "Dog"
+  ],
+  "bird": [
+   "Penguin",
+   "Ostrich",
+   "Owl"
+  ],
+  "reptile": [
+   "Crocodile"
+  ],
+  "dinosaur": [
+   "Tyrannosaurus",
+   "Velociraptor",
+   "Triceratops",
+   "Stegosaurus"
+  ],
+  "food": [
+   "Pizza",
+   "Bread",
+   "Cheese"
+  ],
+  "dish": [
+   "Pizza",
+   "Sushi",
+   "Paella"
+  ],
+  "cheese": [
+   "Cheddar",
+   "Brie"
+  ],
+  "cocktail": [
+   "Margarita",
+   "Martini",
+   "Cosmopolitan"
+  ],
+  "bread": [
+   "Baguette",
+   "Sourdough",
+   "Naan",
+   "Ciabatta"
+  ],
+  "pasta": [
+   "Spaghetti",
+   "Penne",
+   "Lasagne",
+   "Fusilli"
+  ],
+  "sauce": [
+   "Ketchup",
+   "Mayonnaise",
+   "Pesto",
+   "Soy sauce"
+  ],
+  "cuisine": [
+   "Italian cuisine",
+   "Chinese cuisine",
+   "Mexican cuisine",
+   "Indian cuisine"
+  ],
+  "fruit": [
+   "Apple",
+   "Banana",
+   "Mango"
+  ],
+  "vegetable": [
+   "Carrot",
+   "Potato",
+   "Tomato",
+   "Broccoli"
+  ],
+  "spice": [
+   "Cinnamon",
+   "Pepper",
+   "Turmeric",
+   "Saffron"
+  ],
+  "dessert": [
+   "Ice cream",
+   "Tiramisu",
+   "Cheesecake",
+   "Apple pie"
+  ],
+  "soft-drink": [
+   "Coca-Cola",
+   "Pepsi",
+   "Sprite",
+   "Fanta"
+  ],
+  "instrument": [
+   "Piano",
+   "Guitar",
+   "Violin",
+   "Drum"
+  ],
+  "band": [
+   "Pink Floyd"
+  ],
+  "rock-band": [
+   "The Beatles",
+   "Queen"
+  ],
+  "song": [
+   "Bohemian Rhapsody",
+   "Imagine",
+   "Hey Jude"
+  ],
+  "singer": [
+   "Beyoncé"
+  ],
+  "rapper": [
+   "Kendrick Lamar"
+  ],
+  "film": [
+   "The Godfather",
+   "Titanic",
+   "Star Wars"
+  ],
+  "animated-film": [
+   "Toy Story",
+   "Shrek"
+  ],
+  "documentary": [
+   "March of the Penguins",
+   "An Inconvenient Truth"
+  ],
+  "tv-series": [
+   "The Simpsons"
+  ],
+  "film-studio": [
+   "Warner Bros."
+  ],
+  "tv-network": [
+   "CNN",
+   "HBO"
+  ],
+  "play": [
+   "Hamlet",
+   "Romeo and Juliet",
+   "Macbeth",
+   "Othello"
+  ],
+  "book-series": [
+   "Harry Potter",
+   "The Lord of the Rings",
+   "The Chronicles of Narnia"
+  ],
+  "literary-genre": [
+   "Fantasy",
+   "Novel",
+   "Poetry"
+  ],
+  "comic-series": [
+   "Spider-Man"
+  ],
+  "newspaper": [
+   "The New York Times",
+   "Le Monde"
+  ],
+  "magazine": [
+   "National Geographic"
+  ],
+  "fictional-character": [
+   "Sherlock Holmes",
+   "Harry Potter",
+   "Mickey Mouse",
+   "Batman"
+  ],
+  "sculpture": [
+   "Venus de Milo"
+  ],
+  "architectural-style": [
+   "Art Deco"
+  ],
+  "war": [
+   "World War I",
+   "World War II",
+   "Vietnam War"
+  ],
+  "empire": [
+   "Roman Empire",
+   "British Empire",
+   "Mongol Empire"
+  ],
+  "dynasty": [
+   "Ming dynasty",
+   "Tang dynasty",
+   "Han dynasty"
+  ],
+  "ideology": [
+   "Capitalism"
+  ],
+  "monarch": [
+   "Napoleon",
+   "Henry VIII"
+  ],
+  "us-president": [
+   "Franklin D. Roosevelt"
+  ],
+  "holiday": [
+   "Christmas",
+   "Easter",
+   "Halloween"
+  ],
+  "festival": [
+   "Oktoberfest",
+   "Holi",
+   "Carnival"
+  ],
+  "sport": [
+   "Football",
+   "Basketball",
+   "Tennis",
+   "Cricket"
+  ],
+  "football-club-world": [
+   "Real Madrid CF",
+   "FC Barcelona"
+  ],
+  "national-football-team": [
+   "Brazil national football team",
+   "Germany national football team",
+   "Argentina national football team"
+  ],
+  "tennis-player": [
+   "Roger Federer",
+   "Novak Djokovic"
+  ],
+  "cricketer": [
+   "Sachin Tendulkar"
+  ],
+  "basketball-player": [
+   "Michael Jordan",
+   "Kobe Bryant"
+  ],
+  "golfer": [
+   "Tiger Woods"
+  ],
+  "cricketer-from-india": [
+   "Sachin Tendulkar",
+   "MS Dhoni"
+  ],
+  "footballer-from-spain": [
+   "Xavi"
+  ],
+  "actor-from-united-kingdom": [
+   "Michael Caine"
+  ],
+  "actor-from-germany": [
+   "Marlene Dietrich"
+  ],
+  "actor-from-pakistan": [
+   "Imran Abbas"
+  ],
+  "actor-from-turkey": [
+   "Kıvanç Tatlıtuğ"
+  ],
+  "singer-from-pakistan": [
+   "Atif Aslam",
+   "Abida Parveen",
+   "Rahat Fateh Ali Khan"
+  ],
+  "singer-from-japan": [
+   "Ayumi Hamasaki"
+  ],
+  "singer-from-germany": [
+   "Rammstein"
+  ],
+  "singer-from-mexico": [
+   "Luis Miguel"
+  ],
+  "writer-from-united-kingdom": [
+   "William Shakespeare",
+   "Charles Dickens",
+   "Jane Austen"
+  ],
+  "writer-from-russia": [
+   "Leo Tolstoy",
+   "Fyodor Dostoevsky",
+   "Anton Chekhov",
+   "Alexander Pushkin"
+  ],
+  "writer-from-germany": [
+   "Johann Wolfgang von Goethe",
+   "Franz Kafka",
+   "Thomas Mann"
+  ],
+  "writer-from-india": [
+   "Rabindranath Tagore",
+   "Salman Rushdie"
+  ],
+  "writer-from-pakistan": [
+   "Muhammad Iqbal"
+  ],
+  "writer-from-italy": [
+   "Dante Alighieri"
+  ],
+  "writer-from-spain": [
+   "Miguel de Cervantes"
+  ],
+  "writer-from-argentina": [
+   "Julio Cortázar"
+  ],
+  "writer-from-iran": [
+   "Omar Khayyam",
+   "Rumi",
+   "Hafez"
+  ],
+  "poet-from-pakistan": [
+   "Muhammad Iqbal",
+   "Mirza Ghalib"
+  ],
+  "poet-from-india": [
+   "Rabindranath Tagore",
+   "Mirza Ghalib"
+  ],
+  "poet-from-iran": [
+   "Rumi",
+   "Hafez",
+   "Omar Khayyam",
+   "Ferdowsi"
+  ],
+  "poet-from-russia": [
+   "Alexander Pushkin",
+   "Anna Akhmatova",
+   "Vladimir Mayakovsky"
+  ],
+  "poet-from-germany": [
+   "Johann Wolfgang von Goethe",
+   "Friedrich Schiller",
+   "Heinrich Heine"
+  ],
+  "poet-from-united-kingdom": [
+   "William Shakespeare",
+   "William Wordsworth",
+   "John Keats",
+   "Lord Byron"
+  ],
+  "poet-from-turkey": [
+   "Yunus Emre"
+  ],
+  "poet-from-italy": [
+   "Dante Alighieri",
+   "Petrarch",
+   "Giacomo Leopardi"
+  ],
+  "physicist-from-germany": [
+   "Max Planck",
+   "Werner Heisenberg"
+  ],
+  "physicist-from-united-kingdom": [
+   "Isaac Newton",
+   "Stephen Hawking",
+   "Michael Faraday"
+  ],
+  "physicist-from-france": [
+   "Marie Curie",
+   "Blaise Pascal"
+  ],
+  "physicist-from-italy": [
+   "Galileo Galilei",
+   "Alessandro Volta"
+  ],
+  "physicist-from-russia": [
+   "Lev Landau",
+   "Andrei Sakharov",
+   "Pyotr Kapitsa"
+  ],
+  "physicist-from-india": [
+   "Jagadish Chandra Bose"
+  ],
+  "physicist-from-japan": [
+   "Hideki Yukawa"
+  ],
+  "physicist-from-china": [
+   "Tsung-Dao Lee"
+  ],
+  "painter-from-italy": [
+   "Leonardo da Vinci",
+   "Raphael",
+   "Michelangelo",
+   "Caravaggio"
+  ],
+  "painter-from-netherlands": [
+   "Rembrandt",
+   "Vincent van Gogh",
+   "Johannes Vermeer"
+  ],
+  "painter-from-germany": [
+   "Albrecht Dürer",
+   "Caspar David Friedrich",
+   "Hans Holbein the Younger"
+  ],
+  "painter-from-united-kingdom": [
+   "J. M. W. Turner"
+  ],
+  "painter-from-russia": [
+   "Wassily Kandinsky",
+   "Marc Chagall",
+   "Ilya Repin"
+  ],
+  "painter-from-india": [
+   "Raja Ravi Varma"
+  ],
+  "politician-from-india": [
+   "Narendra Modi"
+  ],
+  "politician-from-germany": [
+   "Otto von Bismarck",
+   "Adolf Hitler"
+  ],
+  "politician-from-russia": [
+   "Vladimir Lenin",
+   "Joseph Stalin"
+  ],
+  "politician-from-iran": [
+   "Mohammad Mosaddegh"
+  ],
+  "politician-from-egypt": [
+   "Gamal Abdel Nasser"
+  ],
+  "physicist": [
+   "Isaac Newton",
+   "Stephen Hawking",
+   "Marie Curie"
+  ],
+  "chemist": [
+   "Marie Curie"
+  ],
+  "psychologist": [
+   "Sigmund Freud"
+  ],
+  "engineer": [
+   "Nikola Tesla"
+  ],
+  "chef": [
+   "Julia Child"
+  ],
+  "nobel-physics": [
+   "Marie Curie"
+  ],
+  "nobel-chemistry": [
+   "Marie Curie"
+  ],
+  "language": [
+   "German",
+   "Mandarin Chinese"
+  ],
+  "writing-system": [
+   "Arabic script",
+   "Devanagari"
+  ],
+  "religion": [
+   "Islam"
+  ],
+  "ethnic-group": [
+   "Han Chinese"
+  ],
+  "profession": [
+   "Doctor",
+   "Lawyer"
+  ],
+  "emotion": [
+   "Anger",
+   "Fear",
+   "Sadness"
+  ],
+  "dance": [
+   "Ballet",
+   "Salsa",
+   "Tango",
+   "Waltz"
+  ],
+  "martial-art": [
+   "Karate",
+   "Judo",
+   "Taekwondo",
+   "Kung fu"
+  ],
+  "logical-fallacy": [
+   "Ad hominem",
+   "Straw man",
+   "Slippery slope"
+  ],
+  "deity": [
+   "Zeus",
+   "Odin",
+   "Thor",
+   "Ra",
+   "Vishnu"
+  ],
+  "legendary-creature": [
+   "Unicorn",
+   "Mermaid"
+  ],
+  "mythological-character": [
+   "Hercules",
+   "Achilles",
+   "Odysseus"
+  ],
+  "prophet": [
+   "Moses"
+  ],
+  "religious-text": [
+   "Bhagavad Gita"
+  ],
+  "disease": [
+   "Influenza",
+   "Malaria",
+   "Tuberculosis",
+   "Diabetes mellitus"
+  ],
+  "mental-disorder": [
+   "Depression",
+   "Schizophrenia",
+   "Anxiety disorder"
+  ],
+  "medication": [
+   "Aspirin",
+   "Paracetamol",
+   "Ibuprofen",
+   "Penicillin"
+  ],
+  "symptom": [
+   "Fever",
+   "Cough",
+   "Headache"
+  ],
+  "video-game": [
+   "Tetris",
+   "The Legend of Zelda"
+  ],
+  "board-game": [
+   "Scrabble",
+   "Go"
+  ],
+  "card-game": [
+   "Poker",
+   "Solitaire"
+  ],
+  "video-game-developer": [
+   "Ubisoft"
+  ],
+  "toy": [
+   "Lego",
+   "Barbie",
+   "Teddy bear",
+   "Rubik's Cube"
+  ],
+  "operating-system": [
+   "Microsoft Windows",
+   "Linux",
+   "Android",
+   "macOS"
+  ],
+  "file-format": [
+   "JPEG",
+   "MP3"
+  ],
+  "website": [
+   "Google",
+   "Wikipedia"
+  ],
+  "mobile-app": [
+   "WhatsApp",
+   "Instagram",
+   "TikTok"
+  ],
+  "web-browser": [
+   "Google Chrome"
+  ],
+  "software-company": [
+   "Apple Inc.",
+   "Google",
+   "Oracle Corporation"
+  ],
+  "search-engine": [
+   "Bing"
+  ],
+  "invention": [
+   "Printing press",
+   "Telephone",
+   "Wheel"
+  ],
+  "brand": [
+   "Coca-Cola",
+   "Apple Inc.",
+   "Toyota"
+  ],
+  "car-model": [
+   "Toyota Corolla"
+  ],
+  "restaurant-chain": [
+   "McDonald's",
+   "KFC",
+   "Burger King",
+   "Subway"
+  ],
+  "aircraft-model": [
+   "Concorde"
+  ],
+  "ship-type": [
+   "Aircraft carrier",
+   "Submarine",
+   "Frigate",
+   "Galleon"
+  ],
+  "motorcycle-manufacturer": [
+   "Yamaha"
+  ]
+ }
+}
