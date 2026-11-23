@@ -1,19 +1,57 @@
 {
-  "stoppedAt": 6,
+  "stoppedAt": 16,
   "skipped": [],
   "failed": [],
-  "built": 2,
-  "unchanged": 4,
-  "fallback": [],
+  "built": 8,
+  "unchanged": 2,
+  "fallback": [
+    "peninsula"
+  ],
   "previousRetained": [],
   "rejected": {
-    "capital": {
+    "volcano": {
       "invalid": 0,
       "blocked": 0,
-      "duplicate": 2,
+      "duplicate": 1,
       "wrongClass": 0
     },
-    "city": {
+    "desert": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "sea": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "waterfall": {
+      "invalid": 1,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "national-park": {
+      "invalid": 1,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "mountain-range": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "peninsula": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "strait": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 1,

@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-23 · Manifest version: 25
-Packs: 580 · Answers: 346,684 · Pack bytes: 20,901,661 (19.93 MiB) / 60 MiB
+Built: 2026-11-23 · Manifest version: 26
+Packs: 580 · Answers: 351,855 · Pack bytes: 21,371,541 (20.38 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 580 · Answers: 346,684 · Pack bytes: 20,901,661 (19.93 MiB) / 60 MiB
 | Film & TV | 11 | 8737 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
-| Geography | 174 | 98032 | 724 |
+| Geography | 174 | 103203 | 724 |
 | History | 18 | 13591 | 949.5 |
 | Language | 10 | 4385 | 251 |
 | Literature | 12 | 10463 | 971 |
@@ -57,20 +57,20 @@ Packs: 580 · Answers: 346,684 · Pack bytes: 20,901,661 (19.93 MiB) / 60 MiB
 | Prompt | Rejected | Rate |
 |---|---:|---:|
 | capital | 2 | 0.9% |
+| desert | 1 | 0.1% |
+| strait | 1 | 0.1% |
+| volcano | 1 | 0.1% |
+| waterfall | 1 | 0.1% |
+| mountain-range | 1 | 0.1% |
+| national-park | 1 | 0.1% |
 | city | 1 | 0.1% |
 | country | 0 | 0.0% |
 | island | 0 | 0.0% |
 | river | 0 | 0.0% |
 | mountain | 0 | 0.0% |
 | lake | 0 | 0.0% |
-| volcano | 0 | 0.0% |
-| desert | 0 | 0.0% |
 | sea | 0 | 0.0% |
-| waterfall | 0 | 0.0% |
-| national-park | 0 | 0.0% |
-| mountain-range | 0 | 0.0% |
 | peninsula | 0 | 0.0% |
-| strait | 0 | 0.0% |
 | bay | 0 | 0.0% |
 | glacier | 0 | 0.0% |
 | canyon | 0 | 0.0% |
@@ -85,9 +85,15 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| capital | 69 | 54 |
-| city | 1085 | 70 |
+| volcano | 796 | 5 |
+| desert | 37 | 1 |
+| sea | 48 | 1 |
+| waterfall | 990 | 0 |
+| national-park | 997 | 1 |
+| mountain-range | 994 | 0 |
+| peninsula | 1011 | 11 |
+| strait | 318 | 1 |
 
 ## Repository size check
 
-Raw data/packs size: 20,901,661 bytes (19.93 MiB); budget 60 MiB.
+Raw data/packs size: 21,371,541 bytes (20.38 MiB); budget 60 MiB.
