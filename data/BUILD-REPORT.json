@@ -1,0 +1,23 @@
+{
+  "stoppedAt": 6,
+  "skipped": [],
+  "failed": [],
+  "built": 2,
+  "unchanged": 4,
+  "fallback": [],
+  "previousRetained": [],
+  "rejected": {
+    "capital": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 2,
+      "wrongClass": 0
+    },
+    "city": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    }
+  }
+}
