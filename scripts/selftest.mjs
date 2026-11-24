@@ -191,6 +191,11 @@ eq(meaningfulChange(overridePool,[...overridePool,{id:'Q9',n:'New answer',s:1,a:
 {
   const MUST = [['country','China'],['country','United States'],['capital','Paris'],['capital','London'],['capital','Tokyo'],['city','Tokyo'],['city','Paris'],
     ['island','Madagascar'],['mountain','Kilimanjaro'],['volcano','Mount Etna'],['volcano','Mount Fuji'],['river','Nile'],['university','Harvard University'],['tower','Eiffel Tower']];
+  if (existsSync('data/packs/reptile.json')) {   // birds must not count as reptiles
+    const rp = buildPool(fromPack(JSON.parse(readFileSync('data/packs/reptile.json', 'utf8'))));
+    ok(!matchAnswer('Bald Eagle', rp)?.exact && !matchAnswer("Hartlaub's bustard", rp)?.exact, 'real pack reptile does not accept birds');
+    ok(matchAnswer('Komodo dragon', rp)?.exact, 'real pack reptile accepts Komodo dragon');
+  }
   for (const [id, answer] of MUST) {
     const file = `data/packs/${id}.json`;
     if (!existsSync(file)) continue;

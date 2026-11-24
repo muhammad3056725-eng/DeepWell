@@ -1,3 +1,11 @@
+# Changes: reptile fix and bigger answer lists (2026-11-24)
+- **Birds were counted as reptiles.** In Wikidata birds descend from Reptilia, so the reptile questions (base and "starts with <letter>") were mostly birds. The reptile query now excludes Aves (`notParent` in `js/catalog.js`, `js/wikidata.js`), and the existing reptile packs were cleaned (about 10,000 wrong entries removed).
+- **More accepted answers.** Answers that only existed in the "starts with <letter>" packs were folded back into the main pack (bird, mammal, amphibian and reptile now hold 2,000 each, up from about 1,000), and every pack was re-cleaned with the current alias rules (about 31,600 more accepted aliases, 211 duplicates removed). Script: `scripts/enrich-packs.mjs` (offline; re-run it any time).
+- Regression test: the reptile pack must not accept a bird.
+- Not changed: the real Wikidata rebuild is still the way to reach 2,000 answers for the other questions; this only uses data we already have.
+
+---
+
 # Changes: famous answers, mobile lag, data build (2026-11-23)
 
 ## 1. Famous answers were being rejected (China, Paris, Tokyo, Madagascar, Kilimanjaro...)
