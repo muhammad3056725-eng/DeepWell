@@ -1,30 +1,30 @@
 # DEEPWELL data report
 
-Built: 2026-11-23 · Manifest version: 27
-Packs: 580 · Answers: 352,476 · Pack bytes: 21,428,772 (20.44 MiB) / 60 MiB
+Built: 2026-11-24 · Manifest version: 29
+Packs: 581 · Answers: 346,133 · Pack bytes: 21,891,861 (20.88 MiB) / 60 MiB
 
 ## Category coverage
 
 | Category | Questions | Answers | Median pool |
 |---|---:|---:|---:|
-| Art | 10 | 9481 | 976 |
+| Art | 10 | 9456 | 975 |
 | Body | 5 | 1768 | 313 |
-| Brands | 7 | 6638 | 976 |
-| Film & TV | 11 | 8737 | 952 |
+| Brands | 7 | 6633 | 976 |
+| Film & TV | 11 | 8735 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
 | Geography | 174 | 103203 | 724 |
-| History | 18 | 13591 | 949.5 |
-| Language | 10 | 4385 | 251 |
-| Literature | 12 | 10463 | 971 |
-| Music | 14 | 13589 | 983.5 |
+| History | 18 | 13503 | 949.5 |
+| Language | 10 | 4383 | 251 |
+| Literature | 12 | 10458 | 971 |
+| Music | 14 | 13568 | 979 |
 | Mythology | 5 | 2912 | 586 |
-| Nature | 131 | 43015 | 226 |
-| People | 114 | 98207 | 989 |
-| Science | 10 | 4569 | 189 |
-| Space | 14 | 5467 | 306.5 |
+| Nature | 132 | 36846 | 134 |
+| People | 114 | 98197 | 989 |
+| Science | 10 | 4568 | 189 |
+| Space | 14 | 5464 | 306.5 |
 | Sports | 11 | 10078 | 996 |
-| Technology | 10 | 5645 | 700 |
+| Technology | 10 | 5633 | 700 |
 | Transport | 4 | 3427 | 947.5 |
 
 ## 20 smallest pools
@@ -32,8 +32,8 @@ Packs: 580 · Answers: 352,476 · Pack bytes: 21,428,772 (20.44 MiB) / 60 MiB
 | Prompt | Answers |
 |---|---:|
 | dwarf-planet | 6 |
+| reptile-starts-x | 7 |
 | shark-starts-v | 8 |
-| reptile-starts-x | 8 |
 | dinosaur-starts-g | 8 |
 | shark-starts-i | 9 |
 | dinosaur-starts-r | 9 |
@@ -85,10 +85,8 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| bird-starts-c | 25 | 1 |
-| bird-starts-b | 598 | 0 |
-| bird-starts-a | 0 | 1 |
+| bird-starts-j | 134 | 0 |
 
 ## Repository size check
 
-Raw data/packs size: 21,428,772 bytes (20.44 MiB); budget 60 MiB.
+Raw data/packs size: 21,891,861 bytes (20.88 MiB); budget 60 MiB.
