@@ -207,10 +207,46 @@ export function pickEntries(entries, count, rnd, { avoid = new Set(), category =
   return picks;
 }
 
+/**
+ * Build a dive with a fair difficulty curve. `meta.prompts[id].level` is 3 easy / 2 medium / 1 hard (see
+ * scripts/build-prompt-meta.mjs); prompts without metadata count as medium. Slots follow DIVE_PLAN (easy start, one hard
+ * "boss" at the end), categories are spread, and "starting with <letter>" questions appear at most once per dive and never
+ * as an opener. The first `count` picks are the dive, the next `spares` are swap replacements (levels in SPARE_PLAN),
+ * and `extra` further picks are fallbacks in case a pack fails to load. Deterministic for a given `rnd`.
+ */
+export const DIVE_PLAN = [3, 3, 3, 2, 2, 2, 1];
+export const SPARE_PLAN = [3, 2];
+export function planDive(entries, rnd, meta, { count = 7, spares = 2, extra = 30, category = null } = {}) {
+  const pool = entries.filter(e => !category || e.cat === category);
+  const levelOf = e => meta?.prompts?.[e.id]?.level ?? 2;
+  const used = new Set(), usedCats = new Set(), picks = [];
+  const deriveSlot = rnd() < 0.5 ? 4 : -1;              // one slot may turn into a "starting with" variant
+  let catalogLetters = 0;
+  const slotLevels = [...Array.from({ length: count }, (_, i) => DIVE_PLAN[i] ?? 2), ...Array.from({ length: spares }, (_, i) => SPARE_PLAN[i] ?? 2)];
+  const choose = (level, slot) => {
+    const order = [level, ...(level === 3 ? [2, 1] : level === 2 ? [3, 1] : [2, 3])];
+    for (const strict of [true, false]) for (const lv of order) {
+      const options = pool.filter(e => !used.has(e.id) && levelOf(e) === lv && (!strict || !usedCats.has(e.cat)) &&
+        (!e.startsWith || (slot >= 3 && lv >= 2 && deriveSlot < 0 && catalogLetters < 1)));
+      if (options.length) return options[Math.floor(rnd() * options.length)];
+    }
+    return null;
+  };
+  slotLevels.forEach((level, slot) => {
+    const e = choose(level, slot); if (!e) return;
+    used.add(e.id); usedCats.add(e.cat); if (e.startsWith) catalogLetters++;
+    picks.push({ entry: e, level: levelOf(e), variantRoll: rnd(), letterRoll: rnd(), allowLetter: slot === deriveSlot, spare: slot >= count });
+  });
+  // fallbacks: everything else, categories spread, no letter spam
+  const rest = shuffle(pool.filter(e => !used.has(e.id) && !e.startsWith), rnd).slice(0, extra);
+  for (const e of rest) picks.push({ entry: e, level: levelOf(e), variantRoll: 1, letterRoll: rnd(), allowLetter: false, spare: false, fallback: true });
+  return picks;
+}
+
 /** Decide the letter variant for a pick once its pool is known. Deterministic. */
 export function chooseVariant(pick, pool, { minPool = 14, chance = 0.3 } = {}) {
   const letters = letterOptions(pool, minPool);
-  if (pick.variantRoll < chance && letters.length >= 3 && pool.size >= minPool * 3) {
+  if (pick.allowLetter !== false && pick.variantRoll < chance && letters.length >= 3 && pool.size >= minPool * 3) {
     return letters[Math.floor(pick.letterRoll * letters.length)];
   }
   return null;

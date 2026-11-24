@@ -1,16 +1,16 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js?v=fixes-20261123-1';
-import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=fixes-20261123-1';
-import { loadManifest } from './data.js?v=fixes-20261123-1';
-import { prepareDive, examples } from './game.js?v=random-no-repeat-questions-20261121';
+import { CONFIG } from './config.js?v=fair-dives-20261124';
+import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=fair-dives-20261124';
+import { loadManifest } from './data.js?v=fair-dives-20261124';
+import { prepareDive, examples } from './game.js?v=fair-dives-20261124';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=fixes-20261123-1';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=fixes-20261123-1';
-import { wake, tone, buzz } from './audio.js?v=fixes-20261123-1';
+import * as S from './state.js?v=fair-dives-20261124';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=fair-dives-20261124';
+import { wake, tone, buzz } from './audio.js?v=fair-dives-20261124';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=fixes-20261123-1';
+} from './ui.js?v=fair-dives-20261124';
 
 let run = null; // the dive in progress
 let timerRaf = 0;
@@ -50,7 +50,7 @@ async function startDive(mode, category = null) {
   }
   if (id !== runId) return;
   S.rememberPrompts(prompts.flatMap(p => [p.entry.id, `question:${p.text.toLowerCase().replace(/\\s+/g, ' ').trim()}`]));
-  run = { mode, category, prompts, index: 0, depth: 0, answers: [], used: new Set(), remaining: 0, locked: false, paused: false, timer: null, pending: null, id };
+  run = { spares: prompts.spares || [], swapsLeft: 1, mode, category, prompts, index: 0, depth: 0, answers: [], used: new Set(), remaining: 0, locked: false, paused: false, timer: null, pending: null, id };
   $('answerInput').disabled = false; $('submitBtn').disabled = false;
   nextPrompt();
 }
@@ -68,9 +68,31 @@ function nextPrompt() {
   badge.className = 'src-badge ' + (p.source === 'live' ? 'live' : p.source === 'seed' ? 'seed' : '');
   $('promptText').textContent = p.text;
   $('feedback').textContent = '';
+  updateSwapUI();
   const input = $('answerInput');
   input.value = ''; input.disabled = false; $('submitBtn').disabled = false; input.focus();
   startTimer();
+}
+
+/* ---------------------------------------------------------- swap lifeline */
+function updateSwapUI() {
+  const btn = $('swapBtn'); if (!btn || !run) return;
+  const left = run.swapsLeft > 0 && run.spares.length > 0 ? run.swapsLeft : 0;
+  $('swapLeft').textContent = String(left);
+  btn.disabled = left === 0 || run.locked;
+}
+
+/** Throw away the current question for a fresh one of the same difficulty (once per dive). The timer restarts. */
+function swapPrompt() {
+  if (!run || run.locked || run.paused || run.swapsLeft < 1 || !run.spares.length) return;
+  const current = run.prompts[run.index];
+  const at = run.spares.findIndex(p => p.level === current.level);
+  const [spare] = run.spares.splice(at >= 0 ? at : 0, 1);
+  run.swapsLeft--; run.swapUsed = true;
+  run.prompts[run.index] = spare;
+  S.rememberPrompts([spare.entry.id, `question:${spare.text.toLowerCase().replace(/\s+/g, ' ').trim()}`]);
+  toast('Swapped: new question');
+  nextPrompt();
 }
 
 /* ------------------------------------------------------------------- timer */
@@ -142,7 +164,7 @@ async function resolve(item, value) {
   run.locked = true;
   clearInterval(run.timer);
   const mine = run;
-  $('answerInput').disabled = true; $('submitBtn').disabled = true;
+  $('answerInput').disabled = true; $('submitBtn').disabled = true; $('swapBtn').disabled = true;
   $('confirmBox').classList.remove('show');
   const p = run.prompts[run.index];
 
@@ -210,6 +232,7 @@ function bind() {
   $('statsBtn').onclick = () => show('stats');
   $('settingsBtn').onclick = () => show('settings');
   $('submitBtn').onclick = submit;
+  $('swapBtn').onclick = swapPrompt;
   $('answerInput').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); submit(); } };
   $('confirmYes').onclick = () => confirmNear(true);
   $('confirmNo').onclick = () => confirmNear(false);

@@ -10,7 +10,7 @@
 <meta property="og:description" content="Seven prompts. One breath. Go deeper by thinking sideways.">
 <meta property="og:url" content="https://deepwell.games/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306131e'/%3E%3Cpath d='M12 34 40 22 54 34 40 46Z' fill='%2368e2e8'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/style.css?v=cinematic-abyss-20261122-mobileperf1">
+<link rel="stylesheet" href="css/style.css?v=fair-dives-20261124">
 </head>
 <body>
 <canvas id="scene" aria-hidden="true"></canvas><div id="vignette"></div>
@@ -47,6 +47,7 @@
 <div class="progress-row"><span id="roundLabel">PROMPT 1 / 7</span><span class="src-badge" id="srcBadge"></span><span id="modeLabel">DAILY DIVE</span></div>
 <div class="prompt" id="promptText"></div>
 <div class="timer"><i id="timerBar"></i></div>
+<div class="lifeline-row"><button class="lifeline" id="swapBtn" type="button" aria-label="Swap this question for another (once per dive)">↻ Swap question <span id="swapLeft">1</span></button></div>
 <div class="answer-row"><input id="answerInput" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Your answer" placeholder="Type one answer..."><button class="button primary submit" id="submitBtn">Submit</button></div>
 <div class="confirm" id="confirmBox"><span>Did you mean <b id="confirmName"></b>?</span><button class="button primary" id="confirmYes">Yes</button><button class="button secondary" id="confirmNo">No</button></div>
 <div class="feedback" id="feedback" aria-live="polite"></div>
@@ -99,7 +100,7 @@
 </div></section>
 </main>
 <div class="toast" id="toast"></div><div id="live" aria-live="polite"></div>
-<script type="module" src="js/main.js?v=fixes-20261123-1"></script>
+<script type="module" src="js/main.js?v=fair-dives-20261124"></script>
 <noscript><p style="position:relative;z-index:3;padding:24px;color:#e7fbff">DEEPWELL needs JavaScript.</p></noscript>
 </body>
 </html>

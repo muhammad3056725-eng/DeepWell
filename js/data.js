@@ -2,13 +2,14 @@
 //   1. pre-built pack   data/packs/<id>.json  (built from Wikidata by scripts/build-data.mjs)
 //   2. offline seed     js/seed.js            (small hand-curated fallback bundled with the site)
 //   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Dive)
-import { CONFIG } from './config.js?v=fixes-20261123-1';
-import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=fixes-20261123-1';
+import { CONFIG } from './config.js?v=fair-dives-20261124';
+import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=fair-dives-20261124';
 import { SEED } from './seed.js';
-import { fetchLive, fromPack } from './wikidata.js?v=fixes-20261123-1';
-import { normalize } from './engine.js?v=fixes-20261123-1';
+import { fetchLive, fromPack } from './wikidata.js?v=fair-dives-20261124';
+import { normalize } from './engine.js?v=fair-dives-20261124';
 
 let manifest = { version: 0, built: null, packs: {} };
+let meta = null; // data/prompt-meta.json: per-prompt difficulty level, optional
 const rawCache = new Map(); // entry id -> {items, source}
 
 export async function loadManifest() {
@@ -19,9 +20,14 @@ export async function loadManifest() {
       if (m && typeof m.packs === 'object') manifest = m;
     }
   } catch { /* offline or not built yet: seed only */ }
+  try {
+    const res = await fetch(`data/prompt-meta.json?v=${manifest.version || 0}`);
+    if (res.ok) meta = await res.json();
+  } catch { /* no metadata: every prompt counts as medium */ }
   return manifest;
 }
 
+export const promptMeta = () => meta;
 export const hasPack = id => Boolean(manifest.packs[id]);
 export const hasSeed = id => typeof SEED[id] === 'string';
 

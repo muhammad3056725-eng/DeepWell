@@ -396,3 +396,10 @@ body.quality-low #vignette,body.quality-med #vignette{display:none}
 body.quality-low #scene,body.quality-med #scene{filter:none!important}
 body.quality-low .hero-title,body.quality-med .hero-title{filter:none;text-shadow:none}
 body.quality-low .sub,body.quality-med .sub{filter:none}
+
+/* Swap lifeline: one fresh question per dive */
+.lifeline-row{display:flex;justify-content:flex-end;margin:.35rem 0 0}
+.lifeline{appearance:none;border:1px solid rgba(125,255,160,.35);background:rgba(10,40,58,.55);color:#bfeee0;font:600 .82rem/1 inherit;font-family:inherit;padding:.5rem .8rem;border-radius:999px;cursor:pointer;min-height:36px}
+.lifeline span{display:inline-block;min-width:1.2em;margin-left:.3em;padding:.1em .45em;border-radius:999px;background:rgba(125,255,160,.18);text-align:center}
+.lifeline:hover:not(:disabled){background:rgba(125,255,160,.16)}
+.lifeline:disabled{opacity:.4;cursor:default}

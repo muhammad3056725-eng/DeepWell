@@ -2,7 +2,7 @@
 // All visuals are generated live with Canvas 2D paths, gradients, lighting and particles.
 // No 3D engine, images, video, sprite sheets or downloaded models.
 import { CONFIG } from './config.js';
-import { predatorGulp, rareSparkle } from './audio.js?v=fixes-20261123-1';
+import { predatorGulp, rareSparkle } from './audio.js?v=fair-dives-20261124';
 
 const canvas = document.getElementById('scene');
 const mainCtx = canvas?.getContext('2d', { alpha: false });

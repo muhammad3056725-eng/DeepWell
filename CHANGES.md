@@ -1,3 +1,13 @@
+# Changes: fairer, more fun dives (2026-11-24)
+- **Difficulty curve.** Every dive now starts with questions most people can answer and ramps up: slots are easy, easy, easy, medium, medium, medium, hard (`planDive` in `js/engine.js`). Difficulty comes from `data/prompt-meta.json`, generated offline by `scripts/build-prompt-meta.mjs` from how many well-known answers each pool has. Categories are still spread across the dive.
+- **Thin questions are not served in dives.** 55 packs (packs with fewer than 30 answers or almost no well-known answers, such as moons) are marked level 0 and skipped, because most correct-sounding answers would be rejected. Themed packs still use them. They come back automatically when a Wikidata rebuild gives them real pools; re-run the script after a rebuild.
+- **Far fewer obscure "starting with <letter>" questions:** at most one per dive, never an opener, only on letters with 25+ answers.
+- **Swap button:** once per dive, throw away the current question for a fresh one of the same difficulty (two spares are loaded in advance; the timer restarts).
+- Tests added to `scripts/selftest.mjs` for the planner (ramp, no repeats, at most one letter question, deterministic).
+- Daily Dive is no longer identical for everybody (this was already the case since an earlier change); it follows the same difficulty curve.
+
+---
+
 # Changes: famous answers, mobile lag, data build (2026-11-23)
 
 ## 1. Famous answers were being rejected (China, Paris, Tokyo, Madagascar, Kilimanjaro...)
