@@ -18,7 +18,7 @@ export const CONFIG = {
   LIVE_TIMEOUT_MS: 20000,
 
   // Letter variants ("Name a river starting with M") need a pool at least this big
-  MIN_POOL_FOR_LETTER: 14,
+  MIN_POOL_FOR_LETTER: 25,
 
   // Optional crowd rarity backend (see docs/crowd-backend.md). Leave empty to disable.
   // Example: 'https://deepwell-crowd.YOURNAME.workers.dev'

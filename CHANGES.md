@@ -1,3 +1,10 @@
+# Changes: fairer, more fun dives (2026-11-24)
+- **Difficulty curve.** Every dive now starts with questions most people can answer and ramps up: slots are easy, easy, easy, medium, medium, medium, hard (`planDive` in `js/engine.js`). Difficulty comes from `data/prompt-meta.json`, generated offline by `scripts/build-prompt-meta.mjs` from how many well-known answers each pool has. Categories are still spread across the dive.
+- **Thin questions are not served in dives.** 55 packs (packs with fewer than 30 answers or almost no well-known answers, such as moons) are marked level 0 and skipped, because most correct-sounding answers would be rejected. Themed packs still use them. They come back automatically when a Wikidata rebuild gives them real pools; re-run the script after a rebuild.
+- **Far fewer obscure "starting with <letter>" questions:** at most one per dive, never an opener, only on letters with 25+ answers.
+- **Swap button:** once per dive, throw away the current question for a fresh one of the same difficulty (two spares are loaded in advance; the timer restarts).
+- Tests added to `scripts/selftest.mjs` for the planner (ramp, no repeats, at most one letter question, deterministic).
+- Daily Dive is no longer identical for everybody (this was already the case since an earlier change); it follows the same difficulty curve.
 # Changes: reptile fix and bigger answer lists (2026-11-24)
 - **Birds were counted as reptiles.** In Wikidata birds descend from Reptilia, so the reptile questions (base and "starts with <letter>") were mostly birds. The reptile query now excludes Aves (`notParent` in `js/catalog.js`, `js/wikidata.js`), and the existing reptile packs were cleaned (about 10,000 wrong entries removed).
 - **More accepted answers.** Answers that only existed in the "starts with <letter>" packs were folded back into the main pack (bird, mammal, amphibian and reptile now hold 2,000 each, up from about 1,000), and every pack was re-cleaned with the current alias rules (about 31,600 more accepted aliases, 211 duplicates removed). Script: `scripts/enrich-packs.mjs` (offline; re-run it any time).

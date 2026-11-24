@@ -3,7 +3,7 @@
 import { CATALOG, ENTITY_LABELS, entityIdsOf, QUESTION_TARGET } from '../js/catalog.js';
 import { buildQuery, parseBindings, toPack, fromPack, mergePools } from '../js/wikidata.js';
 import {
-  normalize, matchAnswer, buildPool, assignRarity, pickEntries, mulberry32, hashString,
+  normalize, matchAnswer, buildPool, assignRarity, pickEntries, planDive, DIVE_PLAN, mulberry32, hashString,
   letterOptions, deriveLetterPool, blendPoints, tier, previousUtcDate,
 } from '../js/engine.js';
 import { SEED } from '../js/seed.js';
@@ -203,6 +203,30 @@ eq(meaningfulChange(overridePool,[...overridePool,{id:'Q9',n:'New answer',s:1,a:
     ok(m?.exact, `real pack ${id} accepts "${answer}" (exact match)`);
     if (m?.exact) ok(m.item.r <= 25, `real pack ${id}: "${answer}" is a famous answer, so few points (${m.item.r})`);
   }
+}
+
+// ---- fair dives: difficulty curve, one letter question at most, deterministic
+{
+  const cats = ['A','B','C','D','E','F','G','H'];
+  const entries = Array.from({ length: 160 }, (_, i) => ({ id: 'e' + i, cat: cats[i % 8], prompt: 'Name ' + i, ...(i % 5 === 0 ? { startsWith: 'a' } : {}) }));
+  const meta = { prompts: Object.fromEntries(entries.map((e, i) => [e.id, { level: 1 + (i % 3) }])) };
+  let letterTotal = 0, rampOk = true, dupOk = true;
+  for (let seed = 1; seed <= 200; seed++) {
+    const picks = planDive(entries, mulberry32(seed), meta);
+    const dive = picks.filter(p => !p.spare && !p.fallback), spares = picks.filter(p => p.spare);
+    const ids = picks.map(p => p.entry.id);
+    if (new Set(ids).size !== ids.length) dupOk = false;
+    if (dive.length !== 7 || spares.length !== 2) rampOk = false;
+    DIVE_PLAN.forEach((lv, i) => { if (dive[i] && dive[i].level !== lv) rampOk = false; });
+    letterTotal += dive.filter(p => p.entry.startsWith).length + dive.filter(p => p.allowLetter).length > 1 ? 1000 : 0;
+    if (dive[0].entry.startsWith || dive[1].entry.startsWith || dive[2].entry.startsWith) letterTotal += 1000;
+  }
+  ok(rampOk, 'planDive: 7 prompts + 2 spares following the easy-to-hard plan when data allows');
+  ok(dupOk, 'planDive: no prompt repeated within a dive or its spares');
+  eq(letterTotal, 0, 'planDive: at most one "starting with" question per dive and never as an opener');
+  eq(planDive(entries, mulberry32(9), meta).map(p => p.entry.id).join(), planDive(entries, mulberry32(9), meta).map(p => p.entry.id).join(), 'planDive is deterministic for a seed');
+  const thin = planDive(entries.slice(0, 9), mulberry32(3), {}, { count: 7, spares: 2 });
+  ok(thin.length >= 7, 'planDive still fills a dive when metadata is missing');
 }
 
 console.log(`${passed} passed, ${failed} failed. ${CATALOG.length} prompts, ${Object.keys(SEED).length} seed lists.`);
