@@ -25,6 +25,7 @@ export function buildQuery(entry, overrides = {}) {
   (GROUP_CONCAT(DISTINCT ?latin; separator="|") AS ?alts) WHERE {
   { SELECT DISTINCT ?item ?sl WHERE {
       ?item wdt:P31 wd:Q16521; ${entry.pattern}; wikibase:sitelinks ?sl; wdt:P1843 ?filterName.
+      ${entry.notParent && /^Q\d+$/.test(entry.notParent) ? `FILTER NOT EXISTS { ?item wdt:P171+ wd:${entry.notParent} }` : ''}
       FILTER(?sl >= ${minSL})
       ${maxSL}
       FILTER(LANG(?filterName) = "en")
