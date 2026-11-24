@@ -196,7 +196,9 @@ for (const [id, prompt, pattern, o] of SCIENCE) add('Science', id, prompt, patte
 /* ------------------------------------------------------------------ nature */
 addTaxon('Nature', 'mammal', 'Name a mammal', 'Q7377', 'mammal', 'Q7432', 'species');
 addTaxon('Nature', 'bird', 'Name a bird', 'Q5113', 'bird', 'Q7432', 'species');
-addTaxon('Nature', 'reptile', 'Name a reptile', 'Q10811', 'reptile', 'Q7432', 'species');
+// In Wikidata's taxonomy birds descend from Reptilia, so the reptile pool must explicitly exclude Aves (Q5113):
+// without this, "Name a reptile starting with H" accepted Hartlaub's bustard.
+addTaxon('Nature', 'reptile', 'Name a reptile', 'Q10811', 'reptile', 'Q7432', 'species', { notParent: 'Q5113' });
 addTaxon('Nature', 'amphibian', 'Name an amphibian', 'Q10908', 'amphibian', 'Q7432', 'species', { minSL: 3 });
 addTaxon('Nature', 'insect', 'Name an insect', 'Q1390', 'insect', 'Q7432', 'species', { minSL: 4 });
 addTaxon('Nature', 'flowering-plant', 'Name a flowering plant', 'Q886167', 'flowering plant', 'Q7432', 'species', { minSL: 8 });
