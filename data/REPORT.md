@@ -85,7 +85,6 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| bird-starts-j | 134 | 0 |
 
 ## Repository size check
 
