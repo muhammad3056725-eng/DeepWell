@@ -1,10 +1,10 @@
 // DOM helpers and screen renderers. No game rules live here.
-import { CONFIG } from './config.js?v=living-dive-20261125';
-import { CATEGORIES } from './catalog.js?v=living-dive-20261125';
-import { libraryStats } from './data.js?v=living-dive-20261125';
-import { tierClass, utcDate } from './engine.js?v=living-dive-20261125';
-import * as S from './state.js?v=living-dive-20261125';
-import { setVolume } from './audio.js?v=living-dive-20261125';
+import { CONFIG } from './config.js?v=hud-steps-20261125';
+import { CATEGORIES } from './catalog.js?v=hud-steps-20261125';
+import { libraryStats } from './data.js?v=hud-steps-20261125';
+import { tierClass, utcDate } from './engine.js?v=hud-steps-20261125';
+import * as S from './state.js?v=hud-steps-20261125';
+import { setVolume } from './audio.js?v=hud-steps-20261125';
 
 export const $ = id => document.getElementById(id);
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -98,6 +98,7 @@ export function renderResults(run, streak) {
   $('resultStreak').textContent = streak + ' day' + (streak === 1 ? '' : 's');
   $('resultBest').textContent = S.store.best + ' m';
   $('resultAnswers').textContent = `${hits} / ${CONFIG.PROMPTS_PER_DIVE}`;
+  $('diveLog').innerHTML = diveLogSvg(run);
   $('breakdown').innerHTML = run.answers.map((a, i) => {
     const hint = a.points < 40 && a.examples
       ? `<small>${a.state === 'hit' ? 'Deeper options' : 'You could have said'}: ${[...a.examples.famous.slice(0, a.state === 'hit' ? 0 : 2), a.examples.rare].filter(Boolean).map(esc).join(', ')}</small>`
@@ -144,4 +145,26 @@ export function readSettingsUI() {
   s.motion = $('motionSetting').checked; s.color = $('colorSetting').checked;
   s.timer = Number($('timerSetting').value); s.text = Number($('textSetting').value); s.graphics = $('graphicsSetting')?.value || s.graphics || 'auto';
   applySettings(); S.save();
+}
+
+/** Vertical drop chart: one line per prompt falling as far as its points earned, ending in a glowing orb in the tier colour. */
+function diveLogSvg(run) {
+  const n = CONFIG.PROMPTS_PER_DIVE, W = 320, H = 150, top = 20, bottom = 24, left = 54, right = 12;
+  const plotH = H - top - bottom, gap = (W - left - right) / n, metres = p => Math.round(p * CONFIG.POINTS_PER_METER);
+  // The scale adapts to the dive (at least 40 points tall) so even a run of common answers draws a readable drop.
+  const scalePts = Math.max(40, Math.ceil(Math.max(0, ...run.answers.map(a => a.points)) * 1.15)), maxM = metres(scalePts), ticks = [0, 0.5, 1];
+  let g = '';
+  for (const t of ticks) {
+    const y = top + t * plotH;
+    g += `<line x1="${left - 6}" x2="${W - right}" y1="${y}" y2="${y}" class="dl-grid"/><text x="${left - 10}" y="${y + 3}" class="dl-axis" text-anchor="end">${t === 0 ? '0 m' : '-' + Math.round(maxM * t) + ' m'}</text>`;
+  }
+  for (let i = 0; i < n; i++) {
+    const a = run.answers[i], x = left + gap * (i + 0.5);
+    g += `<text x="${x}" y="${H - 9}" class="dl-axis" text-anchor="middle">P${i + 1}</text>`;
+    if (!a) continue;
+    if (!a.points) { g += `<circle cx="${x}" cy="${top}" r="5" class="dl-miss"/>`; continue; }
+    const y = top + Math.min(1, a.points / scalePts) * plotH;
+    g += `<g class="${tierClass(a.tier)}"><line x1="${x}" x2="${x}" y1="${top}" y2="${y}" class="dl-drop"/><circle cx="${x}" cy="${y}" r="9" class="dl-halo"/><circle cx="${x}" cy="${y}" r="4.5" class="dl-orb"/></g>`;
+  }
+  return `<div class="stat-label">Dive log · deeper = rarer</div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Depth reached by each of your answers">${g}</svg>`;
 }

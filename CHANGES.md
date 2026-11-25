@@ -15,6 +15,12 @@
 
 # Changes: famous answers, mobile lag, data build (2026-11-23)
 
+## 2026-11-25 — Progress steps, tier flash and dive log (ideas from a Krillion design guide, own look)
+
+- **Seven progress steps** above each question. They fill in the rarity-tier colour as you answer; a miss leaves a dashed mark and the current step glows.
+- **Tier flash** after every answer: the tier name in its colour plus "+points · sink metres" (or Miss / Repeat).
+- **Dive log chart** on the results screen: one drop per prompt falling as far as its points, ending in a glowing orb in the tier colour; misses are hollow circles at the surface. The scale adapts so common-answer dives still draw a readable chart.
+
 ## 2026-11-25 — A living dive
 
 - **A boat on the sea.** The game now starts with the craft floating on the surface (mast, flag, blinking beacon, ripples). Each correct answer sinks it: it tips nose-down, splashes through the waterline, trails bubbles, and plankton streams upward while it descends.
