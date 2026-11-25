@@ -1,16 +1,16 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js?v=hud-steps-20261125';
-import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=hud-steps-20261125';
-import { loadManifest } from './data.js?v=hud-steps-20261125';
-import { prepareDive, examples } from './game.js?v=hud-steps-20261125';
+import { CONFIG } from './config.js?v=retry-timer-20261125';
+import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=retry-timer-20261125';
+import { loadManifest } from './data.js?v=retry-timer-20261125';
+import { prepareDive, examples } from './game.js?v=retry-timer-20261125';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=hud-steps-20261125';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=hud-steps-20261125';
-import { wake, tone, buzz } from './audio.js?v=hud-steps-20261125';
+import * as S from './state.js?v=retry-timer-20261125';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=retry-timer-20261125';
+import { wake, tone, buzz } from './audio.js?v=retry-timer-20261125';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=hud-steps-20261125';
+} from './ui.js?v=retry-timer-20261125';
 
 let run = null; // the dive in progress
 let timerRaf = 0;
@@ -60,7 +60,7 @@ const label = (mode, cat) => (mode === 'daily' ? 'DAILY DIVE' : mode === 'pack' 
 function nextPrompt() {
   if (run.index >= run.prompts.length) return finish();
   const p = run.prompts[run.index];
-  run.locked = false; run.paused = false; run.pending = null;
+  run.locked = false; run.paused = false; run.pending = null; run.tries = [];
   $('confirmBox').classList.remove('show');
   $('roundLabel').textContent = `PROMPT ${run.index + 1} / ${run.prompts.length}`;
   const badge = $('srcBadge');
@@ -160,8 +160,23 @@ function confirmNear(yes) {
   else { $('answerInput').focus(); } // no penalty: the player can retype
 }
 
+/** A wrong or repeated answer does not end the question: the timer keeps running and the player may try again. */
+function retryAnswer(item, value) {
+  const mine = run, input = $('answerInput');
+  if (!item) { S.store.misses++; S.save(); }
+  mine.tries.push(value);
+  const message = item ? `${item.n} was already named in this dive. Try another.` : 'Not recognised. Try another answer.';
+  $('feedback').textContent = message;
+  $('live').textContent = message;
+  tone(110, 0.12);
+  if (S.store.settings.haptics) buzz([20, 40, 20]);
+  input.classList.remove('wrong'); void input.offsetWidth; input.classList.add('wrong');
+  input.value = ''; input.focus();
+}
+
 async function resolve(item, value) {
   if (!run || run.locked) return;
+  if (value && run.remaining > 0 && (!item || run.used.has(item.id))) { retryAnswer(item, value); return; }
   run.locked = true;
   clearInterval(run.timer);
   const mine = run;
@@ -170,7 +185,7 @@ async function resolve(item, value) {
   const p = run.prompts[run.index];
 
   let points = 0, state = 'miss', message;
-  if (!value) { message = "Time's up. Depth holds."; state = 'timeout'; }
+  if (!value) { message = "Time's up. Depth holds."; state = 'timeout'; }   // also reached after wrong tries: the clock ran out
   else if (!item) { message = 'Not recognised for this prompt. Depth holds.'; S.store.misses++; S.save(); }
   else if (run.used.has(item.id)) { message = `${item.n} was already named in this dive.`; state = 'repeat'; }
   else {
@@ -191,7 +206,7 @@ async function resolve(item, value) {
   if (state !== 'hit') tone(110, 0.16);
   mine.depth += points * CONFIG.POINTS_PER_METER;
   mine.answers.push({
-    prompt: p.text, input: value || '(no answer)', name: item?.n || '', points, tier: tier(points), state,
+    prompt: p.text, input: value || (mine.tries.length ? mine.tries.join(' / ') : '(no answer)'), name: item?.n || '', points, tier: tier(points), state,
     examples: examples(p.pool),
   });
   $('feedback').textContent = message;
