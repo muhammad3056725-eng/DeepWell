@@ -85,8 +85,10 @@ jobs:
               ANCHOR_INDEX=$(( $(date -u -d '2026-11-21' +%s) / 86400 ))
               DAY_INDEX=$(( TODAY_INDEX - ANCHOR_INDEX ))
               if [ "$DAY_INDEX" -lt 0 ]; then DAY_INDEX=0; fi
-              BATCH=$(( DAY_INDEX % 20 ))
-              CANDIDATE_OFFSET=$(( (DAY_INDEX / 20) * 5000 ))
+              # All real prompts fit in batch 0 (letter variants are derived in the game), so every day
+              # rebuilds them all and pages one step deeper into Wikidata's candidates (cycles every 6 days).
+              BATCH=0
+              CANDIDATE_OFFSET=$(( (DAY_INDEX % 6) * 5000 ))
             fi
           fi
           CANDIDATE_OFFSET=${CANDIDATE_OFFSET:-0}
@@ -172,12 +174,8 @@ jobs:
             echo "Scheduled run finished its batch."
             exit 0
           else
-            NEXT_BATCH=$((BATCH + 1))
-            NEXT_START=0
-            if [ "$NEXT_BATCH" -ge 20 ]; then
-              echo "Completed the final batch (19)."
-              exit 0
-            fi
+            echo "Batch $BATCH finished; all real prompts are covered. Nothing more to queue."
+            exit 0
           fi
           echo "Queueing batch $NEXT_BATCH from position $NEXT_START."
           gh api --method POST \

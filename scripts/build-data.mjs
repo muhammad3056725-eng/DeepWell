@@ -42,7 +42,11 @@ async function main(){
  const manifest=await readJson(MANIFEST,{version:0,built:null,packs:{}}),overrides=await readJson('data/overrides.json',{}),blocklist=await readJson('data/blocklist.json',{qids:[],words:[]}),anchors=await readJson('data/anchors.json',{});
  for(const meta of Object.values(manifest.packs))if(meta.quality){meta.quality.added=0;meta.quality.removed=0;meta.quality.fallback=false;meta.quality.querySplitFallback=false;}
  const report={stoppedAt:null,skipped:[],failed:[],built:0,unchanged:0,fallback:[],previousRetained:[],rejected:{}},today=new Date().toISOString().slice(0,10);
- const all=CATALOG.filter(e=>!ONLY||ONLY.has(e.id));let todo=all;if(BATCH!==undefined&&BATCH!=='all'){const b=parseInt(BATCH,10);if(!Number.isInteger(b)||b<0)throw new Error('Invalid batch index');todo=all.slice(b*BATCH_SIZE,(b+1)*BATCH_SIZE);}
+ // Letter-variant prompts ("... starting with A") are derived inside the game from the base answer list, so rebuilding
+// them from Wikidata only burns time on tiny pools. By default the build targets the real (base) prompts only;
+// pass --letters (or --only <ids>) to include letter variants.
+const WITH_LETTERS=flag('letters')||Boolean(ONLY),isLetter=e=>Boolean(e.startsWith);
+const all=CATALOG.filter(e=>(!ONLY||ONLY.has(e.id))&&(WITH_LETTERS||!isLetter(e))).sort((a,b)=>isLetter(a)-isLetter(b));console.log(`Build list: ${all.length} prompt(s)${WITH_LETTERS?'':' (letter variants skipped)'}`);let todo=all;if(BATCH!==undefined&&BATCH!=='all'){const b=parseInt(BATCH,10);if(!Number.isInteger(b)||b<0)throw new Error('Invalid batch index');todo=all.slice(b*BATCH_SIZE,(b+1)*BATCH_SIZE);}
  todo=todo.slice(START);if(!todo.length){console.log('No prompts left in this batch.');await writeFile('data/BUILD-REPORT.json',JSON.stringify({built:0,stoppedAt:null,note:'nothing to do'},null,2)+'\n');return;}
  for(let i=0;i<todo.length;i++){
   // Stop cleanly before the CI time limit so everything built so far is saved and committed. The workflow then

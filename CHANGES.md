@@ -15,6 +15,12 @@
 
 # Changes: famous answers, mobile lag, data build (2026-11-23)
 
+## 2026-11-25 — Data build now targets the real question lists
+
+- The automatic Wikidata rebuild was spending almost all its time on ~9,500 "starts with <letter>" variants whose pools are tiny (the last run built 0 packs). The game already derives letter questions from the main answer list, so the build now skips them by default (`--letters` or `--only` brings them back).
+- Every daily run now rebuilds all 474 real prompts and pages one step deeper into Wikidata's candidates (6-day cycle), so answer lists keep growing toward 2,000 per question instead of stalling.
+- Chained runs stop once the real prompts are covered (no more empty batches 1–19).
+
 ## 1. Famous answers were being rejected (China, Paris, Tokyo, Madagascar, Kilimanjaro...)
 Causes and fixes
 - `js/catalog.js`: "Name a capital city" now means "is the capital (P36) of a sovereign state" (it was a generic settlement class, so the pool held Krasnodar and no London). Geography classes and the "<class> in <country>" matrix use the subclass closure, so things typed as a subtype (big city, volcano subtypes, private university, island nation...) are found.
