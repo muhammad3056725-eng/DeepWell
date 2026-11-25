@@ -2,7 +2,7 @@
 // All visuals are generated live with Canvas 2D paths, gradients, lighting and particles.
 // No 3D engine, images, video, sprite sheets or downloaded models.
 import { CONFIG } from './config.js';
-import { predatorGulp, rareSparkle } from './audio.js?v=trench-palette-20261125';
+import { predatorGulp, rareSparkle } from './audio.js?v=living-dive-20261125';
 
 const canvas = document.getElementById('scene');
 const mainCtx = canvas?.getContext('2d', { alpha: false });
@@ -12,6 +12,8 @@ let getProgress = () => 0;
 let isStill = () => false;
 let visualDepth = 0;
 let visualStage = 0;
+let sinkSmooth = 0;      // 0..1: how fast the craft is currently descending (drives tilt, bubbles, streaks)
+let camDriftY = 0;       // vertical camera drift applied to the world this frame
 let bubbles = [];
 let plankton = [];
 let fish = [];
@@ -44,9 +46,9 @@ let perfOverlay = null;
 //  layer  = resolution of the cached water/surface layers (smaller = cheaper), sprites = fish drawn from cached
 //  images instead of live paths+gradients, caustics = animated surface light lines, fps = frame-rate cap.
 const QUALITY = {
-  high:  { dpr:2,    bubbles:40, plankton:100, fish:30, jellies:5, layer:0.5,  sprites:false, caustics:true,  kelp:24, kelpGlow:true,  fps:60 },
-  medium:{ dpr:1.25, bubbles:16, plankton:36,  fish:12, jellies:2, layer:0.35, sprites:true,  caustics:false, kelp:14, kelpGlow:false, fps:60 },
-  low:   { dpr:1,    bubbles:8,  plankton:14,  fish:8,  jellies:1, layer:0.25, sprites:true,  caustics:false, kelp:8,  kelpGlow:false, fps:30 }
+  high:  { dpr:2,    bubbles:40, plankton:100, fish:18, jellies:5, layer:0.5,  sprites:false, caustics:true,  kelp:24, kelpGlow:true,  fps:60 },
+  medium:{ dpr:1.25, bubbles:16, plankton:36,  fish:10, jellies:2, layer:0.35, sprites:true,  caustics:false, kelp:14, kelpGlow:false, fps:60 },
+  low:   { dpr:1,    bubbles:8,  plankton:14,  fish:7,  jellies:1, layer:0.25, sprites:true,  caustics:false, kelp:8,  kelpGlow:false, fps:30 }
 };
 const TIER_STORE = 'deepwell.graphicsTier';
 const qNow = () => QUALITY[graphicsTier] || QUALITY.medium;
@@ -97,6 +99,50 @@ const FISH_PALETTE = [
   ['#476d70','#b6c9bd','#203b3e']
 ];
 
+/* Real-world colour schemes, one depth zone each: [body, belly, shade, marking, fins].
+ * kind picks the body drawing (0 generic, 1 slender, 2 tall banded, 3 round, 4 long, 5 glow-dotted,
+ * 6 manta, 7 jellyfish, 8 anglerfish, 9 hatchetfish, 10 viperfish). */
+const SPECIES = [
+  // sunlight zone: warm reef colours
+  {zone:'sun',kind:2,pal:['#ff7a1a','#ffb25e','#a83a08','#fff4e2','#ff9a3c'],scale:0.8,speed:0.8},  // clownfish
+  {zone:'sun',kind:0,pal:['#1f6fe0','#4b97ff','#0a2d78','#ffd21f','#ffd21f'],scale:1,speed:1.1},    // blue tang
+  {zone:'sun',kind:2,pal:['#ffd83a','#fff3a6','#b88a00','#1b1b1b','#ffe35a'],scale:0.85,speed:0.9}, // butterflyfish
+  {zone:'sun',kind:4,pal:['#ff7f9a','#ffd9d2','#a8324e','#ffb4c0','#ff6a8a'],scale:0.75,speed:1.4}, // anthias
+  {zone:'sun',kind:3,pal:['#d8c168','#fff1c2','#7c6a28','#ffffff','#e6d58a'],scale:0.8,speed:0.6},  // pufferfish
+  // twilight zone: open-water hunters
+  {zone:'twi',kind:1,pal:['#2b72ad','#dbe8ee','#0b2c52','#9fd2ff','#f4d23c'],scale:1.25,speed:1.6}, // tuna
+  {zone:'twi',kind:4,pal:['#35c27a','#f2e17c','#0f6a49','#6ff0c0','#1fb7c6'],scale:1.05,speed:1.4}, // mahi-mahi
+  {zone:'twi',kind:0,pal:['#e3504a','#f7b6a2','#86202a','#ff8a80','#c7343c'],scale:1,speed:1},      // snapper
+  {zone:'twi',kind:2,pal:['#c8423a','#f2d9c8','#6f1a1c','#f7efe4','#e9c9a4'],scale:0.95,speed:0.7}, // lionfish
+  // midnight zone: silver and glowing
+  {zone:'mid',kind:9,pal:['#8fb4cb','#dfeaf2','#2b4560','#7cf7ff','#6f98b3'],scale:0.85,speed:1},    // hatchetfish
+  {zone:'mid',kind:5,pal:['#1f6d8a','#6fc4cf','#0b2b3e','#7dffe2','#2a8aa6'],scale:0.9,speed:0.9},   // lanternfish
+  {zone:'mid',kind:10,pal:['#2f4a74','#6b8fb8','#0f1d38','#7cf7ff','#43648e'],scale:1.2,speed:1.2},  // viperfish
+  {zone:'mid',kind:0,pal:['#a6bdd1','#e7eff6','#4a6178','#d3e6f5','#8fa8be'],scale:1.05,speed:0.8},  // ghost cod
+  {zone:'mid',kind:7,pal:FISH_PALETTE[0],scale:1,speed:0.4},                                          // jellyfish
+  // abyss: dark bodies, bright lights
+  {zone:'aby',kind:8,pal:['#4a3d68','#8b76ab','#1c1530','#aef9ff','#5a4a7e'],scale:1,speed:0.55},    // anglerfish
+  {zone:'aby',kind:10,pal:['#4a3a7c','#8870c0','#150d2a','#6fffd0','#5e4a98'],scale:1.3,speed:1},    // gulper
+  {zone:'aby',kind:5,pal:['#2c3f8a','#7aa0ff','#0b1236','#8ab4ff','#3f58c4'],scale:0.9,speed:0.9},   // blue lanternfish
+  {zone:'aby',kind:4,pal:['#cfe1f0','#f2f8ff','#6a86a0','#ffffff','#b8cfe2'],scale:1.1,speed:0.7},   // ghost eel
+  {zone:'aby',kind:7,pal:FISH_PALETTE[0],scale:1.2,speed:0.35}                                       // deep jellyfish
+];
+/** How much of each zone's wildlife belongs at this depth (0..1); neighbouring zones overlap so scenes blend slowly. */
+function zoneWeights(depth) {
+  return {
+    sun:1-smooth((depth-0.08)/0.2),
+    twi:smooth((depth-0.06)/0.2)*(1-smooth((depth-0.39)/0.23)),
+    mid:smooth((depth-0.32)/0.2)*(1-smooth((depth-0.84)/0.16)),
+    aby:smooth((depth-0.82)/0.12)
+  };
+}
+function pickSpecies(depth) {
+  const wt=zoneWeights(depth);let total=0;const w=SPECIES.map(sp=>{const v=wt[sp.zone]||0;total+=v;return v;});
+  if(total<=0)return 0;let r=Math.random()*total;
+  for(let i=0;i<w.length;i++){r-=w[i];if(r<=0)return i;}
+  return 0;
+}
+
 const SHARKS = [
   { name:'Great white', top:'#637f91', side:'#94afb9', belly:'#e5eeea', fin:'#314a5d', eye:'#061723', pattern:'plain' },
   { name:'Tiger shark', top:'#536e78', side:'#879fa4', belly:'#dbe6e0', fin:'#2b4350', eye:'#061723', pattern:'tiger' },
@@ -104,6 +150,17 @@ const SHARKS = [
   { name:'Blue shark', top:'#347d9e', side:'#8ebac8', belly:'#d5e9e8', fin:'#174563', eye:'#061723', pattern:'plain' },
   { name:'Dusky shark', top:'#435f70', side:'#829da9', belly:'#dbe7e4', fin:'#263e52', eye:'#061723', pattern:'plain' }
 ];
+
+/** (Re)start one fish: a species that belongs at this depth, entering from a screen edge and swimming across. */
+function spawnFish(f,w,depth,anywhere,time=-9999) {
+  f.born=time;
+  f.sp=pickSpecies(depth);
+  f.dir=Math.random()<0.5?-1:1;
+  f.z=rand(0.08,1);              // 0 = far away and dim, 1 = close and bright
+  f.v=f.lane??Math.random();      // vertical lane inside the visible water
+  f.vel=rand(0.75,1.2);
+  f.x=anywhere?rand(-0.1*w,1.1*w):(f.dir>0?-170:w+170);
+}
 
 function resize() {
   if (!canvas || !ctx) return;
@@ -146,12 +203,12 @@ function resize() {
     x:rand(0,width),y:rand(0,height),r:rand(0.45,1.75),
     speed:rand(0.08,0.42),phase:rand(0,TAU),alpha:rand(0.08,0.38)
   }));
-  fish = Array.from({length:Math.round(q.fish*quality)},(_,i)=>({
-    u:((i%5)-2)*0.18+rand(-0.09,0.09),v:rand(-0.5,0.42),z:rand(0.015,0.72),
-    scale:rand(0.48,0.94),speed:rand(0.00010,0.00022),
-    dir:Math.random()<0.5?-1:1, phase:rand(0,TAU),
-    palette:FISH_PALETTE[i%FISH_PALETTE.length],kind:i%8,group:i%5
-  }));
+  fish = Array.from({length:Math.round(q.fish*quality)},(_,i)=>{
+    const n=Math.max(1,Math.round(q.fish*quality));
+    // Each fish keeps its own swimming lane so the water never turns into one overlapping crowd.
+    const f={group:i%5,phase:rand(0,TAU),bob:rand(0,TAU),lane:(((i*5)%n)+rand(0.2,0.8))/n,born:-9999};
+    spawnFish(f,width,visualDepth,true);return f;
+  });
   jellies = Array.from({length:q.jellies},(_,i)=>({
     u:rand(0.08,0.92),v:rand(0.12,0.76),scale:rand(0.26,0.58),
     phase:rand(0,TAU),speed:rand(0.000025,0.000055),drift:rand(0.012,0.035),kind:i%3
@@ -208,7 +265,7 @@ export function startScene(depthFn, stillFn, progressFn, hapticsFn, colorSafeFn)
 
 // Visual-only signal from the existing answer resolution. It never changes score or progression.
 export function resetDiveVisual() {
-  visualDepth=0;visualStage=0;eventScene=null;previousTime=0;frozenTime=0;
+  visualDepth=0;visualStage=0;sinkSmooth=0;bannerZone=0;eventScene=null;previousTime=0;frozenTime=0;
 }
 
 const PREDATOR_SPECIES = [
@@ -626,13 +683,17 @@ function drawBubble(x,y,r,alpha) {
 }
 
 function drawParticles(w,h,time,still,depth) {
+  // While the craft is sinking, drifting plankton and bubbles stream upward: that is what makes the descent feel fast.
+  const rush=1+sinkSmooth*7;
+  ctx.strokeStyle='rgba(207,248,239,0.5)';
   for(const p of plankton){
-    if(!still){p.y-=p.speed*(0.45+depth*0.35);p.x+=Math.sin(time*0.00045+p.phase)*0.12;if(p.y<0)p.y=h;}
-    ctx.fillStyle='rgba(207,248,239,'+(p.alpha*(0.85-depth*0.35))+')';
-    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,TAU);ctx.fill();
+    if(!still){p.y-=p.speed*(0.45+depth*0.35)*rush;p.x+=Math.sin(time*0.00045+p.phase)*0.12;if(p.y<0)p.y=h;}
+    const a=p.alpha*(0.85-depth*0.35);
+    if(sinkSmooth>0.12){ctx.globalAlpha=a*1.4;ctx.lineWidth=p.r*1.1;ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x,p.y+sinkSmooth*(10+p.r*9));ctx.stroke();ctx.globalAlpha=1;}
+    else{ctx.fillStyle='rgba(207,248,239,'+a+')';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,TAU);ctx.fill();}
   }
   for(const p of bubbles){
-    if(!still){p.y-=p.speed*(0.65+depth*0.3);p.x+=Math.sin(time*0.0006+p.phase)*p.drift*0.04;if(p.y<-10){p.y=h+10;p.x=rand(0,w);}}
+    if(!still){p.y-=p.speed*(0.65+depth*0.3)*(1+sinkSmooth*3);p.x+=Math.sin(time*0.0006+p.phase)*p.drift*0.04;if(p.y<-10){p.y=h+10;p.x=rand(0,w);}}
     drawBubble(p.x,p.y,p.r,p.alpha);
   }
 }
@@ -702,18 +763,18 @@ function drawFishSide(x,y,scale,palette,phase,time,dir=1,alpha=1,detail=1) {
 function drawUndulatingFish(x,y,scale,palette,phase,time,dir,alpha,kind,depth) {
   const slender=kind===1||kind===4;
   const tall=kind===2||kind===3;
-  const length=kind===1?1.42:kind===4?1.18:kind===3?0.84:1;
-  const bodyHeight=kind===2?31:kind===3?32:kind===5?16:slender?13:21;
-  const [base,belly,dark]=palette;
+  const length=kind===1?1.42:kind===4?1.18:kind===3?0.84:kind===8?0.8:kind===9?0.88:kind===10?1.4:1;
+  const bodyHeight=kind===2?31:kind===3?32:kind===8?42:kind===9?26:kind===10?12:kind===5?16:slender?13:21;
+  const [base,belly,dark]=palette,marking=palette[3]||'rgba(16,43,54,0.52)',fin=palette[4]||dark;
   ctx.save();
   ctx.translate(x,y);
   ctx.scale(dir*scale*length,scale);
   ctx.globalAlpha=alpha;
 
   const tailSwing=Math.sin(time*0.0042+phase)*0.56;
-  ctx.save();ctx.translate(-48,0);ctx.rotate(tailSwing);
+  ctx.save();ctx.translate(-48,0);ctx.rotate(tailSwing);ctx.scale(0.86,0.66);
   const tail=ctx.createLinearGradient(-40,-28,8,28);
-  tail.addColorStop(0,dark);tail.addColorStop(0.5,base);tail.addColorStop(1,'rgba(207,245,239,0.64)');
+  tail.addColorStop(0,fin);tail.addColorStop(0.5,base);tail.addColorStop(1,belly);
   ctx.fillStyle=tail;
   ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(-30,-28,-52,-35);
   ctx.quadraticCurveTo(-42,-6,-50,0);ctx.quadraticCurveTo(-39,9,-52,34);
@@ -724,35 +785,37 @@ function drawUndulatingFish(x,y,scale,palette,phase,time,dir,alpha,kind,depth) {
   for(let segment=0;segment<=8;segment++){
     const t=segment/8, sx=-49+t*100;
     const wave=Math.sin(time*0.0038+phase-t*4.4)*t*t*(kind===4?15:11);
-    const h=Math.sin(Math.PI*t)*bodyHeight;
+    const h=Math.pow(Math.sin(Math.PI*t),0.62)*bodyHeight;
     const sy=wave-h*(0.48+(tall?0.08:0));
     if(segment===0)ctx.moveTo(sx,sy);else ctx.lineTo(sx,sy);
   }
   for(let segment=8;segment>=0;segment--){
     const t=segment/8, sx=-49+t*100;
     const wave=Math.sin(time*0.0038+phase-t*4.4)*t*t*(kind===4?15:11);
-    const h=Math.sin(Math.PI*t)*bodyHeight;
+    const h=Math.pow(Math.sin(Math.PI*t),0.62)*bodyHeight;
     ctx.lineTo(sx,wave+h*0.58);
   }
   ctx.closePath();
   const body=ctx.createLinearGradient(0,-bodyHeight,0,bodyHeight);
-  body.addColorStop(0,'#142d3c');body.addColorStop(0.2,base);
-  body.addColorStop(0.64,belly);body.addColorStop(1,'#294653');
+  body.addColorStop(0,dark);body.addColorStop(0.22,base);
+  body.addColorStop(0.62,belly);body.addColorStop(1,belly);
   ctx.fillStyle=body;ctx.fill();
+  // Dark deep-sea bodies get a faint rim of light so they read against black water.
+  if(kind===8||kind===9||kind===10){ctx.strokeStyle='rgba(165,220,255,0.4)';ctx.lineWidth=1.4;ctx.stroke();}
 
   // Dorsal and pectoral fins bend with the current instead of moving as stickers.
   const finFlap=Math.sin(time*0.005+phase)*0.2;
-  ctx.fillStyle=dark;
-  ctx.beginPath();ctx.moveTo(-14,-10);ctx.quadraticCurveTo(2,-bodyHeight-13+finFlap*10,23,-12);ctx.lineTo(9,-6);ctx.closePath();ctx.fill();
-  ctx.save();ctx.translate(8,9);ctx.rotate(finFlap);
-  ctx.fillStyle=base;ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(22,9,43,30);ctx.quadraticCurveTo(18,23,-5,9);ctx.closePath();ctx.fill();ctx.restore();
+  ctx.fillStyle=fin;
+  ctx.globalAlpha*=0.9;ctx.beginPath();ctx.moveTo(-14,-10);ctx.quadraticCurveTo(2,-bodyHeight*0.72-5+finFlap*6,23,-12);ctx.lineTo(9,-6);ctx.closePath();ctx.fill();
+  ctx.save();ctx.translate(8,bodyHeight*0.3);ctx.rotate(finFlap);ctx.scale(0.62,0.5);
+  ctx.fillStyle=fin;ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(22,9,43,30);ctx.quadraticCurveTo(18,23,-5,9);ctx.closePath();ctx.fill();ctx.restore();
 
   // Distinct body patterns for a few reef and mid-water species.
   if(kind===2){
-    ctx.strokeStyle='rgba(16,43,54,0.52)';ctx.lineWidth=3;
-    for(let stripe=0;stripe<4;stripe++){
-      const sx=-16+stripe*14;
-      ctx.beginPath();ctx.moveTo(sx,-18);ctx.quadraticCurveTo(sx+8,0,sx+3,19);ctx.stroke();
+    ctx.strokeStyle=marking;ctx.lineWidth=3.6;
+    for(let stripe=0;stripe<3;stripe++){
+      const sx=-12+stripe*18;
+      ctx.beginPath();ctx.moveTo(sx,-bodyHeight*0.5);ctx.quadraticCurveTo(sx+8,0,sx+3,bodyHeight*0.55);ctx.stroke();
     }
   }
   if(kind===3){
@@ -767,8 +830,56 @@ function drawUndulatingFish(x,y,scale,palette,phase,time,dir,alpha,kind,depth) {
     for(let dot=0;dot<7;dot++){
       const dx=-12+dot*9,dy=4+Math.sin(time*0.003+phase+dot)*2;
       const glow=ctx.createRadialGradient(dx,dy,0,dx,dy,7);
-      glow.addColorStop(0,'rgba(158,255,226,0.95)');glow.addColorStop(1,'rgba(82,230,214,0)');
+      glow.addColorStop(0,marking.startsWith('#')?marking:'rgba(158,255,226,0.95)');glow.addColorStop(1,'rgba(82,230,214,0)');
       ctx.fillStyle=glow;ctx.beginPath();ctx.arc(dx,dy,7,0,TAU);ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  if(kind===8){
+    // Anglerfish: glowing lure on a stalk and a wide, toothy mouth.
+    ctx.strokeStyle=dark;ctx.lineWidth=2.2;
+    ctx.beginPath();ctx.moveTo(28,-15);ctx.quadraticCurveTo(52,-58,74,-36);ctx.stroke();
+    const pulse=0.72+0.28*Math.sin(time*0.004+phase);
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    const lure=ctx.createRadialGradient(74,-36,0,74,-36,26);
+    lure.addColorStop(0,'rgba(220,255,255,'+pulse+')');lure.addColorStop(0.3,'rgba(120,235,255,'+(pulse*0.55)+')');lure.addColorStop(1,'rgba(60,160,255,0)');
+    ctx.fillStyle=lure;ctx.beginPath();ctx.arc(74,-36,26,0,TAU);ctx.fill();ctx.restore();
+    ctx.strokeStyle='rgba(6,4,12,0.9)';ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(49,3);ctx.quadraticCurveTo(34,16,14,10);ctx.stroke();
+    ctx.fillStyle='#f3f6ee';
+    for(let tooth=0;tooth<7;tooth++){const tx=46-tooth*4.6,ty=4+tooth*0.9+Math.sin(tooth)*0.6;
+      ctx.beginPath();ctx.moveTo(tx,ty);ctx.lineTo(tx-1.6,ty+7);ctx.lineTo(tx-3.2,ty+0.8);ctx.closePath();ctx.fill();}
+  }
+  if(kind===9){
+    // Hatchetfish: silver flanks with rows of light organs along the belly.
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    for(let dot=0;dot<9;dot++){
+      const dx=-30+dot*8.5,dy=bodyHeight*0.34+Math.sin(dot*0.9)*1.5;
+      const g=ctx.createRadialGradient(dx,dy,0,dx,dy,6);
+      g.addColorStop(0,'rgba(170,255,255,0.95)');g.addColorStop(1,'rgba(90,220,255,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(dx,dy,6,0,TAU);ctx.fill();
+    }
+    ctx.restore();
+    ctx.strokeStyle='rgba(235,248,255,0.5)';ctx.lineWidth=1.4;
+    ctx.beginPath();ctx.moveTo(-34,-2);ctx.quadraticCurveTo(0,-bodyHeight*0.3,36,-1);ctx.stroke();
+  }
+  if(kind===10){
+    // Viperfish / gulper: needle teeth, glowing chin barbel and a row of photophores.
+    ctx.fillStyle='#eef4f0';
+    for(let tooth=0;tooth<8;tooth++){const tx=48-tooth*3.6;
+      ctx.beginPath();ctx.moveTo(tx,3);ctx.lineTo(tx-0.8,11);ctx.lineTo(tx-2.2,3.2);ctx.closePath();ctx.fill();}
+    ctx.strokeStyle=fin;ctx.lineWidth=1.6;
+    ctx.beginPath();ctx.moveTo(40,9);ctx.quadraticCurveTo(46,24,34,34);ctx.stroke();
+    ctx.save();ctx.globalCompositeOperation='lighter';
+    const bulb=ctx.createRadialGradient(34,34,0,34,34,12);
+    bulb.addColorStop(0,marking);bulb.addColorStop(1,'rgba(80,255,220,0)');
+    ctx.fillStyle=bulb;ctx.beginPath();ctx.arc(34,34,12,0,TAU);ctx.fill();
+    for(let dot=0;dot<10;dot++){
+      const dx=-36+dot*8,dy=5+Math.sin(time*0.003+phase+dot)*0.8;
+      const g=ctx.createRadialGradient(dx,dy,0,dx,dy,4);
+      g.addColorStop(0,marking);g.addColorStop(1,'rgba(80,255,220,0)');
+      ctx.fillStyle=g;ctx.beginPath();ctx.arc(dx,dy,4,0,TAU);ctx.fill();
     }
     ctx.restore();
   }
@@ -786,53 +897,56 @@ function drawUndulatingFish(x,y,scale,palette,phase,time,dir,alpha,kind,depth) {
   ctx.restore();
 }
 
-const FISH_FRAMES=10,SPR_W=300,SPR_H=130,SPR_OX=200,SPR_OY=65;
-const fishSprites=new Map();  // tint array -> Map(kind*100+frame -> canvas)
-const DEEP_TINT=['#335366','#8daab0','#1a3444'],DEEP_GLOW_TINT=['#244f61','#80aeb5','#153043'];
+const FISH_FRAMES=8,SPR_S=1.6,SPR_LW=300,SPR_LH=130,SPR_OX=200,SPR_OY=65;
+const fishSprites=new Map();  // palette array -> Map(kind*100+frame -> canvas); oldest palettes are evicted
 function fishSpriteFrame(tint,kind,frame) {
-  let byKind=fishSprites.get(tint);if(!byKind){byKind=new Map();fishSprites.set(tint,byKind);}
+  let byKind=fishSprites.get(tint);
+  if(!byKind){
+    if(fishSprites.size>=10)fishSprites.delete(fishSprites.keys().next().value);
+    byKind=new Map();fishSprites.set(tint,byKind);
+  }
   const key=kind*100+frame;let c=byKind.get(key);
   if(!c){
-    c=bakeSprite(SPR_W,SPR_H,()=>{ctx.translate(SPR_OX,SPR_OY);drawUndulatingFish(0,0,1,tint,frame/FISH_FRAMES*TAU,0,1,1,kind,0);});
+    c=bakeSprite(Math.ceil(SPR_LW*SPR_S),Math.ceil(SPR_LH*SPR_S),()=>{ctx.scale(SPR_S,SPR_S);ctx.translate(SPR_OX,SPR_OY);drawUndulatingFish(0,0,1,tint,frame/FISH_FRAMES*TAU,0,1,1,kind,0);});
     byKind.set(key,c);
   }
   return c;
 }
 /** Same fish, drawn from a cached frame: one drawImage instead of ~3 gradients and ~40 path operations. */
 function drawFishSprite(x,y,size,tint,phase,time,dir,alpha,kind,depth) {
-  if(size>1.12){drawUndulatingFish(x,y,size,tint,phase,time,dir,alpha,kind,depth);return;}
+  if(size>1.6){drawUndulatingFish(x,y,size,tint,phase,time,dir,alpha,kind,depth);return;}
   const th=(((time*0.004+phase)%TAU)+TAU)%TAU,fr=Math.floor(th/TAU*FISH_FRAMES)%FISH_FRAMES;
   ctx.save();ctx.translate(x,y);ctx.scale(dir*size,size);ctx.globalAlpha=alpha;
-  ctx.drawImage(fishSpriteFrame(tint,kind,fr),-SPR_OX,-SPR_OY);ctx.restore();
+  ctx.drawImage(fishSpriteFrame(tint,kind,fr),-SPR_OX,-SPR_OY,SPR_LW,SPR_LH);ctx.restore();
 }
 
 function drawFishSchools(w,h,time,still,depth,delta) {
   const useSprites=qNow().sprites,drawFish=useSprites?drawFishSprite:drawUndulatingFish;
-  const sunlight=1-smooth((depth-0.08)/0.2);
-  const twilight=smooth((depth-0.06)/0.2)*(1-smooth((depth-0.39)/0.23));
-  const midnight=smooth((depth-0.32)/0.2)*(1-smooth((depth-0.84)/0.16));
-  const abyss=smooth((depth-0.82)/0.12);
-
+  const wt=zoneWeights(depth),unit=clamp(w/430,0.8,1.7);
+  // Visible water lies between the waterline (or the top bar) and the question panel.
+  const yMin=Math.max(h*0.1,h*(0.305-depth*0.78)+h*0.05),yMax=h*0.57;
   for(const f of fish){
+    const sp=SPECIES[f.sp];
     if(!still){
-      f.z+=f.speed*delta;
+      // Fish swim sideways in the direction they face; nearer fish are faster, bigger and brighter (parallax).
+      f.x+=f.dir*delta*0.03*unit*(0.4+0.9*f.z)*sp.speed*f.vel;
       f.phase+=delta*0.00055;
-      if(f.z>0.9){f.z=rand(0.008,0.075);f.u=rand(-0.72,0.72);f.v=rand(-0.48,0.34);}
+      // Off-screen, or its zone has faded away: bring in a species that belongs at this depth.
+      if((f.dir>0&&f.x>w+190)||(f.dir<0&&f.x<-190))spawnFish(f,w,depth,false,time);
+      else if((wt[sp.zone]||0)<0.04)spawnFish(f,w,depth,true,time);
     }
-    const perspective=0.08+f.z*0.92;
-    let x=w*0.5+f.u*w*perspective;
-    const y=h*(0.35+f.v*perspective);
-    const size=(0.15+f.z*0.74)*f.scale;
-    const alpha=(0.07+f.z*0.36)*(1-depth*0.36);
+    const size=Math.min(1.6,(0.34+f.z*0.7)*sp.scale*unit);
+    const bob=still?0:Math.sin(time*0.0007+f.bob)*7*size;
+    const y=yMin+(yMax-yMin)*f.v+bob-sinkSmooth*h*0.05*(0.3+f.z);
+    let x=f.x;
     const scatter=eventScene?.kind==='predator'?(1-smooth((performance.now()-eventScene.start)/380)):0;
     if(scatter) x-=eventScene.direction*scatter*(14+f.group*5);
-    const habitat=f.kind<=4?Math.max(sunlight,twilight*0.58):f.kind===5?Math.max(twilight,midnight):Math.max(twilight*0.72,midnight,abyss*0.65);
-    const tint=depth>0.34?(f.kind===5?DEEP_GLOW_TINT:DEEP_TINT):f.palette;
-    if(x>-100&&x<w+100&&y>-90&&y<h+90){
-      const a=alpha*habitat;
-      if(f.kind===6) drawManta(x,y,size*1.45,f.phase,time,a*0.68);
-      else if(f.kind===7) drawJellyfish(x,y,size*0.46,f.phase,time,a*0.68);
-      else drawFish(x,y,size,tint,f.phase,time,f.dir,a,f.kind,depth);
+    // Species fade in and out as the dive crosses zone boundaries, so one scene dissolves into the next.
+    const a=clamp(0.34+f.z*0.66,0,1)*(wt[sp.zone]||0)*(1-depth*0.2)*smooth((time-f.born)/1400);
+    if(a>0.02&&x>-200&&x<w+200&&y>-90&&y<h+90){
+      if(sp.kind===6) drawManta(x,y,size*1.1,f.phase,time,a*0.85);
+      else if(sp.kind===7) drawJellyfish(x,y,size*0.5,f.phase,time,a*0.8);
+      else drawFish(x,y,size,sp.pal,f.phase,time,f.dir,a,sp.kind,depth);
     }
   }
 
@@ -840,8 +954,9 @@ function drawFishSchools(w,h,time,still,depth,delta) {
   const sweep=(time*0.000023)%1;
   const x=mix(-155,w+155,sweep);
   const y=h*0.28+Math.sin(time*0.00055)*h*0.035;
-  drawFish(x,y,0.78,FISH_PALETTE[4],1.3,time,1,0.14,1,depth);
+  drawFish(x,y,0.78,SPECIES[5].pal,1.3,time,1,0.2*Math.max(wt.sun,wt.twi),1,depth);
 
+  const twilight=wt.twi,midnight=wt.mid,abyss=wt.aby;
   const jellyBlend=twilight*0.75+midnight*0.9+abyss*0.25;
   for(const j of jellies){
     if(!still) j.v-=j.speed*delta;
@@ -1114,13 +1229,48 @@ function drawOctopus(x,y,scale,phase,time,alpha=1) {
   ctx.restore();
 }
 
+/* ---- Surface boat and dive ----
+ * At 0 m the craft floats on the sea (mast, ripples, half out of the water). Each correct answer sinks it: it tips nose-down,
+ * splashes through the surface, trails bubbles and settles into the underwater view while the scenery scrolls past. */
+function surfaceWaveAt(x,time) { return Math.sin(x*0.013+time*0.00062)*3.2+Math.sin(x*0.006-time*0.00038)*2.6; }
+function clipSea(w,h,time,depth,above) {
+  const base=h*(0.305-depth*0.78)+camDriftY,far=above?-600:h+600;
+  ctx.beginPath();ctx.moveTo(-10,far);
+  for(let x=-10;x<=w+14;x+=14)ctx.lineTo(x,base+surfaceWaveAt(x,time));
+  ctx.lineTo(w+14,far);ctx.closePath();ctx.clip();
+}
+function drawBoatFoam(x,wy,size,time,still) {
+  ctx.save();ctx.strokeStyle='rgba(240,255,250,0.9)';ctx.lineWidth=1.8;
+  const wide=62*size;
+  for(let i=0;i<3;i++){const r=still?i/3:((time*0.0005+i/3)%1);ctx.globalAlpha=(1-r)*0.55;ctx.beginPath();ctx.ellipse(x,wy+3,wide*(0.9+r*0.9),4+r*5,0,0,TAU);ctx.stroke();}
+  if(sinkSmooth>0.06&&!still){
+    ctx.fillStyle='rgba(245,255,252,0.95)';
+    for(let i=0;i<14;i++){const u=((time*0.0011+i*0.37)%1),px=x+Math.sin(i*2.3)*wide,py=wy-Math.sin(u*Math.PI)*52*size*sinkSmooth;
+      ctx.globalAlpha=(1-u)*0.85*Math.min(1,sinkSmooth*1.6);ctx.beginPath();ctx.arc(px,py,1.6+u*1.8,0,TAU);ctx.fill();}
+  }
+  ctx.restore();
+}
+
 function drawSubmersible(w,h,time,depth,still,panic=0,overrideX=null,overrideY=null) {
-  const bob=still?0:Math.sin(time*0.0008)*4;
-  const x=overrideX===null?w*0.5+Math.sin(time*0.00021)*w*0.012:overrideX;
-  const y=overrideY===null?h*0.575+bob:overrideY;
   const size=clamp(w/760,0.55,0.9);
+  const x=overrideX===null?w*0.5+Math.sin(time*0.00021)*w*0.012:overrideX;
+  const dive=smooth(depth/0.09),surf=1-dive;
+  const wl=h*(0.305-depth*0.78)+camDriftY,waterY=wl+surfaceWaveAt(x,time);
+  const bob=still?0:Math.sin(time*0.0008)*4;
+  const afloat=waterY-8*size;                       // the hull rides low in the water
+  const y=overrideY===null?mix(afloat,h*0.575+bob,dive):overrideY;
+  const pitch=overrideY===null?sinkSmooth*0.36*(0.35+0.65*dive)+(still?0:Math.sin(time*0.0011)*0.045*surf):0;
+  if(overrideY===null&&y-58*size<waterY+4){
+    ctx.save();clipSea(w,h,time,depth,true);paintCraft(x,y,size,time,depth,still,panic,pitch,surf);ctx.restore();
+    ctx.save();clipSea(w,h,time,depth,false);ctx.globalAlpha=0.5;paintCraft(x,y,size,time,depth,still,panic,pitch,surf);ctx.restore();
+    drawBoatFoam(x,waterY,size,time,still);
+  } else paintCraft(x,y,size,time,depth,still,panic,pitch,surf);
+  craftBubbles(x,y,size,time,still,overrideX,overrideY===null?waterY+2:-1e9);
+}
+
+function paintCraft(x,y,size,time,depth,still,panic,pitch,mast) {
   const shake=still?0:Math.sin(time*0.073)*panic*5;
-  ctx.save();ctx.translate(x+shake,y+Math.cos(time*0.061)*panic*2);ctx.scale(size,size);
+  ctx.save();ctx.translate(x+shake,y+Math.cos(time*0.061)*panic*2);ctx.rotate(pitch);ctx.scale(size,size);
 
   // The craft lamp becomes the key light as the sunlight disappears.
   const flicker=panic>0&&!still?0.68+0.32*Math.sin(time*0.046):1;
@@ -1165,13 +1315,26 @@ function drawSubmersible(w,h,time,depth,still,panic=0,overrideX=null,overrideY=n
   ctx.beginPath();ctx.moveTo(-28,-16);ctx.quadraticCurveTo(3,-28,35,-15);ctx.stroke();
   ctx.fillStyle='#0d2638';ctx.beginPath();ctx.roundRect(-28,20,50,8,4);ctx.fill();
   ctx.fillStyle='#70d4dc';ctx.fillRect(-22,21,11,5);ctx.fillRect(-5,21,11,5);
+  if(mast>0.02){
+    // Antenna mast, flag and a blinking beacon while the craft is still on the surface.
+    ctx.globalAlpha=Math.min(1,mast*1.5);
+    ctx.strokeStyle='#d8e8e6';ctx.lineWidth=2.6;ctx.beginPath();ctx.moveTo(-14,-26);ctx.lineTo(-14,-66);ctx.stroke();
+    ctx.fillStyle='#ff9a3c';ctx.beginPath();ctx.moveTo(-14,-66);ctx.lineTo(8,-60);ctx.lineTo(-14,-52);ctx.closePath();ctx.fill();
+    const on=still||Math.sin(time*0.006)>0;
+    ctx.fillStyle=on?'#ff5a4a':'#7a2a28';ctx.beginPath();ctx.arc(-14,-68,3.2,0,TAU);ctx.fill();
+    if(on){const g=ctx.createRadialGradient(-14,-68,0,-14,-68,16);g.addColorStop(0,'rgba(255,110,90,0.55)');g.addColorStop(1,'rgba(255,110,90,0)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(-14,-68,16,0,TAU);ctx.fill();}
+    ctx.globalAlpha=1;
+  }
   ctx.restore();
+}
 
+function craftBubbles(x,y,size,time,still,overrideX,minY=-1e9) {
   if(!still){
-    for(let i=0;i<4;i++){
+    const n=4+Math.round(sinkSmooth*8);
+    for(let i=0;i<n;i++){
       const bx=x-size*46+Math.sin(time*0.002+i)*5;
       const by=y+size*(10-i*5)-((time*0.04+i*23)%68);
-      drawBubble(bx,by,2.4+i*0.7,0.5);
+      if(by>minY)drawBubble(bx,by,Math.min(5.5,2.4+i*0.5),0.5);
     }
   }
   if(overrideX!==null && eventScene?.kind==='predator' && eventScene.p>0.82){
@@ -1606,6 +1769,8 @@ function frame(time) {
     visualStage+=(targetStage-visualStage)*blend;
     visualDepth+=(targetStage-visualDepth)*(1-Math.exp(-delta/1550));
   } else if(!frozenTime) frozenTime=time;
+  if(still)sinkSmooth=0;
+  else sinkSmooth+=(clamp((targetStage-visualDepth)*16,0,1)-sinkSmooth)*(1-Math.exp(-delta/260));
   const t=still?(frozenTime||time):time;
   const predatorEvent=eventScene?.kind==='predator';
   const predatorT=predatorEvent?clamp((t-eventScene.start)/eventScene.duration,0,1):0;
@@ -1617,6 +1782,7 @@ function frame(time) {
 
   const swayX=still?0:Math.sin(t*0.00016)*w*0.004;
   const driftY=visualStage*h*0.035+(still?0:Math.sin(t*0.00019)*h*0.0025);
+  camDriftY=driftY;
   ctx.save();
   ctx.translate(swayX+hitShake,-driftY+Math.cos(t*0.071)*impact*5);
   drawReefAndKelp(w,h,t,visualDepth,still);
@@ -1656,6 +1822,21 @@ function frame(time) {
   // Pressure darkens the edge of the lens progressively with depth.
   const pressure=0.12+visualDepth*0.34;
   ctx.fillStyle=`rgba(0,2,8,${pressure*0.22})`;ctx.fillRect(0,0,w,h);
+  checkZoneBanner(time);
   if(!document.hidden) rafHandle=requestAnimationFrame(frame);
   else frameStarted=false;
+}
+
+/* ---- Zone banner: names each new depth as the dive enters it ---- */
+const BANNER_ZONES=[{at:0,name:'Sunlight zone'},{at:0.1,name:'Twilight zone'},{at:0.375,name:'Midnight zone'},{at:0.875,name:'The abyss'}];
+let bannerZone=0,bannerCheck=0,bannerEl=null;
+function checkZoneBanner(time) {
+  if(time-bannerCheck<250)return;bannerCheck=time;
+  let z=0;for(let i=0;i<BANNER_ZONES.length;i++)if(visualDepth>=BANNER_ZONES[i].at+0.012)z=i;
+  if(z===bannerZone)return;
+  const deeper=z>bannerZone;bannerZone=z;
+  if(!deeper||!document.getElementById('game')?.classList.contains('active'))return;
+  if(!bannerEl){bannerEl=document.createElement('div');bannerEl.className='zone-banner';bannerEl.setAttribute('aria-hidden','true');document.body.appendChild(bannerEl);}
+  bannerEl.innerHTML='<small>Entering</small><b></b>';bannerEl.lastChild.textContent=BANNER_ZONES[z].name;
+  bannerEl.classList.remove('show');void bannerEl.offsetWidth;bannerEl.classList.add('show');
 }

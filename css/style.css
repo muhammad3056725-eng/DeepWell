@@ -444,3 +444,11 @@ body[data-zone="sunlight"] .brand,body[data-zone="sunlight"] .eyebrow,body[data-
 body[data-zone="sunlight"] .hero-title,body:not([data-zone]) .hero-title{background:linear-gradient(180deg,#fff 40%,#ffe7ae);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 14px rgba(40,20,0,.45))}
 body[data-zone="sunlight"] .zone-label,body:not([data-zone]) .zone-label{color:#fffaf0;text-shadow:0 1px 3px rgba(60,25,0,.6)}
 body[data-zone="sunlight"] .hero-sub,body:not([data-zone]) .hero-sub{color:#f3fbff;text-shadow:0 1px 6px rgba(0,30,50,.55)}
+
+/* Zone banner shown when the dive crosses into a deeper zone */
+.zone-banner{position:fixed;left:50%;top:21%;transform:translateX(-50%);z-index:4;pointer-events:none;text-align:center;opacity:0;white-space:nowrap}
+.zone-banner small{display:block;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:#fff;opacity:.8;text-shadow:0 1px 8px rgba(0,0,20,.7)}
+.zone-banner b{display:block;margin-top:6px;font-size:clamp(24px,7vw,40px);letter-spacing:.14em;text-transform:uppercase;color:var(--zone-accent);text-shadow:0 0 22px var(--zone-glow),0 2px 12px rgba(0,0,20,.7)}
+.zone-banner.show{animation:zoneBanner 3.6s ease forwards}
+@keyframes zoneBanner{0%{opacity:0;transform:translate(-50%,10px) scale(.96)}18%{opacity:1;transform:translate(-50%,0) scale(1)}72%{opacity:1}100%{opacity:0;transform:translate(-50%,-8px) scale(1.02)}}
+@media (prefers-reduced-motion:reduce){.zone-banner.show{animation-duration:.01s;opacity:1}}
