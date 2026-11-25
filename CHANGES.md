@@ -15,6 +15,11 @@
 
 # Changes: famous answers, mobile lag, data build (2026-11-23)
 
+## 2026-11-25 — Wrong answers no longer end the question
+
+- A wrong (unrecognised) or already-used answer now shakes the field, clears it and lets the player try again while the timer keeps running. The question only ends on a correct answer or when time runs out (then 0 pts, as before).
+- The results list shows what was tried on a timed-out question.
+
 ## 2026-11-25 — Progress steps, tier flash and dive log (ideas from a Krillion design guide, own look)
 
 - **Seven progress steps** above each question. They fill in the rarity-tier colour as you answer; a miss leaves a dashed mark and the current step glows.

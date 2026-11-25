@@ -479,3 +479,8 @@ body[data-zone="sunlight"] .hero-sub,body:not([data-zone]) .hero-sub{color:#f3fb
 .dl-halo{fill:currentColor;opacity:.22}
 .dl-orb{fill:currentColor;stroke:#fff;stroke-width:1}
 .dl-miss{fill:none;stroke:rgba(190,205,230,.6);stroke-width:1.5;stroke-dasharray:3 3}
+
+/* Wrong answer: the field shakes and flashes red, but the question stays open until the timer ends */
+.answer-row input.wrong{animation:wrongShake .38s ease;border-color:#ff6f91;box-shadow:0 0 0 3px rgba(255,111,145,.28)}
+@keyframes wrongShake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+@media (prefers-reduced-motion:reduce){.answer-row input.wrong{animation:none}}
