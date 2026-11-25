@@ -2,7 +2,7 @@
 // All visuals are generated live with Canvas 2D paths, gradients, lighting and particles.
 // No 3D engine, images, video, sprite sheets or downloaded models.
 import { CONFIG } from './config.js';
-import { predatorGulp, rareSparkle } from './audio.js?v=fair-dives-20261124';
+import { predatorGulp, rareSparkle } from './audio.js?v=trench-palette-20261125';
 
 const canvas = document.getElementById('scene');
 const mainCtx = canvas?.getContext('2d', { alpha: false });
@@ -313,11 +313,13 @@ export function triggerAnswerVisual(points, state) {
 export function triggerPredatorAttack() { triggerAnswerVisual(0,'miss'); }
 
 const WATER_ZONES = [
-  {at:0,colors:['#174e5a','#0c4052','#082536']},
-  {at:0.10,colors:['#0d4c68','#0b3b54','#052337']},
-  {at:0.375,colors:['#163c64','#102c50','#07182d']},
-  {at:0.875,colors:['#171e4a','#0b1530','#020818']},
-  {at:1,colors:['#17162f','#080b1d','#00040d']}
+  // "Bioluminescent Trench": turquoise shallows -> cobalt -> indigo -> violet ink. Never flat black, so the dive
+  // keeps its colour all the way down and glowing creatures pop against it.
+  {at:0,colors:['#1bb0b4','#0b7894','#06455f']},
+  {at:0.10,colors:['#0f66b5','#0a4a8e','#062c5c']},
+  {at:0.375,colors:['#2a3fb0','#1b2b80','#0c1552']},
+  {at:0.875,colors:['#4b2a9c','#2b1672','#120a3c']},
+  {at:1,colors:['#33165e','#1a0b3f','#08031d']}
 ];
 
 function mixHex(a,b,t) {

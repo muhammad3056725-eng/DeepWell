@@ -2,11 +2,11 @@
 //   1. pre-built pack   data/packs/<id>.json  (built from Wikidata by scripts/build-data.mjs)
 //   2. offline seed     js/seed.js            (small hand-curated fallback bundled with the site)
 //   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Dive)
-import { CONFIG } from './config.js?v=fair-dives-20261124';
-import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=fair-dives-20261124';
+import { CONFIG } from './config.js?v=trench-palette-20261125';
+import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=trench-palette-20261125';
 import { SEED } from './seed.js';
-import { fetchLive, fromPack } from './wikidata.js?v=fair-dives-20261124';
-import { normalize } from './engine.js?v=fair-dives-20261124';
+import { fetchLive, fromPack } from './wikidata.js?v=trench-palette-20261125';
+import { normalize } from './engine.js?v=trench-palette-20261125';
 
 let manifest = { version: 0, built: null, packs: {} };
 let meta = null; // data/prompt-meta.json: per-prompt difficulty level, optional
