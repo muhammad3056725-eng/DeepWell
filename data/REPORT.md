@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-24 · Manifest version: 29
-Packs: 581 · Answers: 346,133 · Pack bytes: 21,891,861 (20.88 MiB) / 60 MiB
+Built: 2026-11-25 · Manifest version: 30
+Packs: 581 · Answers: 353,153 · Pack bytes: 22,894,289 (21.83 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 581 · Answers: 346,133 · Pack bytes: 21,891,861 (20.88 MiB) / 60 MiB
 | Film & TV | 11 | 8735 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
-| Geography | 174 | 103203 | 724 |
+| Geography | 174 | 110223 | 724 |
 | History | 18 | 13503 | 949.5 |
 | Language | 10 | 4383 | 251 |
 | Literature | 12 | 10458 | 971 |
@@ -56,26 +56,26 @@ Packs: 581 · Answers: 346,133 · Pack bytes: 21,891,861 (20.88 MiB) / 60 MiB
 
 | Prompt | Rejected | Rate |
 |---|---:|---:|
+| cathedral | 23 | 1.2% |
 | capital | 2 | 0.9% |
 | bird-starts-a | 1 | 0.2% |
 | desert | 1 | 0.1% |
+| stadium | 2 | 0.1% |
 | bird-starts-c | 1 | 0.1% |
 | strait | 1 | 0.1% |
 | volcano | 1 | 0.1% |
 | waterfall | 1 | 0.1% |
+| skyscraper | 1 | 0.1% |
 | mountain-range | 1 | 0.1% |
-| national-park | 1 | 0.1% |
+| lighthouse | 1 | 0.1% |
 | city | 1 | 0.1% |
+| national-park | 1 | 0.1% |
 | country | 0 | 0.0% |
 | island | 0 | 0.0% |
 | river | 0 | 0.0% |
 | mountain | 0 | 0.0% |
 | lake | 0 | 0.0% |
 | sea | 0 | 0.0% |
-| peninsula | 0 | 0.0% |
-| bay | 0 | 0.0% |
-| glacier | 0 | 0.0% |
-| canyon | 0 | 0.0% |
 
 ## Fallback packs
 
@@ -85,7 +85,23 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
+| capital | 1 | 0 |
+| city | 3 | 3 |
+| volcano | 2 | 0 |
+| waterfall | 2 | 0 |
+| national-park | 14 | 9 |
+| peninsula | 4 | 4 |
+| glacier | 1005 | 1 |
+| canyon | 252 | 1 |
+| archipelago | 37 | 2 |
+| world-heritage | 609 | 0 |
+| airport | 1003 | 1 |
+| stadium | 1049 | 39 |
+| castle | 42 | 0 |
+| skyscraper | 996 | 0 |
+| cathedral | 1099 | 31 |
+| lighthouse | 993 | 0 |
 
 ## Repository size check
 
-Raw data/packs size: 21,891,861 bytes (20.88 MiB); budget 60 MiB.
+Raw data/packs size: 22,894,289 bytes (21.83 MiB); budget 60 MiB.
