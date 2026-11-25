@@ -1,66 +1,144 @@
 {
-  "stoppedAt": 57,
+  "stoppedAt": 80,
   "skipped": [],
   "failed": [
-    "city-in-united-states: prompt time cap reached",
-    "city-in-australia: prompt time cap reached",
-    "city-in-france: prompt time cap reached",
-    "city-in-brazil: prompt time cap reached"
+    "city-in-ireland: prompt time cap reached",
+    "city-in-colombia: prompt time cap reached"
   ],
-  "built": 8,
-  "unchanged": 13,
+  "built": 21,
+  "unchanged": 0,
   "fallback": [
-    "city-in-canada",
-    "city-in-united-kingdom",
-    "city-in-germany",
-    "city-in-spain",
-    "city-in-china"
+    "city-in-pakistan",
+    "city-in-nigeria",
+    "city-in-south-africa",
+    "city-in-indonesia",
+    "city-in-philippines",
+    "city-in-vietnam",
+    "city-in-thailand"
   ],
   "previousRetained": [],
   "rejected": {
-    "zoo": {
-      "invalid": 1,
+    "city-in-russia": {
+      "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "amusement-park": {
+    "city-in-pakistan": {
       "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-turkey": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-egypt": {
+      "invalid": 1,
       "blocked": 0,
       "duplicate": 1,
       "wrongClass": 0
     },
-    "historical-country": {
+    "city-in-nigeria": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-canada": {
+    "city-in-south-africa": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-united-kingdom": {
+    "city-in-argentina": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-germany": {
+    "city-in-netherlands": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-spain": {
+    "city-in-poland": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-china": {
+    "city-in-sweden": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-indonesia": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-iran": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-saudi-arabia": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-philippines": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-vietnam": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-thailand": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-south-korea": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-new-zealand": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-greece": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-portugal": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-ukraine": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
