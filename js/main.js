@@ -1,16 +1,16 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js?v=living-dive-20261125';
-import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=living-dive-20261125';
-import { loadManifest } from './data.js?v=living-dive-20261125';
-import { prepareDive, examples } from './game.js?v=living-dive-20261125';
+import { CONFIG } from './config.js?v=hud-steps-20261125';
+import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=hud-steps-20261125';
+import { loadManifest } from './data.js?v=hud-steps-20261125';
+import { prepareDive, examples } from './game.js?v=hud-steps-20261125';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=living-dive-20261125';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=living-dive-20261125';
-import { wake, tone, buzz } from './audio.js?v=living-dive-20261125';
+import * as S from './state.js?v=hud-steps-20261125';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=hud-steps-20261125';
+import { wake, tone, buzz } from './audio.js?v=hud-steps-20261125';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=living-dive-20261125';
+} from './ui.js?v=hud-steps-20261125';
 
 let run = null; // the dive in progress
 let timerRaf = 0;
@@ -69,6 +69,7 @@ function nextPrompt() {
   $('promptText').textContent = p.text;
   $('feedback').textContent = '';
   updateSwapUI();
+  paintSteps();
   const input = $('answerInput');
   input.value = ''; input.disabled = false; $('submitBtn').disabled = false; input.focus();
   startTimer();
@@ -198,8 +199,30 @@ async function resolve(item, value) {
   updateDepthUI(mine.depth);
   // Visual-only rarity encounter. Answer points/state are read; scoring and progression are untouched.
   triggerAnswerVisual(points, state);
+  flashTier(points, state);
   mine.index++;
+  paintSteps();
   setTimeout(() => { if (run === mine) nextPrompt(); }, 1100);
+}
+
+/* ---- Per-prompt progress steps and the tier flash shown after each answer ---- */
+function paintSteps() {
+  const box = $('steps'); if (!box || !run) return;
+  const n = CONFIG.PROMPTS_PER_DIVE;
+  while (box.children.length < n) box.appendChild(document.createElement('i'));
+  for (let i = 0; i < n; i++) {
+    const a = run.answers[i];
+    box.children[i].className = a ? (a.points ? 'done ' + tierClass(a.tier) : 'miss') : (i === run.index ? 'now' : '');
+  }
+}
+let tierFlashEl = null;
+function flashTier(points, state) {
+  if (!tierFlashEl) { tierFlashEl = document.createElement('div'); tierFlashEl.className = 'tier-flash'; tierFlashEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(tierFlashEl); }
+  const b = document.createElement('b'), small = document.createElement('small');
+  if (points > 0) { b.textContent = tier(points); b.className = tierClass(tier(points)); small.textContent = `+${points} pts · sink ${Math.round(points * CONFIG.POINTS_PER_METER)} m`; }
+  else { b.textContent = state === 'repeat' ? 'Repeat' : 'Miss'; b.className = 'miss'; small.textContent = 'no depth this time'; }
+  tierFlashEl.replaceChildren(b, small);
+  tierFlashEl.classList.remove('show'); void tierFlashEl.offsetWidth; tierFlashEl.classList.add('show');
 }
 
 /* ---------------------------------------------------------------- finishing */
