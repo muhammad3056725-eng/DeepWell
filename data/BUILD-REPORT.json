@@ -1,111 +1,69 @@
 {
-  "stoppedAt": 32,
+  "stoppedAt": 57,
   "skipped": [],
-  "failed": [],
-  "built": 16,
-  "unchanged": 16,
+  "failed": [
+    "city-in-united-states: prompt time cap reached",
+    "city-in-australia: prompt time cap reached",
+    "city-in-france: prompt time cap reached",
+    "city-in-brazil: prompt time cap reached"
+  ],
+  "built": 8,
+  "unchanged": 13,
   "fallback": [
-    "waterfall",
-    "peninsula",
-    "airport",
-    "castle"
+    "city-in-canada",
+    "city-in-united-kingdom",
+    "city-in-germany",
+    "city-in-spain",
+    "city-in-china"
   ],
   "previousRetained": [],
   "rejected": {
-    "capital": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 2,
-      "wrongClass": 0
-    },
-    "city": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "volcano": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "waterfall": {
+    "zoo": {
       "invalid": 1,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "national-park": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "peninsula": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "glacier": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "canyon": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "archipelago": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "world-heritage": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "airport": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "stadium": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 2,
-      "wrongClass": 0
-    },
-    "castle": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "skyscraper": {
+    "amusement-park": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 1,
       "wrongClass": 0
     },
-    "cathedral": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 22,
-      "wrongClass": 0
-    },
-    "lighthouse": {
+    "historical-country": {
       "invalid": 0,
       "blocked": 0,
-      "duplicate": 1,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-canada": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-united-kingdom": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-germany": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-spain": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-china": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
       "wrongClass": 0
     }
   }
