@@ -15,6 +15,13 @@
 
 # Changes: famous answers, mobile lag, data build (2026-11-23)
 
+## 2026-11-25 — A living dive
+
+- **A boat on the sea.** The game now starts with the craft floating on the surface (mast, flag, blinking beacon, ripples). Each correct answer sinks it: it tips nose-down, splashes through the waterline, trails bubbles, and plankton streams upward while it descends.
+- **Scenes change as you go deeper.** A banner names each new zone ("Entering Twilight zone"). Wildlife belongs to its zone and swaps slowly: sunlight reef (clownfish, blue tang, butterflyfish, anthias, pufferfish), twilight hunters (tuna, mahi-mahi, snapper, lionfish), midnight (hatchetfish, lanternfish, viperfish, jellyfish), abyss (anglerfish with glowing lure, gulper, blue lanternfish, ghost eel).
+- **Real fish, not silhouettes.** Real colour schemes, fuller bodies, smaller natural fins, glowing light organs for deep species, crisper cached sprites. They swim sideways in the direction they face, in their own lanes, nearer fish faster and brighter.
+- Fish counts were reduced slightly (High 18, Medium 10, Low 7) so the water is not crowded. Measured at 4x CPU throttle: Low about 54 fps, Medium about 29 fps (previously 55 / 32).
+
 ## 2026-11-25 — Data build now targets the real question lists
 
 - The automatic Wikidata rebuild was spending almost all its time on ~9,500 "starts with <letter>" variants whose pools are tiny (the last run built 0 packs). The game already derives letter questions from the main answer list, so the build now skips them by default (`--letters` or `--only` brings them back).

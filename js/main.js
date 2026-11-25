@@ -1,16 +1,16 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js?v=trench-palette-20261125';
-import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=trench-palette-20261125';
-import { loadManifest } from './data.js?v=trench-palette-20261125';
-import { prepareDive, examples } from './game.js?v=trench-palette-20261125';
+import { CONFIG } from './config.js?v=living-dive-20261125';
+import { matchAnswer, tier, blendPoints, utcDate } from './engine.js?v=living-dive-20261125';
+import { loadManifest } from './data.js?v=living-dive-20261125';
+import { prepareDive, examples } from './game.js?v=living-dive-20261125';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=trench-palette-20261125';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=trench-palette-20261125';
-import { wake, tone, buzz } from './audio.js?v=trench-palette-20261125';
+import * as S from './state.js?v=living-dive-20261125';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=living-dive-20261125';
+import { wake, tone, buzz } from './audio.js?v=living-dive-20261125';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=trench-palette-20261125';
+} from './ui.js?v=living-dive-20261125';
 
 let run = null; // the dive in progress
 let timerRaf = 0;
