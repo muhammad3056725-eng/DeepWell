@@ -403,3 +403,44 @@ body.quality-low .sub,body.quality-med .sub{filter:none}
 .lifeline span{display:inline-block;min-width:1.2em;margin-left:.3em;padding:.1em .45em;border-radius:999px;background:rgba(125,255,160,.18);text-align:center}
 .lifeline:hover:not(:disabled){background:rgba(125,255,160,.16)}
 .lifeline:disabled{opacity:.4;cursor:default}
+
+
+/* ---- "Bioluminescent Trench" colour theme ----
+   Same layout, richer colour: sunlight gold -> twilight aqua -> midnight violet -> abyss neon mint.
+   Panels stay deep navy with a glowing zone-coloured edge, the main button glows in the zone accent,
+   and the water never goes flat black. */
+body[data-zone="sunlight"]{--zone-accent:#ffc857;--zone-glow:rgba(255,200,87,.24);--zone-2:#ff8a5c}
+body[data-zone="twilight"]{--zone-accent:#52dcff;--zone-glow:rgba(82,220,255,.24);--zone-2:#7a8cff}
+body[data-zone="midnight"]{--zone-accent:#c68bff;--zone-glow:rgba(198,139,255,.28);--zone-2:#ff6fd0}
+body[data-zone="abyss"]{--zone-accent:#5dffc4;--zone-glow:rgba(93,255,196,.26);--zone-2:#4fd2ff}
+:root{--zone-2:#ff8a5c}
+.brand{color:var(--zone-accent);text-shadow:0 0 10px var(--zone-glow),0 0 28px var(--zone-glow);transition:color .6s}
+#game .prompt-panel,.panel{
+  background:linear-gradient(180deg,rgba(10,24,62,.82),rgba(4,9,30,.9));
+  border-color:color-mix(in srgb,var(--zone-accent) 38%,transparent);
+  box-shadow:0 18px 60px rgba(2,4,20,.55),0 0 0 1px rgba(255,255,255,.04) inset,0 0 44px var(--zone-glow);
+}
+.button.primary,#game .button.primary,#game .submit{
+  background:linear-gradient(135deg,var(--zone-accent),var(--zone-2));
+  color:#08122a;border-color:transparent;font-weight:800;letter-spacing:.01em;
+  box-shadow:0 8px 26px var(--zone-glow),inset 0 1px 0 rgba(255,255,255,.5);
+}
+.button.primary:hover,#game .button.primary:hover,#game .button.primary:focus-visible{
+  background:linear-gradient(135deg,var(--zone-accent),var(--zone-2));filter:brightness(1.12) saturate(1.1);transform:translateY(-2px);
+}
+.button:not(.primary){border-color:color-mix(in srgb,var(--zone-accent) 30%,transparent);background:rgba(12,28,70,.55)}
+.button:not(.primary):hover{border-color:var(--zone-accent);background:rgba(22,44,100,.7)}
+.answer-row input{background:rgba(2,6,24,.7);border-color:color-mix(in srgb,var(--zone-accent) 35%,transparent)}
+.answer-row input:focus{border-color:var(--zone-accent);box-shadow:0 0 0 3px var(--zone-glow),0 0 22px var(--zone-glow)}
+#game .timer{background:rgba(160,190,255,.16)}
+#game .timer>i{background:linear-gradient(90deg,var(--zone-accent),var(--zone-2));box-shadow:0 0 12px var(--zone-glow)}
+.lifeline{border-color:color-mix(in srgb,var(--zone-accent) 50%,transparent);color:var(--zone-accent);background:rgba(8,18,52,.6)}
+.hero-title{background:linear-gradient(180deg,#fff 30%,var(--zone-accent));-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 26px var(--zone-glow))}
+.eyebrow{color:var(--zone-accent)}
+.score{color:var(--zone-accent);text-shadow:0 0 34px var(--zone-glow)}
+/* Bright sunrise sky: light text with a soft dark halo so the brand, eyebrow and zone label stay readable. */
+body[data-zone="sunlight"] .brand,body[data-zone="sunlight"] .eyebrow,body[data-zone="sunlight"] .depth-chip,body:not([data-zone]) .brand,body:not([data-zone]) .eyebrow{
+  color:#fffaf0;text-shadow:0 1px 3px rgba(60,25,0,.55),0 0 18px rgba(60,25,0,.35)}
+body[data-zone="sunlight"] .hero-title,body:not([data-zone]) .hero-title{background:linear-gradient(180deg,#fff 40%,#ffe7ae);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 3px 14px rgba(40,20,0,.45))}
+body[data-zone="sunlight"] .zone-label,body:not([data-zone]) .zone-label{color:#fffaf0;text-shadow:0 1px 3px rgba(60,25,0,.6)}
+body[data-zone="sunlight"] .hero-sub,body:not([data-zone]) .hero-sub{color:#f3fbff;text-shadow:0 1px 6px rgba(0,30,50,.55)}

@@ -1,10 +1,10 @@
 // DOM helpers and screen renderers. No game rules live here.
-import { CONFIG } from './config.js?v=fair-dives-20261124';
-import { CATEGORIES } from './catalog.js?v=fair-dives-20261124';
-import { libraryStats } from './data.js?v=fair-dives-20261124';
-import { tierClass, utcDate } from './engine.js?v=fair-dives-20261124';
-import * as S from './state.js?v=fair-dives-20261124';
-import { setVolume } from './audio.js?v=fair-dives-20261124';
+import { CONFIG } from './config.js?v=trench-palette-20261125';
+import { CATEGORIES } from './catalog.js?v=trench-palette-20261125';
+import { libraryStats } from './data.js?v=trench-palette-20261125';
+import { tierClass, utcDate } from './engine.js?v=trench-palette-20261125';
+import * as S from './state.js?v=trench-palette-20261125';
+import { setVolume } from './audio.js?v=trench-palette-20261125';
 
 export const $ = id => document.getElementById(id);
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
