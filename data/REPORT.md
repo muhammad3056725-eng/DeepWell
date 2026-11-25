@@ -85,27 +85,6 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| city-in-russia | 169 | 1 |
-| city-in-pakistan | 4 | 1 |
-| city-in-turkey | 263 | 1 |
-| city-in-egypt | 39 | 1 |
-| city-in-nigeria | 4 | 0 |
-| city-in-argentina | 206 | 3 |
-| city-in-netherlands | 54 | 4 |
-| city-in-poland | 305 | 3 |
-| city-in-sweden | 18 | 0 |
-| city-in-iran | 92 | 1 |
-| city-in-saudi-arabia | 29 | 1 |
-| city-in-new-zealand | 2 | 0 |
-| city-in-greece | 302 | 3 |
-| city-in-ukraine | 448 | 1 |
-| city-in-south-africa | 10 | 1 |
-| city-in-indonesia | 273 | 8 |
-| city-in-vietnam | 13 | 0 |
-| city-in-thailand | 36 | 0 |
-| city-in-south-korea | 79 | 0 |
-| city-in-philippines | 42 | 0 |
-| city-in-portugal | 15 | 0 |
 
 ## Repository size check
 

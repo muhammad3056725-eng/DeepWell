@@ -1,148 +1,24 @@
 {
-  "stoppedAt": 80,
+  "stoppedAt": 97,
   "skipped": [],
   "failed": [
-    "city-in-ireland: prompt time cap reached",
-    "city-in-colombia: prompt time cap reached"
+    "city-in-chile: prompt time cap reached",
+    "city-in-peru: prompt time cap reached",
+    "city-in-kenya: prompt time cap reached",
+    "city-in-morocco: prompt time cap reached",
+    "city-in-bangladesh: prompt time cap reached",
+    "river-in-united-states: prompt time cap reached",
+    "river-in-canada: prompt time cap reached",
+    "river-in-india: prompt time cap reached",
+    "river-in-china: prompt time cap reached",
+    "river-in-russia: prompt time cap reached",
+    "river-in-brazil: prompt time cap reached",
+    "river-in-italy: prompt time cap reached",
+    "river-in-spain: prompt time cap reached"
   ],
-  "built": 21,
-  "unchanged": 0,
-  "fallback": [
-    "city-in-pakistan",
-    "city-in-nigeria",
-    "city-in-south-africa",
-    "city-in-indonesia",
-    "city-in-philippines",
-    "city-in-vietnam",
-    "city-in-thailand"
-  ],
+  "built": 0,
+  "unchanged": 4,
+  "fallback": [],
   "previousRetained": [],
-  "rejected": {
-    "city-in-russia": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-pakistan": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-turkey": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-egypt": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "city-in-nigeria": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-south-africa": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-argentina": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-netherlands": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-poland": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-sweden": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-indonesia": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-iran": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-saudi-arabia": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-philippines": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-vietnam": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-thailand": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-south-korea": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-new-zealand": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-greece": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-portugal": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-ukraine": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    }
-  }
+  "rejected": {}
 }
