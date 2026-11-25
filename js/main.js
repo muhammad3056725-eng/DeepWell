@@ -1,16 +1,16 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js?v=retry-timer-20261125';
-import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=retry-timer-20261125';
-import { loadManifest } from './data.js?v=retry-timer-20261125';
-import { prepareDive, examples } from './game.js?v=retry-timer-20261125';
+import { CONFIG } from './config.js?v=linked-20261125';
+import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=linked-20261125';
+import { loadManifest } from './data.js?v=linked-20261125';
+import { prepareDive, examples } from './game.js?v=linked-20261125';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=retry-timer-20261125';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=retry-timer-20261125';
-import { wake, tone, buzz } from './audio.js?v=retry-timer-20261125';
+import * as S from './state.js?v=linked-20261125';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=linked-20261125';
+import { wake, tone, buzz } from './audio.js?v=linked-20261125';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=retry-timer-20261125';
+} from './ui.js?v=linked-20261125';
 
 let run = null; // the dive in progress
 let timerRaf = 0;

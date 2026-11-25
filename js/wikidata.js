@@ -1,6 +1,9 @@
 // Wikidata query building + parsing. Shared by the browser (live mode) and
 // scripts/build-data.mjs (pre-built packs). Contains no DOM or Node-only APIs.
 
+/** Hard ceiling on answers per question (was 2,000). Large lists are split into chunk files by js/linked.js. */
+export const ANSWER_CAP = 20000;
+
 const Q = s => String(s).replace(/"/g, '');
 
 /** Build the SPARQL query for one catalog entry. */
@@ -10,7 +13,7 @@ export function buildQuery(entry, overrides = {}) {
   const limit = Math.max(1, Math.min(Number(overrides.limit ?? entry.limit ?? 5000), 5000));
   const maxSL = Number.isFinite(Number(overrides.maxSL)) && overrides.maxSL !== undefined ? `FILTER(?sl <= ${Math.max(1, Number(overrides.maxSL))})` : '';
   const offset = Math.max(0, Math.floor(Number(overrides.offset) || 0));
-  const answerLimit = Math.max(1, Math.min(Number(overrides.target ?? entry.target ?? entry.answerLimit ?? 2000), 2000));
+  const answerLimit = Math.max(1, Math.min(Number(overrides.target ?? entry.target ?? entry.answerLimit ?? 2000), ANSWER_CAP));
   const rawLetter = overrides.startsWith ?? entry.startsWith ?? null;
   const letter = /^[a-z]$/i.test(String(rawLetter || '')) ? String(rawLetter).toLowerCase() : null;
   if (entry.kind === 'taxon') {
@@ -86,7 +89,7 @@ export function parseBindings(json, entry) {
     if (entry.startsWith && !name.toLowerCase().startsWith(entry.startsWith.toLowerCase())) continue;
     out.push({ id, n: name, s, a: aliases.slice(0, 24) });
   }
-  const answerLimit = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, 2000));
+  const answerLimit = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, ANSWER_CAP));
   return out.slice(0, answerLimit);
 }
 
@@ -110,7 +113,7 @@ export function mergePools(existingItems = [], freshItems = [], entry = {}) {
   };
   for (const item of existingItems) upsert(item);
   for (const item of freshItems) upsert(item);
-  const cap = Math.max(1,Math.min(Number(entry.target ?? entry.answerLimit)||2000,2000));
+  const cap = Math.max(1,Math.min(Number(entry.target ?? entry.answerLimit)||2000,ANSWER_CAP));
   const names = new Set();
   return [...byId.values()].sort((a,b)=>b.s-a.s||a.n.localeCompare(b.n)).filter(item=>{
     const key=item.n.trim().toLowerCase();
@@ -143,7 +146,7 @@ export async function fetchLive(entry, { endpoint, timeoutMs = 9000, fetchImpl =
 
 /** Compact v2 packs; the reader continues to accept legacy v1 files. */
 export function toPack(entry, items) {
-  const cap = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, 2000));
+  const cap = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, ANSWER_CAP));
   const rows = items.slice(0, cap), aliases = {};
   rows.forEach((item, i) => { if (item.a?.length) aliases[i] = item.a; });
   return { v: 2, id: entry.id, built: new Date().toISOString().slice(0,10),

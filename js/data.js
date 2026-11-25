@@ -2,11 +2,12 @@
 //   1. pre-built pack   data/packs/<id>.json  (built from Wikidata by scripts/build-data.mjs)
 //   2. offline seed     js/seed.js            (small hand-curated fallback bundled with the site)
 //   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Dive)
-import { CONFIG } from './config.js?v=retry-timer-20261125';
-import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=retry-timer-20261125';
+import { CONFIG } from './config.js?v=linked-20261125';
+import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=linked-20261125';
 import { SEED } from './seed.js';
-import { fetchLive, fromPack } from './wikidata.js?v=retry-timer-20261125';
-import { normalize } from './engine.js?v=retry-timer-20261125';
+import { fetchLive, fromPack, ANSWER_CAP } from './wikidata.js?v=linked-20261125';
+import { loadLinkedItems } from './linked.js?v=linked-20261125';
+import { normalize } from './engine.js?v=linked-20261125';
 
 let manifest = { version: 0, built: null, packs: {} };
 let meta = null; // data/prompt-meta.json: per-prompt difficulty level, optional
@@ -63,11 +64,18 @@ export function parseSeed(entry) {
 }
 
 async function fromPackFile(entry) {
-  const res = await fetch(`${CONFIG.PACK_DIR}/${entry.id}.json?v=${manifest.version || 0}`);
-  if (!res.ok) throw new Error('pack ' + res.status);
-  let items = fromPack(await res.json());
+  const meta = manifest.packs[entry.id];
+  let items;
+  if (meta?.shard) {
+    // Linked store (v3): the answers live in shared chunk files, one row per answer, many questions per row.
+    items = await loadLinkedItems(meta, manifest);
+  } else {
+    const res = await fetch(`${CONFIG.PACK_DIR}/${entry.id}.json?v=${manifest.version || 0}`);
+    if (!res.ok) throw new Error('pack ' + res.status);
+    items = fromPack(await res.json());
+  }
   if (entry.startsWith) items = items.filter(i => i.n.toLowerCase().startsWith(entry.startsWith.toLowerCase()));
-  const answerLimit = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, 2000));
+  const answerLimit = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, ANSWER_CAP));
   items = items.slice(0, answerLimit);
   if (items.length < Math.min(entry.minPool || 20, 8)) throw new Error('pack too small');
   return { items, source: 'wikidata' };

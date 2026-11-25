@@ -484,3 +484,8 @@ body[data-zone="sunlight"] .hero-sub,body:not([data-zone]) .hero-sub{color:#f3fb
 .answer-row input.wrong{animation:wrongShake .38s ease;border-color:#ff6f91;box-shadow:0 0 0 3px rgba(255,111,145,.28)}
 @keyframes wrongShake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
 @media (prefers-reduced-motion:reduce){.answer-row input.wrong{animation:none}}
+
+/* Star on GitHub link: an <a> that looks like the other secondary buttons */
+a.button.star-btn{display:inline-flex;align-items:center;justify-content:center;gap:.45em;text-decoration:none;cursor:pointer}
+a.button.star-btn span{color:#ffd166;font-size:1.1em;line-height:1}
+a.button.star-btn:hover span,a.button.star-btn:focus-visible span{filter:drop-shadow(0 0 6px rgba(255,209,102,.8))}
