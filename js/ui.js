@@ -1,5 +1,5 @@
 // DOM helpers and screen renderers. No game rules live here.
-import { CONFIG } from './config.js?v=linked-20261125';
+import { CONFIG, sinkMetres } from './config.js?v=linked-20261125';
 import { CATEGORIES } from './catalog.js?v=linked-20261125';
 import { libraryStats } from './data.js?v=linked-20261125';
 import { tierClass, utcDate } from './engine.js?v=linked-20261125';
@@ -150,7 +150,7 @@ export function readSettingsUI() {
 /** Vertical drop chart: one line per prompt falling as far as its points earned, ending in a glowing orb in the tier colour. */
 function diveLogSvg(run) {
   const n = CONFIG.PROMPTS_PER_DIVE, W = 320, H = 150, top = 20, bottom = 24, left = 54, right = 12;
-  const plotH = H - top - bottom, gap = (W - left - right) / n, metres = p => Math.round(p * CONFIG.POINTS_PER_METER);
+  const plotH = H - top - bottom, gap = (W - left - right) / n, metres = p => sinkMetres(p);
   // The scale adapts to the dive (at least 40 points tall) so even a run of common answers draws a readable drop.
   const scalePts = Math.max(40, Math.ceil(Math.max(0, ...run.answers.map(a => a.points)) * 1.15)), maxM = metres(scalePts), ticks = [0, 0.5, 1];
   let g = '';

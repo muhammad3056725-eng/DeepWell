@@ -1,5 +1,5 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG } from './config.js?v=linked-20261125';
+import { CONFIG, sinkMetres } from './config.js?v=linked-20261125';
 import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=linked-20261125';
 import { loadManifest } from './data.js?v=linked-20261125';
 import { prepareDive, examples } from './game.js?v=linked-20261125';
@@ -205,7 +205,7 @@ async function resolve(item, value) {
   }
   if (run !== mine) return;
   if (state !== 'hit') tone(110, 0.16);
-  mine.depth += points * CONFIG.POINTS_PER_METER;
+  mine.depth += sinkMetres(points);
   mine.answers.push({
     prompt: p.text, input: value || (mine.tries.length ? mine.tries.join(' / ') : '(no answer)'), name: item?.n || '', points, tier: tier(points), state,
     examples: examples(p.pool),
@@ -251,7 +251,7 @@ let tierFlashEl = null;
 function flashTier(points, state) {
   if (!tierFlashEl) { tierFlashEl = document.createElement('div'); tierFlashEl.className = 'tier-flash'; tierFlashEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(tierFlashEl); }
   const b = document.createElement('b'), small = document.createElement('small');
-  if (points > 0) { b.textContent = tier(points); b.className = tierClass(tier(points)); small.textContent = `+${points} pts · sink ${Math.round(points * CONFIG.POINTS_PER_METER)} m`; }
+  if (points > 0) { b.textContent = tier(points); b.className = tierClass(tier(points)); small.textContent = `+${points} pts · sink ${sinkMetres(points).toLocaleString()} m`; }
   else { b.textContent = state === 'repeat' ? 'Repeat' : 'Miss'; b.className = 'miss'; small.textContent = 'no depth this time'; }
   tierFlashEl.replaceChildren(b, small);
   tierFlashEl.classList.remove('show'); void tierFlashEl.offsetWidth; tierFlashEl.classList.add('show');
