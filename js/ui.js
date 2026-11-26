@@ -65,7 +65,7 @@ export function renderHome() {
   $('countdown').textContent = `Next daily in ${untilReset()} · ${today ? 'come back tomorrow' : 'a fresh flight awaits'}`;
   const st = libraryStats();
   $('library').textContent = st.packs
-    ? `${st.prompts.toLocaleString()} broad questions · ${(st.unique || st.answers).toLocaleString()} answers · updated ${st.built}`
+    ? `${st.stable.toLocaleString()} broad questions · ${(st.unique || st.answers).toLocaleString()} answers · updated ${st.built}`
     : `Starter set: ${st.stable} offline-ready prompts · ${st.prompts.toLocaleString()} question prompts available for live Endless play.`;
 }
 
