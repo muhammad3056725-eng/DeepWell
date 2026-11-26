@@ -6,8 +6,8 @@ export const CONFIG = {
   // Dive shape
   PROMPTS_PER_DIVE: 7,
   DAILY_SECONDS: 20,
-  POINTS_PER_METER: 10,
-  MAX_DEPTH_VISUAL: 4000, // metres at which the scene is fully "deep"
+  POINTS_PER_METER: 15,
+  MAX_DEPTH_VISUAL: 3200, // metres at which the scene is fully "deep"
 
   // Data sources (all relative to the site root)
   MANIFEST_URL: 'data/manifest.json',
