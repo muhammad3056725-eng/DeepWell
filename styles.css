@@ -1,14 +1,13 @@
 /* deepwell.games — game-selection hub.
-   Clean UI (owner directive, Nov 26, 2026): two selectable game
+   Clean UI (owner directive, Nov 26, 2026): four selectable game
    cards over a code-drawn pixel SPACE backdrop (hub-bg.svg —
    starfield, nebulae, a ringed planet, radar rings and a telemetry
    grid, drawn in code; NOT the advertising poster, which stays off
-   this page). Both games are space games (owner correction, Nov 26,
-   2026): APOGEE (Deepwell) is a trivia space flight, NEXUS RELAY a
-   deep-space telemetry deduction. Each card's identity is carried
-   by colour and typography: Apogee's violet nebula flight on the
-   left, Nexus Relay's Hi-Bit CRT console on the right. No build
-   step; the only asset is the background SVG. */
+   this page). Each card's identity is carried by colour and
+   typography: Apogee's violet nebula flight, Nexus Relay's Hi-Bit
+   CRT console, Hype Riot's neon pixel arcade, and Lumen Vault's
+   Kinetic Obsidian & Liquid Brass. No build step; the only asset
+   is the background SVG. */
 
 :root {
   --abyss: #020309;
@@ -19,6 +18,14 @@
   --nexus-navy: #0b132b;
   --nexus-cyan: #00d4ff;
   --nexus-amber: #ff9f1c;
+  --hype-pink: #ff2e88;
+  --hype-yellow: #ffe93d;
+  --hype-deep: #16041f;
+  --lumen-obsidian: #0b0d14;
+  --lumen-glass: #161a26;
+  --lumen-brass: #e5c17b;
+  --lumen-cream: #f7f3ea;
+  --lumen-teal: #3fe0c5;
   --ink: #e8f1f5;
   --muted: #97a0bd;
 }
@@ -74,7 +81,7 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
   width: 100%;
-  max-width: 62rem;
+  max-width: 84rem;
   margin-top: 2.5rem;
 }
 
@@ -197,6 +204,57 @@ body {
   color: #231300;
   border-radius: 6px;
   box-shadow: 0 0 0 2px #05080f, 0 0 0 4px var(--nexus-amber), 0 10px 22px rgba(255, 159, 28, 0.3);
+}
+
+/* ---------- Hype Riot card: neon pixel arcade ---------- */
+
+.card-hype {
+  background: linear-gradient(165deg, #33093b 0%, #1d0529 52%, var(--hype-deep) 100%);
+  box-shadow: 0 18px 50px rgba(20, 2, 30, 0.65);
+  font-family: "Courier New", ui-monospace, monospace;
+}
+.card-hype .card-kicker { color: var(--hype-yellow); }
+
+.hype-title {
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  letter-spacing: 0.08em;
+  color: var(--hype-pink);
+  text-shadow: 0 0 18px rgba(255, 46, 136, 0.6), 3px 3px 0 rgba(255, 233, 61, 0.4);
+}
+.card-hype .card-blurb { color: #f3d3ec; }
+.card-hype .card-facts { color: #c99cc9; }
+
+.cta-hype {
+  background: var(--hype-pink);
+  color: #2b0215;
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px var(--hype-deep), 0 0 0 4px var(--hype-pink), 0 10px 22px rgba(255, 46, 136, 0.35);
+}
+
+/* ---------- Lumen Vault card: Kinetic Obsidian & Liquid Brass ---------- */
+
+.card-lumen {
+  background: linear-gradient(170deg, var(--lumen-glass) 0%, var(--lumen-obsidian) 60%, #05060a 100%);
+  border: 1px solid rgba(229, 193, 123, 0.35);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+.card-lumen .card-kicker { color: var(--lumen-brass); }
+
+.lumen-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--lumen-brass);
+  text-shadow: 0 0 22px rgba(229, 193, 123, 0.4);
+}
+.card-lumen .card-blurb { color: var(--lumen-cream); }
+.card-lumen .card-facts { color: #b8ab8d; }
+
+.cta-lumen {
+  background: linear-gradient(180deg, #f2d79a 0%, var(--lumen-brass) 55%, #c9a24f 100%);
+  color: #241a04;
+  box-shadow: 0 10px 24px rgba(229, 193, 123, 0.3);
 }
 
 /* ---------- footer ---------- */

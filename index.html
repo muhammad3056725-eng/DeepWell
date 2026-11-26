@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>deepwell.games — Choose Your Game</title>
-<meta name="description" content="Two free browser games on one domain: APOGEE, the rare-answer trivia space flight, and NEXUS RELAY, the retro mystery-guest guessing game. Pick one and play — no downloads, no sign-up.">
+<meta name="description" content="Four free browser games on one domain: APOGEE, the rare-answer trivia space flight; NEXUS RELAY, the retro mystery-guest guessing game; HYPE RIOT, the 90-second pixel game show; and LUMEN VAULT, the tactile puzzle-adventure. Pick one and play — no downloads, no sign-up.">
 <meta property="og:title" content="deepwell.games — Choose Your Game">
-<meta property="og:description" content="APOGEE: the rarer your answer, the higher you fly. NEXUS RELAY: who's the mystery guest? Ten guesses, warmer/colder hints, free clues. Both free, both in your browser.">
+<meta property="og:description" content="APOGEE: the rarer your answer, the higher you fly. NEXUS RELAY: who's the mystery guest? HYPE RIOT: 90 seconds, 3 mini-rounds, one electrified pixel crowd. LUMEN VAULT: solve the locks, pour the light. All free, all in your browser.">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -14,7 +14,7 @@
 <header class="site-head">
   <p class="domain">deepwell<span class="domain-tld">.games</span></p>
   <h1>CHOOSE YOUR GAME</h1>
-  <p class="tagline">Two games live on this domain. One takes you to the stars. One takes you deep into the signal.</p>
+  <p class="tagline">Four games live on this domain — a flight to the stars, a signal to decode, a 90-second riot, and a vault full of light.</p>
 </header>
 
 <main class="picker">
@@ -61,6 +61,48 @@
     <a class="cta cta-nexus" id="link-nexus" href="https://muhammad3056725-eng.github.io/Nexus-Relay/">OPEN CONSOLE ▶</a>
   </article>
 
+  <!-- HYPE RIOT — the 90-second pixel game show. Lives in its OWN
+       repository (Hype-Riot) and is served from its own GitHub Pages
+       URL; this hub only links to it. Target configured in
+       GAME_URLS below. -->
+  <article class="card card-hype">
+    <div class="scanlines" aria-hidden="true"></div>
+    <p class="card-kicker">⚡ THE 90-SECOND PIXEL GAME SHOW</p>
+    <h2 class="card-title hype-title">HYPE&nbsp;RIOT</h2>
+    <p class="card-blurb">
+      Electrify a 64-character pixel crowd across 3 mini-rounds in 90
+      seconds — rapid-fire Top 5 brainstorms, Fact or Cap?!, and a
+      one-line pitch finale. Fast fingers, faster brain.
+    </p>
+    <ul class="card-facts">
+      <li>Arcade trivia · retro neon pixel art</li>
+      <li>Daily Riot · Quick Arcade · Brainstorm Blitz</li>
+    </ul>
+    <a class="cta cta-hype" id="link-hype" href="https://muhammad3056725-eng.github.io/Hype-Riot/">START THE RIOT ▶</a>
+  </article>
+
+  <!-- LUMEN VAULT — the tactile puzzle-adventure. Lives in its OWN
+       repository (Lumen-Vault) and is served from its own GitHub
+       Pages URL (note: the served path is /Lumen-vault/); this hub
+       only links to it. Target configured in GAME_URLS below. Its
+       identity is Kinetic Obsidian & Liquid Brass — deliberately
+       zero pixel art. -->
+  <article class="card card-lumen">
+    <p class="card-kicker">🔆 THE TACTILE PUZZLE VAULT</p>
+    <h2 class="card-title lumen-title">LUMEN&nbsp;VAULT</h2>
+    <p class="card-blurb">
+      A calm puzzle-adventure in obsidian and liquid brass. Solve
+      Venn locks, chrono gears, resonance forges and deduction
+      astrolabes to pour light through a constellation — and collect
+      a Wonder Artifact Card from every chamber.
+    </p>
+    <ul class="card-facts">
+      <li>Puzzle-adventure · trivia-logic + brainstorming</li>
+      <li>No timers · no fail screens · Daily Grand Vault</li>
+    </ul>
+    <a class="cta cta-lumen" id="link-lumen" href="https://muhammad3056725-eng.github.io/Lumen-vault/">ENTER THE VAULT ▶</a>
+  </article>
+
 </main>
 
 <script>
@@ -69,22 +111,30 @@
      Each game stays in its OWN repository and is served from its own
      URL; this hub links to those served URLs and loads nothing local.
        Deepwell   — this repo's Pages, at its own path /deepwell/ (one tap).
-       Nexus Relay — this repo's GitHub Pages URL. If the subdomain is
+       Nexus Relay — its own repo's GitHub Pages URL. If the subdomain is
                      set up instead, change the value to
                      "https://nexus.deepwell.games/".
+       Hype Riot  — its own repo's GitHub Pages URL (/Hype-Riot/).
+       Lumen Vault — its own repo's GitHub Pages URL. The served path
+                     is /Lumen-vault/ (lowercase "vault") — keep the
+                     casing exactly as written here.
      The anchors above carry the same URLs as static fallbacks, so the
      page works even with JavaScript disabled.
      ================================================================ */
   const GAME_URLS = {
     deepwell: "deepwell/",
-    nexusRelay: "https://muhammad3056725-eng.github.io/Nexus-Relay/"
+    nexusRelay: "https://muhammad3056725-eng.github.io/Nexus-Relay/",
+    hypeRiot: "https://muhammad3056725-eng.github.io/Hype-Riot/",
+    lumenVault: "https://muhammad3056725-eng.github.io/Lumen-vault/"
   };
   document.getElementById("link-deepwell").href = GAME_URLS.deepwell;
   document.getElementById("link-nexus").href = GAME_URLS.nexusRelay;
+  document.getElementById("link-hype").href = GAME_URLS.hypeRiot;
+  document.getElementById("link-lumen").href = GAME_URLS.lumenVault;
 </script>
 
 <footer class="site-foot">
-  <p>Both games are free, run entirely in your browser, and need no downloads or sign-up.</p>
+  <p>All four games are free, run entirely in your browser, and need no downloads or sign-up.</p>
 </footer>
 
 </body>

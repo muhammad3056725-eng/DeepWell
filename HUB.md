@@ -1,9 +1,10 @@
 # deepwell.games hub — note for whoever maintains the Deepwell game
 
 deepwell.games root is no longer the game itself. It is a clean
-game-selection interface: two cards (Deepwell + NEXUS RELAY) over a
-code-drawn pixel-space background (`hub-bg.svg`). No advertising
-poster is used. A visitor picks a card and is sent to that game.
+game-selection interface: four cards (Deepwell + NEXUS RELAY +
+HYPE RIOT + LUMEN VAULT) over a code-drawn pixel-space background
+(`hub-bg.svg`). No advertising poster is used. A visitor picks a
+card and is sent to that game.
 
 Note on theme: Deepwell (in-game title APOGEE) is a SPACE flight
 trivia game — the rarer your answer, the higher you fly. Its poster
@@ -11,13 +12,19 @@ art is ocean-styled, but the game itself is space (owner
 correction, Nov 26, 2026). Do not describe or theme it as a
 sea/ocean game.
 
-## Two games, two repositories
+## Four games, four repositories
 
 - This repo (`muhammad3056725-eng/DeepWell`) serves the domain: the
   hub at the root, plus the Deepwell game.
 - `muhammad3056725-eng/Nexus-Relay` serves NEXUS RELAY from its own
   GitHub Pages: https://muhammad3056725-eng.github.io/Nexus-Relay/
   (or https://nexus.deepwell.games/ if that subdomain is set up).
+- `muhammad3056725-eng/Hype-Riot` serves HYPE RIOT from its own
+  GitHub Pages: https://muhammad3056725-eng.github.io/Hype-Riot/
+- `muhammad3056725-eng/Lumen-Vault` serves LUMEN VAULT from its own
+  GitHub Pages: https://muhammad3056725-eng.github.io/Lumen-vault/
+  (the served path is `/Lumen-vault/` — lowercase "vault"; the
+  capital-V form 404s, so keep the casing exact).
 - The hub only links out to each game's own URL. The games are NOT
   merged or copied into one repo.
 
@@ -25,8 +32,28 @@ sea/ocean game.
 
 - Deepwell card → https://deepwell.games/deepwell/
 - NEXUS RELAY card → https://muhammad3056725-eng.github.io/Nexus-Relay/
+- HYPE RIOT card → https://muhammad3056725-eng.github.io/Hype-Riot/
+- LUMEN VAULT card → https://muhammad3056725-eng.github.io/Lumen-vault/
 - Link targets live in ONE `GAME_URLS` block in the hub's
   `index.html`; keep the card anchor `href`s in sync with it.
+
+## Workflow arrangement (all game repos)
+
+Each game repo deploys via GitHub Actions (`.github/workflows/
+pages.yml`, source = GitHub Actions in the repo's Pages settings).
+Per the standing rule below, each game also has a Wikidata
+dataset-build workflow (Nexus: `dataset-expansion.yml`; Hype Riot:
+`data-build.yml`, weekly; Lumen Vault: `data-build.yml`, monthly,
+plus `daily-vault.yml` generating the Daily Grand Vault). The Muse
+GitHub App cannot push `.github/workflows/` files (no Workflows
+permission), so the owner pastes those files into each repo
+himself; everything else is pushed by the app.
+
+HYPE RIOT party mode: the relay code is written
+(`packages/party-worker/` in the Hype-Riot repo, a Cloudflare
+Durable Objects WebSocket relay) but NOT deployed. The in-game
+Party Room stays gated until a relay URL is deployed and built in
+via `VITE_PARTY_WS_URL`. Solo modes are fully live without it.
 
 ## What this repo must keep stable
 
@@ -46,10 +73,12 @@ four files were added: `index.html`, `styles.css` and `hub-bg.svg`
 
 ## Status (Nov 26, 2026)
 
-Hub and Deepwell are live and verified. The NEXUS RELAY card is
-wired, but the Nexus-Relay repo push is still pending: it awaits the
-owner adding Nexus-Relay to the Muse GitHub App's repository
-access.
+All four games are live and verified end-to-end from this hub:
+APOGEE (Deepwell), NEXUS RELAY (casual mystery-guest version,
+dataset grown to 1,021 entities via the Wikidata pipeline),
+HYPE RIOT (solo game; party relay written, not deployed) and
+LUMEN VAULT. Each card on the hub was followed through to its
+game and the game's data files checked live.
 
 ## Standing rule: every game ships a Wikidata dataset build
 
