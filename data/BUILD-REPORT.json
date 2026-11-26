@@ -1,70 +1,24 @@
 {
-  "stoppedAt": 57,
+  "stoppedAt": 97,
   "skipped": [],
   "failed": [
-    "city-in-united-states: prompt time cap reached",
-    "city-in-australia: prompt time cap reached",
-    "city-in-france: prompt time cap reached",
-    "city-in-brazil: prompt time cap reached"
+    "city-in-chile: prompt time cap reached",
+    "city-in-peru: prompt time cap reached",
+    "city-in-kenya: prompt time cap reached",
+    "city-in-morocco: prompt time cap reached",
+    "city-in-bangladesh: prompt time cap reached",
+    "river-in-united-states: prompt time cap reached",
+    "river-in-canada: prompt time cap reached",
+    "river-in-india: prompt time cap reached",
+    "river-in-china: prompt time cap reached",
+    "river-in-russia: prompt time cap reached",
+    "river-in-brazil: prompt time cap reached",
+    "river-in-italy: prompt time cap reached",
+    "river-in-spain: prompt time cap reached"
   ],
-  "built": 8,
-  "unchanged": 13,
-  "fallback": [
-    "city-in-canada",
-    "city-in-united-kingdom",
-    "city-in-germany",
-    "city-in-spain",
-    "city-in-china"
-  ],
+  "built": 0,
+  "unchanged": 4,
+  "fallback": [],
   "previousRetained": [],
-  "rejected": {
-    "zoo": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "amusement-park": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "historical-country": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-canada": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-united-kingdom": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-germany": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-spain": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-china": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    }
-  }
+  "rejected": {}
 }

@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-25 · Manifest version: 31
-Packs: 581 · Answers: 355,893 · Pack bytes: 23,256,365 (22.18 MiB) / 60 MiB
+Built: 2026-11-25 · Manifest version: 32
+Packs: 583 · Answers: 358,267 · Pack bytes: 23,470,612 (22.38 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 581 · Answers: 355,893 · Pack bytes: 23,256,365 (22.18 MiB) / 60 MiB
 | Film & TV | 11 | 8735 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
-| Geography | 174 | 112963 | 724 |
+| Geography | 176 | 115337 | 724 |
 | History | 18 | 13503 | 949.5 |
 | Language | 10 | 4383 | 251 |
 | Literature | 12 | 10458 | 971 |
@@ -39,7 +39,6 @@ Packs: 581 · Answers: 355,893 · Pack bytes: 23,256,365 (22.18 MiB) / 60 MiB
 | dinosaur-starts-r | 9 |
 | dinosaur-starts-m | 9 |
 | dinosaur-starts-l | 9 |
-| city-in-vietnam | 10 |
 | university-in-australia | 10 |
 | shark-starts-e | 10 |
 | dinosaur-starts-c | 10 |
@@ -51,6 +50,7 @@ Packs: 581 · Answers: 355,893 · Pack bytes: 23,256,365 (22.18 MiB) / 60 MiB
 | amphibian-starts-q | 12 |
 | dinosaur-starts-a | 12 |
 | shark-starts-o | 13 |
+| mammal-starts-q | 13 |
 
 ## 20 highest rejection rates
 
@@ -58,6 +58,7 @@ Packs: 581 · Answers: 355,893 · Pack bytes: 23,256,365 (22.18 MiB) / 60 MiB
 |---|---:|---:|
 | cathedral | 23 | 1.2% |
 | capital | 2 | 0.9% |
+| city-in-egypt | 2 | 0.9% |
 | bird-starts-a | 1 | 0.2% |
 | desert | 1 | 0.1% |
 | stadium | 2 | 0.1% |
@@ -75,7 +76,6 @@ Packs: 581 · Answers: 355,893 · Pack bytes: 23,256,365 (22.18 MiB) / 60 MiB
 | country | 0 | 0.0% |
 | island | 0 | 0.0% |
 | river | 0 | 0.0% |
-| mountain | 0 | 0.0% |
 
 ## Fallback packs
 
@@ -85,15 +85,7 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| zoo | 1004 | 0 |
-| amusement-park | 629 | 3 |
-| historical-country | 992 | 0 |
-| city-in-canada | 30 | 0 |
-| city-in-united-kingdom | 9 | 0 |
-| city-in-germany | 60 | 0 |
-| city-in-spain | 4 | 0 |
-| city-in-china | 15 | 0 |
 
 ## Repository size check
 
-Raw data/packs size: 23,256,365 bytes (22.18 MiB); budget 60 MiB.
+Raw data/packs size: 23,470,612 bytes (22.38 MiB); budget 60 MiB.
