@@ -6,6 +6,11 @@
 //  3. enforce `notParent` (reptile must not contain birds) on base and letter packs;
 //  4. re-apply data/overrides.json and guarantee anchors.
 // Then run `node scripts/backfill-manifest.mjs` and bump manifest.version. Usage: node scripts/enrich-packs.mjs [--dry]
+import { existsSync, readdirSync } from 'node:fs';
+if (!existsSync('data/packs') || !readdirSync('data/packs').some(f => f.endsWith('.json'))) {
+  console.error('No loose packs in data/packs/. The site data is stored linked: run `node scripts/linked-store.mjs unpack` first, and `node scripts/linked-store.mjs pack` afterwards.');
+  process.exit(1);
+}
 import { readFile, writeFile, readdir } from 'node:fs/promises';
 import { CATALOG } from '../js/catalog.js';
 import { fromPack, toPack } from '../js/wikidata.js';

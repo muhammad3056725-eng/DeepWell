@@ -1,10 +1,10 @@
 // DOM helpers and screen renderers. No game rules live here.
-import { CONFIG } from './config.js?v=retry-timer-20261125';
-import { CATEGORIES } from './catalog.js?v=retry-timer-20261125';
-import { libraryStats } from './data.js?v=retry-timer-20261125';
-import { tierClass, utcDate } from './engine.js?v=retry-timer-20261125';
-import * as S from './state.js?v=retry-timer-20261125';
-import { setVolume } from './audio.js?v=retry-timer-20261125';
+import { CONFIG } from './config.js?v=linked-20261125';
+import { CATEGORIES } from './catalog.js?v=linked-20261125';
+import { libraryStats } from './data.js?v=linked-20261125';
+import { tierClass, utcDate } from './engine.js?v=linked-20261125';
+import * as S from './state.js?v=linked-20261125';
+import { setVolume } from './audio.js?v=linked-20261125';
 
 export const $ = id => document.getElementById(id);
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -34,12 +34,12 @@ const DEPTH_ZONES = [
   {key:'abyss',label:'Abyss',end:7000},
 ];
 
-export function updateDepthUI(depth) {
+export function updateDepthUI(depth, ms = 340) {
   const d = Math.max(0,Math.round(Number(depth)||0));
   const readout = $('topDepth');
   if(depthAnimation) cancelAnimationFrame(depthAnimation);
   const from=displayedDepth,started=performance.now();
-  const duration=S.store.settings.motion?0:340;
+  const duration=S.store.settings.motion?0:ms;
   const paint=now=>{
     const t=duration?Math.min(1,(now-started)/duration):1;
     const eased=1-Math.pow(1-t,3);

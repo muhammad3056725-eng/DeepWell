@@ -1,7 +1,8 @@
 // Offline self-test: node scripts/selftest.mjs
 // Checks the catalog, query builder, matching, rarity and seeded picking. No network needed.
 import { CATALOG, ENTITY_LABELS, entityIdsOf, QUESTION_TARGET } from '../js/catalog.js';
-import { buildQuery, parseBindings, toPack, fromPack, mergePools } from '../js/wikidata.js';
+import { readAnyPrompt } from './linked-store.mjs';
+import { buildQuery, parseBindings, toPack, fromPack, mergePools, ANSWER_CAP } from '../js/wikidata.js';
 import {
   normalize, matchAnswer, buildPool, assignRarity, pickEntries, planDive, DIVE_PLAN, mulberry32, hashString,
   letterOptions, deriveLetterPool, blendPoints, tier, previousUtcDate,
@@ -26,10 +27,10 @@ for (const e of CATALOG) {
 eq(CATALOG.length, QUESTION_TARGET, 'catalog reaches configured question target');
 eq(CATALOG.length, 10000, 'catalog has exactly 10,000 unique prompts');
 eq(new Set(CATALOG.map(e => e.prompt)).size, CATALOG.length, 'all prompt texts are unique');
-ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= 2000), 'no prompt allows more than 1,000 answers');
+ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= ANSWER_CAP), 'no prompt allows more than the answer cap');
 const foodF = CATALOG.find(e => e.id === 'food-starts-f');
 eq(foodF?.prompt, 'Name a food starting with F', 'food starting with F is included');
-eq(foodF?.answerLimit, 2000, 'food F can use up to 1,000 answers');
+eq(foodF?.answerLimit, 5000, 'food F can use up to 5,000 answers');
 const elementEntry = CATALOG.find(e => e.id === 'chemical-element');
 eq(elementEntry?.answerLimit, 118, 'chemical elements keep their natural 118-answer ceiling');
 
@@ -41,7 +42,7 @@ ok(programmingEntry?.limit >= 5000, 'programming language query fetches a larger
 ok(/SELECT/.test(buildQuery(item)) && /sitelinks/.test(buildQuery(item)), 'item query');
 ok(/LIMIT 5000/.test(buildQuery(programmingEntry)), 'programming-language candidate search has a 5,000-row limit');
 ok(/LIMIT 5000 OFFSET 5000/.test(buildQuery(programmingEntry,{limit:5000,minSL:1,offset:5000})), 'scheduled candidate pages advance by 5,000 records');
-ok(/LIMIT 2000$/.test(buildQuery(programmingEntry)), 'programming-language answer pool is capped at 1,000');
+ok(new RegExp('LIMIT '+programmingEntry.target+'$').test(buildQuery(programmingEntry)), 'programming-language answer pool follows its target');
 ok(buildQuery(foodF, { limit: 5000, minSL: 1 }).includes('STRSTARTS(LCASE(STR(?itemLabel)), "f")'), 'food F query filters labels by F');
 const foodFQuery = buildQuery(foodF, { limit: 5000, minSL: 1 });
 ok(foodFQuery.indexOf('STRSTARTS') < foodFQuery.indexOf('LIMIT 5000'), 'food F prefix is applied before candidate truncation');
@@ -49,7 +50,7 @@ const insectA = { ...taxon, startsWith: 'A' };
 const insectAQuery = buildQuery(insectA, { limit: 5000, minSL: 1 });
 ok(insectAQuery.includes('STRSTARTS(LCASE(STR(?filterName)), "a")'), 'taxon letter filtering is applied to common names before candidate limit');
 ok(insectAQuery.indexOf('STRSTARTS') < insectAQuery.indexOf('LIMIT 5000'), 'taxon prefix is applied before candidate truncation');
-ok(/LIMIT 2000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than 2,000 answers');
+ok(/LIMIT 5000$/.test(buildQuery(foodF, { limit: 5000, minSL: 1 })), 'food F query returns no more than its 5,000 target');
 ok(/LIMIT 118$/.test(buildQuery(elementEntry)), 'chemical-element query respects its 118-answer limit');
 
 ok(/P1843/.test(buildQuery(taxon)), 'taxon query uses common names');
@@ -191,15 +192,17 @@ eq(meaningfulChange(overridePool,[...overridePool,{id:'Q9',n:'New answer',s:1,a:
 {
   const MUST = [['country','China'],['country','United States'],['capital','Paris'],['capital','London'],['capital','Tokyo'],['city','Tokyo'],['city','Paris'],
     ['island','Madagascar'],['mountain','Kilimanjaro'],['volcano','Mount Etna'],['volcano','Mount Fuji'],['river','Nile'],['university','Harvard University'],['tower','Eiffel Tower']];
-  if (existsSync('data/packs/reptile.json')) {   // birds must not count as reptiles
-    const rp = buildPool(fromPack(JSON.parse(readFileSync('data/packs/reptile.json', 'utf8'))));
+  const MAN = existsSync('data/manifest.json') ? JSON.parse(readFileSync('data/manifest.json', 'utf8')) : { packs: {} };
+  const reptileItems = MAN.packs.reptile ? await readAnyPrompt(MAN, 'reptile') : null;
+  if (reptileItems) {   // birds must not count as reptiles
+    const rp = buildPool(reptileItems);
     ok(!matchAnswer('Bald Eagle', rp)?.exact && !matchAnswer("Hartlaub's bustard", rp)?.exact, 'real pack reptile does not accept birds');
     ok(matchAnswer('Komodo dragon', rp)?.exact, 'real pack reptile accepts Komodo dragon');
   }
   for (const [id, answer] of MUST) {
-    const file = `data/packs/${id}.json`;
-    if (!existsSync(file)) continue;
-    const m = matchAnswer(answer, buildPool(fromPack(JSON.parse(readFileSync(file, 'utf8')))));
+    const items = MAN.packs[id] ? await readAnyPrompt(MAN, id) : null;
+    if (!items) continue;
+    const m = matchAnswer(answer, buildPool(items));
     ok(m?.exact, `real pack ${id} accepts "${answer}" (exact match)`);
     if (m?.exact) ok(m.item.r <= 25, `real pack ${id}: "${answer}" is a famous answer, so few points (${m.item.r})`);
   }

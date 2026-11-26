@@ -72,6 +72,24 @@ const COUNTRIES = [
   ['Q45', 'portugal', 'Portugal'], ['Q212', 'ukraine', 'Ukraine'], ['Q739', 'colombia', 'Colombia'],
   ['Q298', 'chile', 'Chile'], ['Q419', 'peru', 'Peru'], ['Q114', 'kenya', 'Kenya'],
   ['Q1028', 'morocco', 'Morocco'], ['Q902', 'bangladesh', 'Bangladesh'],
+  // Asia and the Middle East (every id is checked against Wikidata by the build; a wrong one just skips that prompt)
+  ['Q854', 'sri lanka', 'Sri Lanka'], ['Q837', 'nepal', 'Nepal'], ['Q889', 'afghanistan', 'Afghanistan'],
+  ['Q796', 'iraq', 'Iraq'], ['Q801', 'israel', 'Israel'], ['Q878', 'united arab emirates', 'the United Arab Emirates'],
+  ['Q833', 'malaysia', 'Malaysia'], ['Q334', 'singapore', 'Singapore'], ['Q836', 'myanmar', 'Myanmar'],
+  ['Q232', 'kazakhstan', 'Kazakhstan'], ['Q265', 'uzbekistan', 'Uzbekistan'], ['Q865', 'taiwan', 'Taiwan'],
+  ['Q810', 'jordan', 'Jordan'], ['Q822', 'lebanon', 'Lebanon'], ['Q858', 'syria', 'Syria'],
+  ['Q817', 'kuwait', 'Kuwait'], ['Q846', 'qatar', 'Qatar'], ['Q711', 'mongolia', 'Mongolia'],
+  ['Q424', 'cambodia', 'Cambodia'], ['Q917', 'bhutan', 'Bhutan'],
+  // Balance: Africa, Latin America and Europe get the same depth, so no region dominates the data.
+  ['Q115', 'ethiopia', 'Ethiopia'], ['Q117', 'ghana', 'Ghana'], ['Q262', 'algeria', 'Algeria'],
+  ['Q924', 'tanzania', 'Tanzania'], ['Q1036', 'uganda', 'Uganda'], ['Q948', 'tunisia', 'Tunisia'],
+  ['Q1041', 'senegal', 'Senegal'], ['Q1009', 'cameroon', 'Cameroon'],
+  ['Q717', 'venezuela', 'Venezuela'], ['Q736', 'ecuador', 'Ecuador'], ['Q241', 'cuba', 'Cuba'],
+  ['Q750', 'bolivia', 'Bolivia'], ['Q77', 'uruguay', 'Uruguay'],
+  ['Q20', 'norway', 'Norway'], ['Q35', 'denmark', 'Denmark'], ['Q33', 'finland', 'Finland'],
+  ['Q40', 'austria', 'Austria'], ['Q31', 'belgium', 'Belgium'], ['Q213', 'czech', 'Czech Republic'],
+  ['Q28', 'hungary', 'Hungary'], ['Q218', 'romania', 'Romania'], ['Q403', 'serbia', 'Serbia'],
+  ['Q712', 'fiji', 'Fiji'],
 ];
 const byName = n => COUNTRIES.find(c => c[2].replace(/^the /, '') === n);
 
@@ -340,24 +358,82 @@ const SPORTS = [
 ];
 for (const [id, prompt, pattern, o] of SPORTS) add('Sports', id, prompt, pattern, o);
 
+// Countries added for balance (non-Asia). Asia has full coverage in the lists above; these keep the dataset worldwide.
+const BALANCE = ['Ethiopia', 'Ghana', 'Algeria', 'Tanzania', 'Uganda', 'Tunisia', 'Senegal', 'Cameroon', 'Venezuela', 'Ecuador', 'Cuba',
+  'Bolivia', 'Uruguay', 'Norway', 'Denmark', 'Finland', 'Austria', 'Belgium', 'Czech Republic', 'Hungary', 'Romania', 'Serbia',
+  'Colombia', 'Chile', 'Peru', 'Kenya', 'Morocco', 'Greece', 'Portugal', 'Ukraine', 'Poland', 'Sweden', 'Ireland', 'Canada', 'Australia',
+  'New Zealand', 'the Netherlands', 'South Africa', 'Argentina', 'Mexico', 'Nigeria', 'Egypt', 'Brazil'];
+const BAL_KINDS = new Set(['actor', 'singer', 'writer', 'poet', 'politician', 'painter', 'film-director', 'musician', 'scientist', 'film', 'tv-series', 'band', 'dish', 'newspaper']);
+const withBalance = (kind, names) => BAL_KINDS.has(kind) ? [...names, ...BALANCE.filter(x => !names.includes(x))] : names;
+
 // Nationality splits (a long tail of "Name a X from Y" prompts)
 const NAT = [
-  ['cricketer', 'Q12299841', 'cricketer', 'Name a cricketer from', ['India', 'Pakistan', 'Australia', 'the United Kingdom', 'South Africa', 'New Zealand', 'Bangladesh'], { minSL: 4 }],
+  ['cricketer', 'Q12299841', 'cricketer', 'Name a cricketer from', ['India', 'Pakistan', 'Australia', 'the United Kingdom', 'South Africa', 'New Zealand', 'Bangladesh', 'Sri Lanka', 'Afghanistan', 'Nepal', 'Malaysia'], { minSL: 4 }],
   ['footballer', 'Q937857', 'association football player', 'Name a footballer from', ['Brazil', 'Argentina', 'France', 'Germany', 'Italy', 'Spain', 'the United Kingdom', 'the Netherlands', 'Portugal', 'Nigeria'], { minSL: 20 }],
-  ['actor', 'Q33999', 'actor', 'Name an actor from', ['the United States', 'the United Kingdom', 'India', 'France', 'Japan', 'Italy', 'Germany', 'South Korea', 'Pakistan', 'Turkey'], { minSL: 20 }],
-  ['singer', 'Q177220', 'singer', 'Name a singer from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'France', 'South Korea', 'Japan', 'Brazil', 'Germany', 'Mexico', 'Turkey'], { minSL: 15 }],
-  ['writer', 'Q36180', 'writer', 'Name a writer from', ['the United Kingdom', 'France', 'Russia', 'Germany', 'the United States', 'Japan', 'India', 'Pakistan', 'Italy', 'Spain', 'Argentina', 'Nigeria', 'Egypt', 'Turkey', 'Iran'], { minSL: 20 }],
-  ['poet', 'Q49757', 'poet', 'Name a poet from', ['Pakistan', 'India', 'Iran', 'Russia', 'France', 'Germany', 'the United Kingdom', 'the United States', 'Turkey', 'Egypt', 'Spain', 'Italy'], { minSL: 10 }],
-  ['physicist', 'Q169470', 'physicist', 'Name a physicist from', ['Germany', 'the United Kingdom', 'the United States', 'France', 'Italy', 'Russia', 'India', 'Pakistan', 'Japan', 'China'], { minSL: 10 }],
-  ['painter', 'Q1028181', 'painter', 'Name a painter from', ['France', 'Italy', 'Spain', 'the Netherlands', 'Germany', 'the United Kingdom', 'the United States', 'Russia', 'Japan', 'Mexico', 'India', 'Pakistan'], { minSL: 15 }],
-  ['politician', 'Q82955', 'politician', 'Name a politician from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'France', 'Germany', 'Russia', 'Turkey', 'Iran', 'Egypt', 'Brazil', 'South Africa'], { minSL: 40 }],
+  ['actor', 'Q33999', 'actor', 'Name an actor from', ['the United States', 'the United Kingdom', 'India', 'France', 'Japan', 'Italy', 'Germany', 'South Korea', 'Pakistan', 'Turkey', 'Bangladesh', 'Iran', 'China', 'Indonesia', 'the Philippines', 'Thailand', 'Egypt', 'Sri Lanka', 'Nepal', 'Taiwan', 'Vietnam', 'Israel', 'Iraq', 'Lebanon', 'Malaysia'], { minSL: 20 }],
+  ['singer', 'Q177220', 'singer', 'Name a singer from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'France', 'South Korea', 'Japan', 'Brazil', 'Germany', 'Mexico', 'Turkey', 'Bangladesh', 'Iran', 'China', 'Indonesia', 'the Philippines', 'Thailand', 'Egypt', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Taiwan', 'Vietnam', 'Israel', 'Iraq', 'Lebanon', 'Malaysia', 'Saudi Arabia'], { minSL: 15 }],
+  ['writer', 'Q36180', 'writer', 'Name a writer from', ['the United Kingdom', 'France', 'Russia', 'Germany', 'the United States', 'Japan', 'India', 'Pakistan', 'Italy', 'Spain', 'Argentina', 'Nigeria', 'Egypt', 'Turkey', 'Iran', 'Bangladesh', 'China', 'Indonesia', 'the Philippines', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Israel', 'Iraq', 'Syria', 'Lebanon', 'Vietnam', 'Thailand', 'South Korea', 'Taiwan', 'Malaysia'], { minSL: 20 }],
+  ['poet', 'Q49757', 'poet', 'Name a poet from', ['Pakistan', 'India', 'Iran', 'Russia', 'France', 'Germany', 'the United Kingdom', 'the United States', 'Turkey', 'Egypt', 'Spain', 'Italy', 'Bangladesh', 'Afghanistan', 'China', 'Japan', 'Iraq', 'Israel', 'Lebanon', 'Syria', 'Sri Lanka', 'Nepal', 'Uzbekistan', 'Kazakhstan', 'South Korea', 'Vietnam'], { minSL: 10 }],
+  ['physicist', 'Q169470', 'physicist', 'Name a physicist from', ['Germany', 'the United Kingdom', 'the United States', 'France', 'Italy', 'Russia', 'India', 'Pakistan', 'Japan', 'China', 'Iran', 'South Korea', 'Israel', 'Taiwan', 'Turkey', 'Bangladesh'], { minSL: 10 }],
+  ['painter', 'Q1028181', 'painter', 'Name a painter from', ['France', 'Italy', 'Spain', 'the Netherlands', 'Germany', 'the United Kingdom', 'the United States', 'Russia', 'Japan', 'Mexico', 'India', 'Pakistan', 'China', 'Iran', 'Bangladesh', 'Turkey', 'Iraq', 'Afghanistan', 'Uzbekistan', 'Sri Lanka', 'South Korea'], { minSL: 15 }],
+  ['politician', 'Q82955', 'politician', 'Name a politician from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'France', 'Germany', 'Russia', 'Turkey', 'Iran', 'Egypt', 'Brazil', 'South Africa', 'Bangladesh', 'China', 'Indonesia', 'the Philippines', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Iraq', 'Israel', 'Malaysia', 'Singapore', 'Thailand', 'Vietnam', 'Saudi Arabia', 'Syria', 'Lebanon', 'Japan', 'South Korea', 'Taiwan'], { minSL: 40 }],
 ];
 for (const [kind, cls, clsLabel, lead, names, o] of NAT) {
-  for (const n of names) {
+  for (const n of withBalance(kind, names)) {
     const c = byName(n.replace(/^the /, ''));
     if (!c) continue;
     add('People', `${kind}-from-${slug(n.replace(/^the /, ''))}`, `${lead} ${n}`,
       `${occ(cls, clsLabel)}; ${citizen(c[0], c[1])}`, { people: true, minPool: 20, limit: 1200, ...o });
+  }
+}
+
+// More people and things "from" a country. Everything here lands in that country's shared answer store
+// (data/linked/c-<country>.*): one answer, many questions.
+const NAT2 = [
+  ['film-director', 'Q2526255', 'film director', 'Name a film director from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'Bangladesh', 'Iran', 'Japan', 'China', 'South Korea', 'France', 'Italy', 'Germany', 'Turkey', 'Egypt', 'Russia', 'Spain', 'Brazil', 'Thailand', 'Indonesia', 'the Philippines', 'Taiwan', 'Israel', 'Sri Lanka'], { minSL: 6 }],
+  ['musician', 'Q639669', 'musician', 'Name a musician from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'Bangladesh', 'Iran', 'Japan', 'China', 'South Korea', 'France', 'Germany', 'Turkey', 'Egypt', 'Russia', 'Brazil', 'Indonesia', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Iraq', 'Israel', 'Lebanon'], { minSL: 6 }],
+  ['composer', 'Q36834', 'composer', 'Name a composer from', ['India', 'Pakistan', 'Iran', 'Japan', 'China', 'South Korea', 'Turkey', 'Russia', 'Germany', 'France', 'Italy', 'the United Kingdom', 'the United States', 'Egypt', 'Israel'], { minSL: 6 }],
+  ['scientist', 'Q901', 'scientist', 'Name a scientist from', ['India', 'Pakistan', 'Bangladesh', 'Iran', 'China', 'Japan', 'South Korea', 'Turkey', 'Egypt', 'Israel', 'Russia', 'Germany', 'France', 'the United Kingdom', 'the United States', 'Iraq', 'Taiwan'], { minSL: 6 }],
+  ['journalist', 'Q1930187', 'journalist', 'Name a journalist from', ['India', 'Pakistan', 'Bangladesh', 'Iran', 'China', 'Japan', 'Turkey', 'Egypt', 'Israel', 'Russia', 'the United Kingdom', 'the United States', 'Afghanistan', 'Sri Lanka', 'Nepal'], { minSL: 6 }],
+  ['businessperson', 'Q43845', 'businessperson', 'Name a businessperson from', ['India', 'Pakistan', 'Bangladesh', 'China', 'Japan', 'South Korea', 'Indonesia', 'Malaysia', 'Singapore', 'Saudi Arabia', 'the United Arab Emirates', 'Turkey', 'Iran', 'Egypt', 'Russia', 'the United Kingdom', 'the United States', 'Israel'], { minSL: 6 }],
+  ['screenwriter', 'Q28389', 'screenwriter', 'Name a screenwriter from', ['India', 'Pakistan', 'Iran', 'Japan', 'China', 'South Korea', 'Turkey', 'France', 'Italy', 'the United Kingdom', 'the United States'], { minSL: 6 }],
+];
+for (const [kind, cls, clsLabel, lead, names, o] of NAT2) {
+  for (const n of withBalance(kind, names)) {
+    const c = byName(n.replace(/^the /, ''));
+    if (!c) continue;
+    add('People', `${kind}-from-${slug(n.replace(/^the /, ''))}`, `${lead} ${n}`,
+      `${occ(cls, clsLabel)}; ${citizen(c[0], c[1])}`, { people: true, minPool: 20, limit: 1200, ...o });
+  }
+}
+
+// Things from a country: patterns use "country of origin" (P495) or "country" (P17).
+const origin = (q, l) => `wdt:P495 wd:${reg(q, l)}`;
+const ASIA_AND_WORLD = ['India', 'Pakistan', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Iran', 'Iraq', 'Israel', 'Turkey', 'Saudi Arabia',
+  'China', 'Japan', 'South Korea', 'Taiwan', 'Indonesia', 'Malaysia', 'Thailand', 'Vietnam', 'the Philippines', 'Egypt', 'Russia',
+  'the United States', 'the United Kingdom', 'France', 'Germany', 'Italy', 'Spain', 'Brazil', 'Mexico', 'Nigeria'];
+const THINGS = [
+  // [id kind, class q, class label, joiner, prompt lead, pattern type, category, options]
+  ['film', 'Q11424', 'film', 'from', 'Name a film from', 'origin', 'Film & TV', { minSL: 4 }, ASIA_AND_WORLD],
+  ['tv-series', 'Q5398426', 'television series', 'from', 'Name a TV series from', 'origin', 'Film & TV', { minSL: 4 }, ASIA_AND_WORLD],
+  ['band', 'Q215380', 'musical group', 'from', 'Name a band or music group from', 'origin', 'Music', { minSL: 4 }, ASIA_AND_WORLD],
+  ['dish', 'Q746549', 'dish', 'from', 'Name a dish from', 'origin', 'Food', { minSL: 2, minPool: 15 }, ASIA_AND_WORLD],
+  ['newspaper', 'Q11032', 'newspaper', 'in', 'Name a newspaper in', 'country', 'History', { minSL: 2 }, ASIA_AND_WORLD],
+  ['political-party', 'Q7278', 'political party', 'in', 'Name a political party in', 'country', 'History', { minSL: 3 }, ASIA_AND_WORLD],
+  ['airport', 'Q1248784', 'airport', 'in', 'Name an airport in', 'country', 'Transport', { minSL: 2 }, ASIA_AND_WORLD],
+  ['stadium', 'Q483110', 'stadium', 'in', 'Name a stadium in', 'country', 'Sports', { minSL: 2 }, ASIA_AND_WORLD],
+  ['mosque', 'Q32815', 'mosque', 'in', 'Name a mosque in', 'country', 'History', { minSL: 2 }, ['India', 'Pakistan', 'Bangladesh', 'Iran', 'Iraq', 'Turkey', 'Saudi Arabia', 'Egypt', 'Indonesia', 'Malaysia', 'Afghanistan', 'China', 'the United Kingdom', 'France', 'Germany']],
+  ['hindu-temple', 'Q842402', 'hindu temple', 'in', 'Name a Hindu temple in', 'country', 'History', { minSL: 2, minPool: 15 }, ['India', 'Nepal', 'Sri Lanka', 'Bangladesh', 'Pakistan', 'Indonesia', 'Malaysia', 'the United States', 'the United Kingdom']],
+  ['company', 'Q4830453', 'business', 'in', 'Name a company in', 'country', 'Brands', { minSL: 4 }, ASIA_AND_WORLD],
+  ['bank', 'Q22687', 'bank', 'in', 'Name a bank in', 'country', 'Brands', { minSL: 2, minPool: 15 }, ASIA_AND_WORLD],
+  ['hospital', 'Q16917', 'hospital', 'in', 'Name a hospital in', 'country', 'Body', { minSL: 2 }, ['India', 'Pakistan', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Iran', 'Turkey', 'China', 'Japan', 'the United Kingdom', 'the United States']],
+];
+for (const [kind, cls, clsLabel, join, lead, type, cat, o, names] of THINGS) {
+  for (const n of withBalance(kind, names)) {
+    const c = byName(n.replace(/^the /, ''));
+    if (!c) continue;
+    const place = type === 'origin' ? origin(c[0], c[1]) : country(c[0], c[1]);
+    add(cat, `${kind}-${join}-${slug(n.replace(/^the /, ''))}`, `${lead} ${n}`, `${sub(cls, clsLabel)}; ${place}`, { minPool: 20, ...o });
   }
 }
 
@@ -468,6 +544,24 @@ const TRANSPORT = [
   ['motorcycle-manufacturer', 'Name a motorcycle manufacturer', inst('Q15081030', 'motorcycle manufacturer'), { minSL: 4, minPool: 15 }],
 ];
 for (const [id, prompt, pattern, o] of TRANSPORT) add('Transport', id, prompt, pattern, o);
+
+/* ------------------------------------------------------------ list growth */
+// Bigger answer lists: the old limit was 2,000 answers per question and a high popularity floor (minSL) that cut off
+// everything but the best known. Lists now grow to GROW_TARGET answers and reach down to GROW_FLOOR Wikipedia language
+// editions, so players are credited for obscure-but-real answers. The same limits apply to every country and region.
+// Closed sets (planets, chemical elements) keep their natural size: an explicit answerLimit below the default is respected.
+const GROW_TARGET = {
+  People: 10000, Geography: 8000, 'Film & TV': 10000, Music: 8000, Literature: 8000, Sports: 8000, Nature: 8000,
+  Art: 6000, History: 6000, Games: 6000, Food: 5000, Brands: 5000, Transport: 5000, Technology: 5000, Science: 5000,
+  Space: 5000, Language: 5000, Mythology: 4000, Body: 3000,
+};
+const GROW_FLOOR = 8;
+for (const e of CATALOG) {
+  if (e.answerLimit < 2000) continue;
+  e.target = Math.max(e.target || 0, GROW_TARGET[e.cat] || 4000);
+  e.answerLimit = e.target;
+  e.minSL = Math.min(e.minSL ?? GROW_FLOOR, GROW_FLOOR);
+}
 
 /* --------------------------------------------------------- 10,000 prompt library */
 // Keep the original broad prompts and add letter-constrained forms such as

@@ -15,13 +15,13 @@ on:
         required: false
         default: 'true'
       batch:
-        description: '0-based batch index (0–19 at 500 each); use all to attempt every prompt'
+        description: '0-based batch index (all real prompts fit in batch 0); use all to attempt every prompt'
         required: false
         default: '0'
       batch_size:
         description: 'Prompts per batch (the run stops cleanly at the time budget and continues itself)'
         required: false
-        default: '500'
+        default: '2500'
       start:
         description: 'Position inside the batch to start from (used by the automatic continuation)'
         required: false
@@ -62,6 +62,9 @@ jobs:
       - name: Self-test (engine + catalog)
         run: node scripts/selftest.mjs
 
+      - name: Unpack the linked answer store into per-question files
+        run: node scripts/linked-store.mjs unpack
+
       - name: Build packs from Wikidata
         env:
           ONLY: ${{ github.event.inputs.only }}
@@ -94,13 +97,16 @@ jobs:
           CANDIDATE_OFFSET=${CANDIDATE_OFFSET:-0}
           echo "BUILT_BATCH=$BATCH" >> "$GITHUB_ENV"
           echo "BUILT_OFFSET=$CANDIDATE_OFFSET" >> "$GITHUB_ENV"
-          if [ "$BATCH" != "all" ]; then ARGS+=(--batch "$BATCH" --batch-size "${BATCH_SIZE:-500}"); fi
+          if [ "$BATCH" != "all" ]; then ARGS+=(--batch "$BATCH" --batch-size "${BATCH_SIZE:-2500}"); fi
           ARGS+=(--candidate-offset "$CANDIDATE_OFFSET")
           node scripts/build-data.mjs "${ARGS[@]}"
 
       - name: Backfill legacy manifest metadata and validate data
         run: |
           node scripts/backfill-manifest.mjs
+          # Fold the per-question files back into the linked store (one row per answer, shared by many questions).
+          node scripts/linked-store.mjs pack
+          node scripts/build-prompt-meta.mjs
           node scripts/validate-data.mjs
           node scripts/report-data.mjs
 
@@ -186,5 +192,5 @@ jobs:
             -f "inputs[batch]=$NEXT_BATCH" \
             -f "inputs[start]=$NEXT_START" \
             -f "inputs[max_minutes]=${MAX_MINUTES:-140}" \
-            -f "inputs[batch_size]=${BATCH_SIZE:-500}" \
+            -f "inputs[batch_size]=${BATCH_SIZE:-2500}" \
             -f "inputs[candidate_offset]=${CANDIDATE_OFFSET:-0}"

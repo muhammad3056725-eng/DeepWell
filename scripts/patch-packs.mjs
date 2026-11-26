@@ -2,6 +2,11 @@
 // Offline repair of the packs already in data/: re-clean, apply data/overrides.json, and guarantee the anchors
 // (famous answers) through the real matcher. Needs no network. Run this, then `node scripts/backfill-manifest.mjs`.
 // Usage: node scripts/patch-packs.mjs [--only a,b,c] [--all]
+import { existsSync, readdirSync } from 'node:fs';
+if (!existsSync('data/packs') || !readdirSync('data/packs').some(f => f.endsWith('.json'))) {
+  console.error('No loose packs in data/packs/. The site data is stored linked: run `node scripts/linked-store.mjs unpack` first, and `node scripts/linked-store.mjs pack` afterwards.');
+  process.exit(1);
+}
 import { readFile, writeFile } from 'node:fs/promises';
 import { CATALOG } from '../js/catalog.js';
 import { fromPack, toPack } from '../js/wikidata.js';

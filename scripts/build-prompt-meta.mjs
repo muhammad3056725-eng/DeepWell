@@ -2,13 +2,14 @@
 // Writes data/prompt-meta.json: how well-known each prompt's answers are, so the game can build dives with a fair
 // difficulty curve ("easy" prompts where most people can name something, "hard" where only fans can).
 // fame = median Wikipedia-language count of the 10 best-known answers (log scale); letter packs inherit their base pack.
-// Offline: reads data/packs only. Usage: node scripts/build-prompt-meta.mjs
+// Offline: reads the linked store (or loose packs). Usage: node scripts/build-prompt-meta.mjs
 import { readFile, readdir, writeFile } from 'node:fs/promises';
-import { fromPack } from '../js/wikidata.js';
-const files = (await readdir('data/packs')).filter(f => f.endsWith('.json'));
+import { readAnyPrompt } from './linked-store.mjs';
+const manifest = JSON.parse(await readFile('data/manifest.json', 'utf8'));
+const files = Object.keys(manifest.packs).map(id => id + '.json');
 const rows = [];
 for (const f of files) {
-  const id = f.slice(0, -5), items = fromPack(JSON.parse(await readFile('data/packs/' + f, 'utf8')));
+  const id = f.slice(0, -5), items = await readAnyPrompt(manifest, id);
   // "known" = answers that exist in 20+ Wikipedia languages: a rough count of things an ordinary player could name.
   const known = items.filter(i => (+i.s || 0) >= 20).length;
   rows.push({ id, n: items.length, known });
