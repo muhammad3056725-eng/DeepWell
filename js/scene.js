@@ -1741,7 +1741,8 @@ function frame(time) {
   const w=width||window.innerWidth,h=height||window.innerHeight;
   const actualDepth=clamp((Number(getDepth())||0)/CONFIG.MAX_DEPTH_VISUAL,0,1);
   const promptProgress=clamp(Number(getProgress())||0,0,1);
-  const targetStage=clamp(Math.max(actualDepth,promptProgress*0.82),0,1);
+  // The scene only goes deeper when the player earns depth. A wrong answer or a timeout never moves the region.
+  const targetStage=actualDepth;
   const still=Boolean(isStill());
   const delta=still?0:Math.min(42,previousTime?time-previousTime:16);
   perfFrames++;
@@ -1765,12 +1766,12 @@ function frame(time) {
   }
   if(!still){
     previousTime=time;frozenTime=0;
-    const blend=1-Math.exp(-delta/1150);
+    const blend=1-Math.exp(-delta/1900);
     visualStage+=(targetStage-visualStage)*blend;
-    visualDepth+=(targetStage-visualDepth)*(1-Math.exp(-delta/1550));
+    visualDepth+=(targetStage-visualDepth)*(1-Math.exp(-delta/2600));
   } else if(!frozenTime) frozenTime=time;
   if(still)sinkSmooth=0;
-  else sinkSmooth+=(clamp((targetStage-visualDepth)*16,0,1)-sinkSmooth)*(1-Math.exp(-delta/260));
+  else sinkSmooth+=(clamp((targetStage-visualDepth)*22,0,1)-sinkSmooth)*(1-Math.exp(-delta/420));
   const t=still?(frozenTime||time):time;
   const predatorEvent=eventScene?.kind==='predator';
   const predatorT=predatorEvent?clamp((t-eventScene.start)/eventScene.duration,0,1):0;

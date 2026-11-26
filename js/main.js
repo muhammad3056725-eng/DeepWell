@@ -58,6 +58,7 @@ async function startDive(mode, category = null) {
 const label = (mode, cat) => (mode === 'daily' ? 'DAILY DIVE' : mode === 'pack' ? String(cat).toUpperCase() : 'ENDLESS DIVE');
 
 function nextPrompt() {
+  endDescent();
   if (run.index >= run.prompts.length) return finish();
   const p = run.prompts[run.index];
   run.locked = false; run.paused = false; run.pending = null; run.tries = [];
@@ -211,14 +212,30 @@ async function resolve(item, value) {
   });
   $('feedback').textContent = message;
   $('live').textContent = message;
-  updateDepthUI(mine.depth);
+  // A scoring answer starts a slow, readable descent: the question fades, the craft sinks, then the next one appears.
+  const descend = points > 0 && !S.store.settings.motion;
+  const wait = descend ? Math.min(5200, 3200 + Math.round(points * 20)) : 1100;
+  updateDepthUI(mine.depth, descend ? wait - 700 : undefined);
+  if (descend) startDescent(mine.depth);
   // Visual-only rarity encounter. Answer points/state are read; scoring and progression are untouched.
   triggerAnswerVisual(points, state);
   flashTier(points, state);
   mine.index++;
   paintSteps();
-  setTimeout(() => { if (run === mine) nextPrompt(); }, 1100);
+  setTimeout(() => { if (run === mine) nextPrompt(); }, wait);
 }
+
+/* ---- Descent interlude between questions ---- */
+let descentEl = null;
+function startDescent(depth) {
+  if (!descentEl) { descentEl = document.createElement('div'); descentEl.className = 'descent-note'; descentEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(descentEl); }
+  descentEl.textContent = '';
+  const a = document.createElement('b'), b = document.createElement('small');
+  a.textContent = 'Descending'; b.textContent = `${Math.round(depth).toLocaleString()} m`;
+  descentEl.replaceChildren(a, b);
+  document.body.classList.add('descending');
+}
+function endDescent() { document.body.classList.remove('descending'); }
 
 /* ---- Per-prompt progress steps and the tier flash shown after each answer ---- */
 function paintSteps() {
@@ -242,7 +259,7 @@ function flashTier(points, state) {
 
 /* ---------------------------------------------------------------- finishing */
 function finish() {
-  clearInterval(run.timer);
+  clearInterval(run.timer); endDescent();
   const valid = run.answers.filter(a => a.points > 0).length;
   const streak = S.recordDive({ mode: run.mode, depth: run.depth, answers: valid });
   renderResults(run, run.mode === 'daily' ? streak : S.liveStreak());
