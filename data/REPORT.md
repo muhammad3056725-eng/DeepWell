@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-26 · Manifest version: 35
-Packs: 489 · Answers: 377,230 · Pack bytes: 23,189,751 (22.12 MiB) / 60 MiB
+Built: 2026-11-26 · Manifest version: 36
+Packs: 489 · Answers: 377,233 · Pack bytes: 23,190,847 (22.12 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 489 · Answers: 377,230 · Pack bytes: 23,189,751 (22.12 MiB) / 60 MiB
 | Film & TV | 11 | 8735 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
-| Geography | 176 | 149497 | 724 |
+| Geography | 176 | 149500 | 724 |
 | History | 18 | 13503 | 949.5 |
 | Language | 10 | 4383 | 251 |
 | Literature | 12 | 10458 | 971 |
@@ -78,7 +78,8 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
+| city-in-chile | 4 | 1 |
 
 ## Repository size check
 
-Raw answer data size (data/linked + data/packs): 23,189,751 bytes (22.12 MiB); budget 60 MiB.
+Raw answer data size (data/linked + data/packs): 23,190,847 bytes (22.12 MiB); budget 60 MiB.

@@ -1,29 +1,38 @@
 {
-  "stoppedAt": 73,
-  "skipped": [],
+  "stoppedAt": 91,
+  "skipped": [
+    "city-in-iraq (pool too small; previous retained)",
+    "city-in-united-arab-emirates (pool too small; previous retained)"
+  ],
   "failed": [
-    "city-in-russia: prompt time cap reached",
-    "city-in-turkey: prompt time cap reached",
-    "city-in-south-africa: prompt time cap reached",
-    "city-in-poland: prompt time cap reached",
-    "city-in-sweden: prompt time cap reached",
-    "city-in-indonesia: prompt time cap reached"
+    "city-in-south-korea: prompt time cap reached",
+    "city-in-new-zealand: prompt time cap reached",
+    "city-in-greece: prompt time cap reached",
+    "city-in-portugal: prompt time cap reached",
+    "city-in-ukraine: prompt time cap reached",
+    "city-in-colombia: prompt time cap reached",
+    "city-in-kenya: prompt time cap reached",
+    "city-in-bangladesh: prompt time cap reached",
+    "city-in-sri-lanka: prompt time cap reached",
+    "city-in-nepal: prompt time cap reached",
+    "city-in-afghanistan: This operation was aborted",
+    "city-in-israel: prompt time cap reached"
   ],
   "built": 2,
-  "unchanged": 9,
+  "unchanged": 2,
   "fallback": [
-    "city-in-argentina",
-    "city-in-saudi-arabia"
+    "city-in-chile",
+    "city-in-peru"
   ],
   "previousRetained": [],
   "rejected": {
-    "city-in-argentina": {
+    "city-in-chile": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-saudi-arabia": {
+    "city-in-peru": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
