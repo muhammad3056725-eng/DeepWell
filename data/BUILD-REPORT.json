@@ -1,24 +1,174 @@
 {
-  "stoppedAt": 97,
+  "stoppedAt": 31,
   "skipped": [],
   "failed": [
-    "city-in-chile: prompt time cap reached",
-    "city-in-peru: prompt time cap reached",
-    "city-in-kenya: prompt time cap reached",
-    "city-in-morocco: prompt time cap reached",
-    "city-in-bangladesh: prompt time cap reached",
-    "river-in-united-states: prompt time cap reached",
-    "river-in-canada: prompt time cap reached",
-    "river-in-india: prompt time cap reached",
-    "river-in-china: prompt time cap reached",
-    "river-in-russia: prompt time cap reached",
-    "river-in-brazil: prompt time cap reached",
-    "river-in-italy: prompt time cap reached",
-    "river-in-spain: prompt time cap reached"
+    "mountain: prompt time cap reached",
+    "peninsula: prompt time cap reached"
   ],
-  "built": 0,
+  "built": 25,
   "unchanged": 4,
-  "fallback": [],
+  "fallback": [
+    "island",
+    "river",
+    "lake",
+    "bay",
+    "museum",
+    "airport",
+    "bridge",
+    "castle",
+    "mosque"
+  ],
   "previousRetained": [],
-  "rejected": {}
+  "rejected": {
+    "city": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 7,
+      "wrongClass": 0
+    },
+    "island": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "river": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "lake": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "volcano": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "desert": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "sea": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "waterfall": {
+      "invalid": 2,
+      "blocked": 0,
+      "duplicate": 2,
+      "wrongClass": 0
+    },
+    "national-park": {
+      "invalid": 1,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "mountain-range": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 9,
+      "wrongClass": 0
+    },
+    "strait": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "bay": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "glacier": {
+      "invalid": 1,
+      "blocked": 0,
+      "duplicate": 3,
+      "wrongClass": 0
+    },
+    "canyon": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "archipelago": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "world-heritage": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "museum": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "airport": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 4,
+      "wrongClass": 0
+    },
+    "stadium": {
+      "invalid": 1,
+      "blocked": 0,
+      "duplicate": 10,
+      "wrongClass": 0
+    },
+    "bridge": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "castle": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "skyscraper": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 2,
+      "wrongClass": 0
+    },
+    "cathedral": {
+      "invalid": 1,
+      "blocked": 0,
+      "duplicate": 41,
+      "wrongClass": 0
+    },
+    "mosque": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "lighthouse": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 3,
+      "wrongClass": 0
+    }
+  }
 }
