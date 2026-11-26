@@ -1,10 +1,10 @@
 // Dive preparation: choose prompts, load their answer pools, apply letter variants.
-import { CONFIG } from './config.js?v=linked-20261125';
-import { CATALOG, loadRawPool, stableEntries, promptMeta } from './data.js?v=linked-20261125';
+import { CONFIG } from './config.js?v=space-20261126';
+import { CATALOG, loadRawPool, stableEntries, promptMeta } from './data.js?v=space-20261126';
 import {
   pickEntries, planDive, mulberry32, hashString, buildPool, deriveLetterPool, chooseVariant,
   promptKey, promptText, utcDate,
-} from './engine.js?v=linked-20261125';
+} from './engine.js?v=space-20261126';
 
 const historyKey = text => `question:${String(text || '').toLowerCase().replace(/\s+/g, ' ').trim()}`;
 

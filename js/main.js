@@ -1,18 +1,18 @@
 // DEEPWELL entry point: wires the screens to the game rules.
-import { CONFIG, sinkMetres } from './config.js?v=linked-20261125';
-import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=linked-20261125';
-import { loadManifest } from './data.js?v=linked-20261125';
-import { prepareDive, examples } from './game.js?v=linked-20261125';
+import { CONFIG, sinkMetres, altitudeLabel } from './config.js?v=space-20261126';
+import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=space-20261126';
+import { loadManifest } from './data.js?v=space-20261126';
+import { prepareDive, examples } from './game.js?v=space-20261126';
 import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=linked-20261125';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './scene.js?v=linked-20261125';
-import { wake, tone, buzz } from './audio.js?v=linked-20261125';
+import * as S from './state.js?v=space-20261126';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './space.js?v=space-20261126';
+import { wake, tone, buzz } from './audio.js?v=space-20261126';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=linked-20261125';
+} from './ui.js?v=space-20261126';
 
-let run = null; // the dive in progress
+let run = null; // the flight in progress
 let timerRaf = 0;
 let lastTimerPaint = -1;
 let runId = 0;  // guards against a stale async load finishing after the player left
@@ -22,7 +22,7 @@ const SOURCE_LABEL = { wikidata: 'Wikidata', seed: 'Offline list', live: 'Live W
 /* ---------------------------------------------------------------- starting */
 async function startDive(mode, category = null) {
   wake();
-  if (mode === 'daily' && S.dailyDone()) { toast("Today's dive is already in your logbook."); return; }
+  if (mode === 'daily' && S.dailyDone()) { toast("Today's flight is already in your logbook."); return; }
   const id = ++runId;
   resetDiveVisual();
   clearInterval(run?.timer);
@@ -43,7 +43,7 @@ async function startDive(mode, category = null) {
     prompts = await prepareDive({ mode, category, recent: S.store.recentPrompts });
   } catch (e) {
     if (id !== runId) return;
-    toast(e.message || 'Could not start a dive.');
+    toast(e.message || 'Could not start a flight.');
     show('home');
     document.body.classList.remove('in-game');
     return;
@@ -55,7 +55,7 @@ async function startDive(mode, category = null) {
   nextPrompt();
 }
 
-const label = (mode, cat) => (mode === 'daily' ? 'DAILY DIVE' : mode === 'pack' ? String(cat).toUpperCase() : 'ENDLESS DIVE');
+const label = (mode, cat) => (mode === 'daily' ? 'DAILY FLIGHT' : mode === 'pack' ? String(cat).toUpperCase() : 'ENDLESS FLIGHT');
 
 function nextPrompt() {
   endDescent();
@@ -84,7 +84,7 @@ function updateSwapUI() {
   btn.disabled = left === 0 || run.locked;
 }
 
-/** Throw away the current question for a fresh one of the same difficulty (once per dive). The timer restarts. */
+/** Throw away the current question for a fresh one of the same difficulty (once per flight). The timer restarts. */
 function swapPrompt() {
   if (!run || run.locked || run.paused || run.swapsLeft < 1 || !run.spares.length) return;
   const current = run.prompts[run.index];
@@ -166,7 +166,7 @@ function retryAnswer(item, value) {
   const mine = run, input = $('answerInput');
   if (!item) { S.store.misses++; S.save(); }
   mine.tries.push(value);
-  const message = item ? `${item.n} was already named in this dive. Try another.` : 'Not recognised. Try another answer.';
+  const message = item ? `${item.n} was already named in this flight. Try another.` : 'Not recognised. Try another answer.';
   $('feedback').textContent = message;
   $('live').textContent = message;
   tone(110, 0.12);
@@ -186,9 +186,9 @@ async function resolve(item, value) {
   const p = run.prompts[run.index];
 
   let points = 0, state = 'miss', message;
-  if (!value) { message = "Time's up. Depth holds."; state = 'timeout'; }   // also reached after wrong tries: the clock ran out
-  else if (!item) { message = 'Not recognised for this prompt. Depth holds.'; S.store.misses++; S.save(); }
-  else if (run.used.has(item.id)) { message = `${item.n} was already named in this dive.`; state = 'repeat'; }
+  if (!value) { message = "Time's up. Altitude holds."; state = 'timeout'; }   // also reached after wrong tries: the clock ran out
+  else if (!item) { message = 'Not recognised for this prompt. Altitude holds.'; S.store.misses++; S.save(); }
+  else if (run.used.has(item.id)) { message = `${item.n} was already named in this flight.`; state = 'repeat'; }
   else {
     run.used.add(item.id);
     points = item.r;
@@ -212,7 +212,7 @@ async function resolve(item, value) {
   });
   $('feedback').textContent = message;
   $('live').textContent = message;
-  // A scoring answer starts a slow, readable descent: the question fades, the craft sinks, then the next one appears.
+  // A scoring answer starts a slow, readable climb: the question fades, the rocket climbs, then the next one appears.
   const descend = points > 0 && !S.store.settings.motion;
   const wait = descend ? Math.min(5200, 3200 + Math.round(points * 20)) : 1100;
   updateDepthUI(mine.depth, descend ? wait - 700 : undefined);
@@ -231,7 +231,7 @@ function startDescent(depth) {
   if (!descentEl) { descentEl = document.createElement('div'); descentEl.className = 'descent-note'; descentEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(descentEl); }
   descentEl.textContent = '';
   const a = document.createElement('b'), b = document.createElement('small');
-  a.textContent = 'Descending'; b.textContent = `${Math.round(depth).toLocaleString()} m`;
+  a.textContent = 'Ascending'; b.textContent = altitudeLabel(depth);
   descentEl.replaceChildren(a, b);
   document.body.classList.add('descending');
 }
@@ -251,8 +251,8 @@ let tierFlashEl = null;
 function flashTier(points, state) {
   if (!tierFlashEl) { tierFlashEl = document.createElement('div'); tierFlashEl.className = 'tier-flash'; tierFlashEl.setAttribute('aria-hidden', 'true'); document.body.appendChild(tierFlashEl); }
   const b = document.createElement('b'), small = document.createElement('small');
-  if (points > 0) { b.textContent = tier(points); b.className = tierClass(tier(points)); small.textContent = `+${points} pts · sink ${sinkMetres(points).toLocaleString()} m`; }
-  else { b.textContent = state === 'repeat' ? 'Repeat' : 'Miss'; b.className = 'miss'; small.textContent = 'no depth this time'; }
+  if (points > 0) { b.textContent = tier(points); b.className = tierClass(tier(points)); small.textContent = `+${points} pts · now ${altitudeLabel(run.depth)}`; }
+  else { b.textContent = state === 'repeat' ? 'Repeat' : 'Miss'; b.className = 'miss'; small.textContent = 'no altitude this time'; }
   tierFlashEl.replaceChildren(b, small);
   tierFlashEl.classList.remove('show'); void tierFlashEl.offsetWidth; tierFlashEl.classList.add('show');
 }
@@ -270,8 +270,8 @@ function finish() {
 async function share() {
   if (!run) return;
   const marks = run.answers.map(a => (a.points >= 70 ? '◈' : a.points ? '◆' : '·')).join('');
-  const head = run.mode === 'daily' ? `DEEPWELL ${utcDate()} · ${Math.round(run.depth)} m` : `DEEPWELL ${Math.round(run.depth)} m`;
-  const text = `${head}\n${marks}\nCan you think deeper? https://${CONFIG.DOMAIN}`;
+  const head = run.mode === 'daily' ? `DEEPWELL ${utcDate()} · ${altitudeLabel(run.depth)}` : `DEEPWELL ${altitudeLabel(run.depth)}`;
+  const text = `${head}\n${marks}\nCan you fly higher? https://${CONFIG.DOMAIN}`;
   try {
     if (navigator.share) await navigator.share({ title: CONFIG.TITLE, text });
     else { await navigator.clipboard.writeText(text); toast('Result copied.'); }
