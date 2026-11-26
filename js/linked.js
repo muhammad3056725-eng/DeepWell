@@ -1,120 +1,74 @@
-// Linked answer store (pack format v3).
+// Linked answer store, format v4: every answer is stored ONCE for the whole game.
 //
-// Idea: one answer is stored ONCE, and every question it belongs to just points at it.
-//   "Shah Rukh Khan" is an actor, a singer, a film producer ... from India. In the old layout he was copied into each
-//   of those question files (with all his aliases). In the linked layout there is one row for him, plus a bit mask that
-//   says which questions of the shard he answers.
+//   data/linked/e.<k>.json   entity chunks. One row per answer (id, name, popularity, aliases), shared by every
+//                            question it answers. "Shah Rukh Khan" is one row even though he answers "Name an actor",
+//                            "Name a film producer" and "Name a TV presenter"; "pizza" is one row for "food at a party",
+//                            "pizza topping" and "fast food". Rows are grouped by the smallest question that uses them,
+//                            so a question mostly downloads chunks full of its own answers.
+//   data/linked/q/<id>.json  one small index per question: which rows answer it, plus per-question popularity
+//                            overrides for hand-curated answers (pizza is the #1 party food, not the #1 fast food).
 //
-// A SHARD is a group of related questions (all the India questions: actors, poets, cities, rivers, ...).
-// A shard is saved as a few CHUNK files (about 300 KB each, most famous answers first) so that very large answer
-// lists (up to ANSWER_CAP per question) never make one huge download. A question only fetches the chunks that
-// actually contain its answers.
+// Entity chunk: { v:4, chunk, ids:[number|string], names:[], s:[], aliases:{rowIndex:[...]} }
+//   ids: number n = Wikidata Q<n>; strings ("c:pizza", "manual:...") are kept as they are.
+// Question index: { v:4, id, r:{ "<chunk>": [delta-encoded row numbers] }, o:{ "<chunk>.<row>": popularity } }
+// Manifest: manifest.store = { v:4, chunks:[{n,hash,bytes}], entities, memberships }
+//           manifest.packs[id] = { n, chunks:[k...], qhash, source, kind?, prompt?, cat?, level? }
 //
-// Chunk file:  { v:3, shard, chunk, ids:[number|string], names:[], sitelinks:[], aliases:{rowIndex:[...]}, m:[mask] }
-//   ids       number n means Wikidata Q<n>; strings (manual:...) are kept as they are
-//   m         one integer per row, bit i set = answers the shard's i-th question; omitted when the shard has 1 question
-//
-// Manifest:    manifest.shards[shard] = { prompts:[ids], chunks:[{n,hash,bytes}], built }
-//              manifest.packs[id]     = { n, shard, bit, chunks:[indexes], ... }   (no hash/bytes: the chunks carry them)
-//
-// This file has no DOM or Node-only code: the browser loader and the Node tooling share it.
+// No DOM or Node-only code here: the browser loader and the Node tooling share this file.
 
-export const MAX_SHARD_PROMPTS = 30;          // one 31-bit integer mask per row
-export const CHUNK_BYTES = 300 * 1024;        // target raw size of one chunk file
 export const LINKED_DIR = 'data/linked';
+export const CHUNK_BYTES = 96 * 1024;   // target raw size of one entity chunk (about 30 KB gzipped)
+export const MAX_SHARD_PROMPTS = Infinity; // kept for old tooling; v4 has no per-shard question limit
 
-const idOut = id => /^Q\d+$/.test(id) ? Number(id.slice(1)) : String(id);
-const idIn = v => typeof v === 'number' ? 'Q' + v : String(v);
+export const idOut = id => /^Q\d+$/.test(id) ? Number(id.slice(1)) : String(id);
+export const idIn = v => typeof v === 'number' ? 'Q' + v : String(v);
 
-/**
- * Which shard a question belongs to. Country questions ("actor-from-india", "city-in-india") share a shard per country,
- * everything else is a shard of its own (it still gets chunking, a compact encoding and shared id/alias storage).
- * `countrySuffixes` is the set of country slugs that have at least two questions (computed by the caller).
- */
-export function shardOf(id, countrySuffixes = new Set()) {
-  const m = /-(?:from|in)-([a-z0-9-]+)$/.exec(id);
-  if (m && !/-starts-/.test(id) && countrySuffixes.has(m[1])) return 'c-' + m[1];
-  return 'p-' + id;
+/** Rows of one entity chunk as [{id,n,s,a}]. */
+export function entityRows(chunk) {
+  return (chunk.names || []).map((n, i) => ({ id: idIn(chunk.ids[i]), n, s: Number(chunk.s?.[i]) || 0, a: chunk.aliases?.[i] || [] }));
 }
 
-/** Country slugs shared by two or more question ids. */
-export function countrySuffixesOf(ids) {
-  const count = new Map();
-  for (const id of ids) {
-    const m = /-(?:from|in)-([a-z0-9-]+)$/.exec(id);
-    if (m && !/-starts-/.test(id)) count.set(m[1], (count.get(m[1]) || 0) + 1);
-  }
-  return new Set([...count].filter(([, n]) => n >= 2).map(([s]) => s));
-}
-
-/** Group question ids into shards of at most MAX_SHARD_PROMPTS, deterministically. Returns Map shardId -> [ids]. */
-export function planShards(ids) {
-  const suffixes = countrySuffixesOf(ids), groups = new Map();
-  for (const id of [...ids].sort()) {
-    const key = shardOf(id, suffixes);
-    (groups.get(key) || groups.set(key, []).get(key)).push(id);
-  }
-  const out = new Map();
-  for (const [key, list] of groups) {
-    for (let i = 0; i < list.length; i += MAX_SHARD_PROMPTS) {
-      out.set(i ? `${key}-${i / MAX_SHARD_PROMPTS + 1}` : key, list.slice(i, i + MAX_SHARD_PROMPTS));
-    }
+/** Decode a question index into [[chunk, row, override|undefined]] in file order. */
+export function questionRefs(q) {
+  const out = [];
+  for (const [c, deltas] of Object.entries(q.r || {})) {
+    let row = 0;
+    deltas.forEach((d, i) => { row = i ? row + d : d; out.push([Number(c), row, q.o?.[`${c}.${row}`]]); });
   }
   return out;
 }
 
-// Total order on ids so packing is repeatable: Q-numbers by value, then everything else alphabetically.
-const idCompare = (a, b) => {
-  const qa = /^Q\d+$/.test(a), qb = /^Q\d+$/.test(b);
-  if (qa && qb) return Number(a.slice(1)) - Number(b.slice(1));
-  return qa ? -1 : qb ? 1 : a < b ? -1 : a > b ? 1 : 0;
-};
-
-const rowBytes = (r) => 12 + r.n.length + (r.a.length ? r.a.join(',').length + r.a.length * 3 : 0);
-
-/**
- * Pack one shard. `pools` is Map promptId -> [{id,n,s,a}]. Returns { prompts, chunks:[object], perPrompt:{id:{n,chunks}} }.
- * Rows are ordered most-famous first; a row's mask lists every question it answers.
- */
-export function packShard(shardId, pools) {
-  const prompts = [...pools.keys()].sort();
-  if (prompts.length > MAX_SHARD_PROMPTS) throw new Error(`shard ${shardId} has ${prompts.length} questions (max ${MAX_SHARD_PROMPTS})`);
-  const rows = new Map(); let order = 0;
-  prompts.forEach((pid, bit) => {
-    for (const it of pools.get(pid)) {
-      const key = String(it.id);
-      let r = rows.get(key);
-      if (!r) { r = { id: key, n: it.n, s: Number(it.s) || 0, a: [], mask: 0, order: order++ }; rows.set(key, r); }
-      if ((Number(it.s) || 0) > r.s) { r.s = Number(it.s) || 0; r.n = it.n; }
-      r.mask |= (1 << bit);
-      for (const a of it.a || []) if (!r.a.includes(a) && a !== r.n) r.a.push(a);
-    }
-  });
-  const sorted = [...rows.values()].sort((x, y) => y.s - x.s || idCompare(x.id, y.id));
-  const solo = prompts.length === 1, chunks = [], perPrompt = Object.fromEntries(prompts.map(p => [p, { n: 0, chunks: new Set() }]));
-  let cur = null, bytes = 0;
-  const open = () => { cur = { v: 3, shard: shardId, chunk: chunks.length, ids: [], names: [], sitelinks: [], aliases: {}, ...(solo ? {} : { m: [] }) }; bytes = 0; chunks.push(cur); };
-  for (const r of sorted) {
-    if (!cur || (bytes >= CHUNK_BYTES && cur.ids.length)) open();
-    const i = cur.ids.length;
-    cur.ids.push(idOut(r.id)); cur.names.push(r.n); cur.sitelinks.push(r.s);
-    if (r.a.length) cur.aliases[i] = r.a;
-    if (!solo) cur.m.push(r.mask);
-    bytes += rowBytes(r);
-    prompts.forEach((pid, bit) => { if (r.mask & (1 << bit)) { perPrompt[pid].n++; perPrompt[pid].chunks.add(cur.chunk); } });
+/** Encode refs ([[chunk,row,override?]]) into the compact question-index form. */
+export function encodeRefs(id, refs) {
+  const by = new Map(), o = {};
+  for (const [c, row, s] of refs) {
+    (by.get(c) || by.set(c, []).get(c)).push(row);
+    if (s !== undefined) o[`${c}.${row}`] = s;
   }
-  for (const pid of prompts) perPrompt[pid].chunks = [...perPrompt[pid].chunks].sort((a, b) => a - b);
-  return { prompts, chunks, perPrompt };
+  const r = {};
+  for (const c of [...by.keys()].sort((a, b) => a - b)) {
+    const rows = [...new Set(by.get(c))].sort((a, b) => a - b);
+    r[c] = rows.map((v, i) => (i ? v - rows[i - 1] : v));
+  }
+  return { v: 4, id, r, ...(Object.keys(o).length ? { o } : {}) };
 }
 
-/** Rows of one chunk file as [{id,n,s,a,m}] (m undefined for single-question shards). */
+/** Items of a question given its index and a chunk lookup (chunk number -> rows). Sorted best known first. */
+export function itemsFromRefs(q, rowsOf) {
+  const out = [];
+  for (const [c, row, s] of questionRefs(q)) {
+    const r = rowsOf(c)?.[row];
+    if (r) out.push({ id: r.id, n: r.n, s: s ?? r.s, a: r.a });
+  }
+  return out.sort((a, b) => b.s - a.s || a.n.localeCompare(b.n));
+}
+
+/* ------------------------------------------------------------------ legacy v3 (read-only, for migration) */
 export function chunkRows(chunk) {
   return (chunk.names || []).map((n, i) => ({
     id: idIn(chunk.ids[i]), n, s: Number(chunk.sitelinks?.[i]) || 0, a: chunk.aliases?.[i] || [], m: chunk.m ? chunk.m[i] : undefined,
   }));
 }
-
-/** The answers of question number `bit`, from rows already loaded (any subset of chunks, in rank order). */
 export function itemsForBit(rows, bit) {
   const out = [];
   for (const r of rows) if (r.m === undefined || (r.m >> bit) & 1) out.push({ id: r.id, n: r.n, s: r.s, a: r.a });
@@ -122,27 +76,26 @@ export function itemsForBit(rows, bit) {
 }
 
 /* ------------------------------------------------------------- browser loader */
+const chunkCache = new Map(); // "<k>.<version>" -> Promise<rows>
 
-const chunkCache = new Map(); // "<shard>.<n>.<version>" -> Promise<rows>
+function loadChunk(k, version, fetchFn) {
+  const key = `${k}.${version}`;
+  if (!chunkCache.has(key)) {
+    chunkCache.set(key, fetchFn(`${LINKED_DIR}/e.${k}.json?v=${version}`).then(r => {
+      if (!r.ok) throw new Error('chunk ' + r.status);
+      return r.json();
+    }).then(entityRows).catch(e => { chunkCache.delete(key); throw e; }));
+  }
+  return chunkCache.get(key);
+}
 
-/**
- * Load the answers of one question from the linked store. Chunks are cached per session, so the second question of a
- * shard (another India question, say) costs no download for the chunks they have in common.
- */
-export async function loadLinkedItems(meta, manifest, fetchFn = fetch) {
-  const shard = manifest.shards?.[meta.shard];
-  if (!shard) throw new Error('unknown shard ' + meta.shard);
-  const version = manifest.version || 0, all = [];
-  const parts = await Promise.all((meta.chunks || shard.chunks.map((_, i) => i)).map(i => {
-    const key = `${meta.shard}.${i}.${version}`;
-    if (!chunkCache.has(key)) {
-      chunkCache.set(key, fetchFn(`${LINKED_DIR}/${meta.shard}.${i}.json?v=${version}`).then(r => {
-        if (!r.ok) throw new Error('chunk ' + r.status);
-        return r.json();
-      }).then(chunkRows).catch(e => { chunkCache.delete(key); throw e; }));
-    }
-    return chunkCache.get(key);
-  }));
-  for (const rows of parts) all.push(...rows);
-  return itemsForBit(all, meta.bit || 0);
+/** Load the answers of one question. Chunks are cached for the session and shared between questions. */
+export async function loadLinkedItems(meta, manifest, fetchFn = fetch, id = meta.id) {
+  const version = manifest.version || 0;
+  const res = await fetchFn(`${LINKED_DIR}/q/${id}.json?v=${version}`);
+  if (!res.ok) throw new Error('question index ' + res.status);
+  const q = await res.json();
+  const chunks = [...new Set(Object.keys(q.r || {}).map(Number))];
+  const rows = new Map(await Promise.all(chunks.map(async k => [k, await loadChunk(k, version, fetchFn)])));
+  return itemsFromRefs(q, k => rows.get(k));
 }

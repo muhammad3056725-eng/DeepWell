@@ -5,7 +5,7 @@ export const CONFIG = {
 
   // Flight shape
   PROMPTS_PER_DIVE: 7,
-  DAILY_SECONDS: 20,
+  DAILY_SECONDS: 30, // enough time to type on a phone
   // Every scoring answer climbs CLIMB_BASE flight units plus CLIMB_PER_POINT per point, so even a run of common answers
   // leaves the sky (about 2,500 units over seven answers) and rare answers climb much further. Misses climb nothing.
   // Flight units are shown to the player as real-looking distances (km, million km, AU, light-years) by altitudeLabel().

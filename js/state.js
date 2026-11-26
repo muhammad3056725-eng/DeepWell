@@ -1,5 +1,5 @@
 // Persistent player state (localStorage, with an in-memory fallback).
-import { utcDate, previousUtcDate } from './engine.js';
+import { utcDate, previousUtcDate } from './engine.js?v=apogee-20261127';
 
 const KEY = 'deepwell-v2';
 let memory = null;

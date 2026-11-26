@@ -1,10 +1,10 @@
 // DOM helpers and screen renderers. No game rules live here.
-import { CONFIG, sinkMetres, altitudeLabel, ZONES, zoneOf } from './config.js?v=space-20261126';
-import { CATEGORIES } from './catalog.js?v=space-20261126';
-import { libraryStats } from './data.js?v=space-20261126';
-import { tierClass, utcDate } from './engine.js?v=space-20261126';
-import * as S from './state.js?v=space-20261126';
-import { setVolume } from './audio.js?v=space-20261126';
+import { CONFIG, sinkMetres, altitudeLabel, ZONES, zoneOf } from './config.js?v=apogee-20261127';
+import { CATEGORIES } from './catalog.js?v=apogee-20261127';
+import { libraryStats } from './data.js?v=apogee-20261127';
+import { tierClass, utcDate } from './engine.js?v=apogee-20261127';
+import * as S from './state.js?v=apogee-20261127';
+import { setVolume } from './audio.js?v=apogee-20261127';
 
 export const $ = id => document.getElementById(id);
 export const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -65,7 +65,7 @@ export function renderHome() {
   $('countdown').textContent = `Next daily in ${untilReset()} · ${today ? 'come back tomorrow' : 'a fresh flight awaits'}`;
   const st = libraryStats();
   $('library').textContent = st.packs
-    ? `${st.answers.toLocaleString()} saved answers · ${st.packs.toLocaleString()} offline packs · ${st.prompts.toLocaleString()} question prompts · updated ${st.built}`
+    ? `${st.prompts.toLocaleString()} broad questions · ${(st.unique || st.answers).toLocaleString()} answers · updated ${st.built}`
     : `Starter set: ${st.stable} offline-ready prompts · ${st.prompts.toLocaleString()} question prompts available for live Endless play.`;
 }
 

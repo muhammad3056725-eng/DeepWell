@@ -23,7 +23,8 @@ export function tone(freq, duration = 0.12, type = 'sine') {
 }
 
 export function buzz(pattern) {
-  try { if (navigator.vibrate) navigator.vibrate(pattern); } catch { /* ignore */ }
+  // Browsers refuse (and log an error) until the player has tapped the page at least once.
+  try { if (navigator.vibrate && navigator.userActivation?.hasBeenActive !== false) navigator.vibrate(pattern); } catch { /* ignore */ }
 }
 
 

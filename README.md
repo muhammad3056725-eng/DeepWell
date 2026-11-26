@@ -2,33 +2,38 @@
 
 *(formerly DEEPWELL; the domain deepwell.games, the `/deepwell/` URL and the repository name are unchanged.)*
 
-A rare-answer space flight. Seven prompts, one timer, and the rarer your answer the higher your rocket climbs: sky, orbit, the planets, black holes, other galaxies.
+A rare-answer space flight. Seven broad prompts, one timer, and the rarer your answer the higher your rocket climbs: sky, orbit, the planets, black holes, other galaxies.
 Static site for **deepwell.games**, served by GitHub Pages. No server and no build step for the game itself.
 
 ## How it works
 
-- **Questions:** `js/catalog.js` defines 470+ question types ("Name a river", "Name a mountain in Italy", "Name a film director"). Each carries a Wikidata pattern that defines its answer pool.
-- **Answers:** `scripts/build-data.mjs` queries Wikidata and writes one file per question; `scripts/linked-store.mjs pack` then folds them into the linked store `data/linked/` (one row per answer, shared by many questions, chunked). A GitHub Action refreshes them daily. See `CHANGES.md`.
-- **Rarity:** an answer's score is its percentile rank by Wikipedia language count inside its pool: best known is about 3 points, rarest is 100. Climb per scoring answer = 280 units + points x 9 units (internally still called depth); units map to altitude: Moon, Mars, Sun, Jupiter, Neptune, light-years, galaxies (`unitsToKm` in `js/config.js`).
-- **Crowd data (optional):** set `CROWD_ENDPOINT` in `js/config.js` (see `docs/crowd-backend.md`) and real player answer shares are blended into the score once a prompt has enough samples.
-- **Daily Flight:** one personalized seven-prompt challenge per player each UTC day. Daily, Endless and themed flights share question history to avoid repeats until the unused pool is exhausted. Daily resets 00:00 UTC.
-- **Fallbacks:** pre-built pack, then bundled seed lists (`js/seed/`), then live Wikidata (Endless and packs only).
+- **Questions are broad.** Two kinds, mixed in every flight:
+  - **Everyday survey prompts** (`data/curated/*.txt`, about 90): "Name something people do at a party", "Name something you'd find in a kitchen", "Name a pizza topping", "Name a superpower you'd like to have". Hand-written answer lists of 60–200 answers each, ordered from most to least common.
+  - **Knowledge prompts** (`js/catalog.js`, about 275): "Name a mammal", "Name a skyscraper", "Name an actor", "Name a river". Answers come from Wikidata (thousands per prompt). Common-name overlays in `data/curated/` make sure the obvious answers count too: "cat", "bear" and "whale" for mammals, "pineapple" for fruits.
+  - Narrow prompts were removed: no "starting with X" variants and no "from <country>" splits.
+- **Answers are stored once.** `data/linked/` is a single answer store (format v4, see `js/linked.js`): one row per answer with its aliases and popularity, and a small index per question that points at its rows. An answer that fits several questions ("pizza" answers party food, fast food and things you buy at a supermarket) is written once. About 204,000 answers, 13 MB raw / 5 MB gzipped.
+- **Type it your way.** The matcher (`matchAnswer` in `js/engine.js`) accepts names, aliases, plurals, missing spaces or hyphens ("spiderman"), a single distinctive word ("winston" → Winston Churchill, "petronas" → Petronas Towers), typos ("margret thatcher") and sound-alike spellings ("chaikovsky"). Confident matches count at once and the game says what they were counted as; a doubtful one asks "Did you mean …?". Generic words ("lake") never count on their own.
+- **Rarity:** an answer's score is its percentile rank by popularity inside the prompt's pool: best known is about 3 points, rarest is 100. Wikidata answers use the number of Wikipedia language editions; curated answers use their place in the hand-ordered list. Climb per scoring answer = 280 units + points × 9 units; units map to altitude (`unitsToKm` in `js/config.js`).
+- **Crowd data (optional):** set `CROWD_ENDPOINT` in `js/config.js` (see `docs/crowd-backend.md`) to blend real player answer shares into the score.
+- **Daily Flight:** one personalised seven-prompt flight per player each UTC day (30 s per prompt). Flights alternate everyday and knowledge prompts, start easy and end with one hard prompt, and avoid prompts you have seen recently.
 
-## Run locally
+## Data workflow
 
 ```bash
-npm run serve      # then open http://localhost:8080 (ES modules need a server)
-npm test           # offline self-test
-npm run build-data # pull data from Wikidata (needs internet, slow)
+npm run serve                               # then open http://localhost:8080/deepwell/
+npm test                                    # offline self-test (engine, matcher, catalog, store)
+node scripts/linked-store.mjs unpack        # store -> data/packs/<id>.json (Wikidata prompts)
+node scripts/build-data.mjs --only actor    # refresh prompts from Wikidata (needs internet, slow)
+node scripts/linked-store.mjs pack          # data/packs + data/curated -> store (answers stored once)
+node scripts/build-prompt-meta.mjs && node scripts/validate-data.mjs
 ```
 
-## Deploy
+The **Build question data** workflow does the same every day and grows the Wikidata pools a little further each run.
 
-Push to `main`, then Settings > Pages > Deploy from branch > `main` / root. `CNAME` holds `deepwell.games`.
-Run the **Build question data** workflow once to fill `data/packs/`.
+## Add a question
 
-## Add a question type
+- **Everyday prompt:** add a block to a file in `data/curated/` (format at the top of `party-fun.txt`), then run `node scripts/linked-store.mjs pack`.
+- **Common names for a Wikidata prompt:** add an `@<prompt-id> | overlay | level | Prompt text` block.
+- **Wikidata prompt:** add one entry in `js/catalog.js` (register every Q-id through `inst(...)`, `occ(...)` and the other helpers so the build verifies it), then `node scripts/build-data.mjs --only your-id` and pack.
 
-Add one entry in `js/catalog.js`. Register every Q-id through `inst(...)`, `occ(...)` and the other helpers so the build can verify it against Wikidata, then rebuild that pack: `node scripts/build-data.mjs --only your-id`.
-
-**Hub note:** deepwell.games root is a two-game selection hub (this game + NEXUS RELAY) — see [HUB.md](HUB.md) before moving the game entry point or the root asset folders.
+**Hub note:** deepwell.games root is a four-game selection hub — see [HUB.md](HUB.md) before moving the game entry point or the root asset folders.

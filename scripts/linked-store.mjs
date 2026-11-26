@@ -1,32 +1,52 @@
 #!/usr/bin/env node
-// Converts between the two on-disk layouts of the answer data:
-//   loose   data/packs/<question>.json        one file per question (what build/patch/enrich scripts work on)
-//   linked  data/linked/<shard>.<n>.json      shared answer rows, many questions per row (what the site serves)
+// Converts between the on-disk layouts of the answer data:
+//   loose   data/packs/<question>.json   one file per Wikidata question (what build/patch/enrich scripts work on)
+//   linked  data/linked/                 v4 store: every answer stored ONCE, questions point at it (what the site serves)
+//   curated data/curated/*.txt           hand-written survey prompts and common-name overlays (see the file headers)
 //
-//   node scripts/linked-store.mjs unpack   linked -> loose   (run before build-data / patch-packs / enrich-packs)
-//   node scripts/linked-store.mjs pack     loose  -> linked  (run after them; loose files are removed)
-//   node scripts/linked-store.mjs pack --prune   also drop questions that are no longer in js/catalog.js
-//   node scripts/linked-store.mjs stats    sizes and sharing figures
+//   node scripts/linked-store.mjs unpack            linked -> loose (Wikidata questions only)
+//   node scripts/linked-store.mjs pack [--prune] [--from dirA,dirB]
+//        loose (+ extra loose dirs, merged by answer id) + curated -> linked; loose files are removed afterwards.
+//        --prune drops Wikidata questions that are no longer in js/catalog.js.
+//   node scripts/linked-store.mjs stats
 //
-// `pack` is idempotent: running it twice (or unpack then pack) writes byte-identical chunk files.
+// Reads the older v3 layout (shards with bit masks) too, so the first pack migrates it.
 import { mkdir, readFile, writeFile, readdir, rm } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { fromPack, toPack, ANSWER_CAP } from '../js/wikidata.js';
 import { CATALOG } from '../js/catalog.js';
-import { planShards, packShard, chunkRows, itemsForBit, LINKED_DIR } from '../js/linked.js';
+import { normalize, singular } from '../js/engine.js';
+import { ensureAnchors } from './data-quality.mjs';
+import { LINKED_DIR, CHUNK_BYTES, idOut, entityRows, encodeRefs, itemsFromRefs, chunkRows, itemsForBit } from '../js/linked.js';
 
-const MANIFEST = 'data/manifest.json', LOOSE = 'data/packs';
+const MANIFEST = 'data/manifest.json', LOOSE = 'data/packs', CURATED = 'data/curated';
 const sha = v => createHash('sha256').update(v).digest('hex');
 const readJson = async (f, d) => { try { return JSON.parse(await readFile(f, 'utf8')); } catch { return d; } };
 const today = () => new Date().toISOString().slice(0, 10);
+const arg = (n, d) => { const i = process.argv.indexOf('--' + n); return i >= 0 ? process.argv[i + 1] : d; };
 
-/** Answers of one question from the linked store (used by validators and tools). */
+/* ------------------------------------------------------------------ reading */
+const chunkMemo = new Map();
+async function readChunk(path) {
+  if (!chunkMemo.has(path)) chunkMemo.set(path, JSON.parse(await readFile(path, 'utf8')));
+  return chunkMemo.get(path);
+}
+
+/** Answers of one question from the linked store, v4 or legacy v3: [{id,n,s,a}] or null. */
 export async function readLinkedPrompt(manifest, id, dir = '.') {
   const meta = manifest.packs[id];
-  if (!meta?.shard) return null;
+  if (!meta) return null;
+  if (manifest.store?.v === 4) {
+    const q = await readJson(`${dir}/${LINKED_DIR}/q/${id}.json`, null);
+    if (!q) return null;
+    const rows = new Map();
+    for (const c of Object.keys(q.r || {})) rows.set(Number(c), entityRows(await readChunk(`${dir}/${LINKED_DIR}/e.${c}.json`)));
+    return itemsFromRefs(q, c => rows.get(c));
+  }
+  if (!meta.shard) return null;
   const rows = [];
-  for (const i of meta.chunks || []) rows.push(...chunkRows(JSON.parse(await readFile(`${dir}/${LINKED_DIR}/${meta.shard}.${i}.json`, 'utf8'))));
+  for (const i of meta.chunks || []) rows.push(...chunkRows(await readChunk(`${dir}/${LINKED_DIR}/${meta.shard}.${i}.json`)));
   return itemsForBit(rows, meta.bit || 0);
 }
 
@@ -37,88 +57,243 @@ export async function readAnyPrompt(manifest, id) {
   return readLinkedPrompt(manifest, id);
 }
 
+/* ------------------------------------------------------------------ curated */
+const display = s => s.charAt(0).toUpperCase() + s.slice(1);
+const cKey = s => singular(normalize(s));
+
+/** Parse data/curated/*.txt into [{id, cat, level, prompt, overlay, answers:[{n, a:[]}]}]. */
+export async function readCurated(dir = CURATED) {
+  const out = [];
+  for (const f of (await readdir(dir).catch(() => [])).filter(f => f.endsWith('.txt')).sort()) {
+    let cur = null;
+    for (const raw of (await readFile(`${dir}/${f}`, 'utf8')).split(/\r?\n/)) {
+      const line = raw.trim();
+      if (!line || line.startsWith('#')) continue;
+      if (line.startsWith('@')) {
+        const [id, cat, level, ...rest] = line.slice(1).split('|').map(s => s.trim());
+        cur = { id, cat: cat === 'overlay' ? null : cat, overlay: cat === 'overlay', level: Number(level) || 2, prompt: rest.join('|'), answers: [], file: f };
+        out.push(cur); continue;
+      }
+      if (!cur) throw new Error(`${f}: answers before the first @prompt line`);
+      for (const part of line.split('|')) {
+        const names = part.split('=').map(s => s.trim()).filter(Boolean);
+        if (names.length) cur.answers.push({ n: names[0], a: names.slice(1) });
+      }
+    }
+  }
+  for (const p of out) {      // drop repeats inside one prompt (first mention keeps its rank)
+    const seen = new Set();
+    p.answers = p.answers.filter(x => { const k = cKey(x.n); if (!k || seen.has(k)) return false; seen.add(k); return true; });
+  }
+  return out;
+}
+
+/** Popularity given to the i-th of n curated answers: the first ties the best-known answer, the last is rare. */
+const curatedS = (i, n, top) => Math.max(1, Math.round(top * Math.pow(1 - i / Math.max(1, n), 1.6)));
+
+/* ------------------------------------------------------------------ pack */
+async function loadExistingPools(manifest) {
+  const pools = new Map();
+  for (const [id, meta] of Object.entries(manifest.packs || {})) {
+    if (meta.kind === 'curated') continue;
+    const items = await readLinkedPrompt(manifest, id);
+    if (items?.length) pools.set(id, items);
+  }
+  return pools;
+}
+
+async function readLooseDir(dir) {
+  const out = new Map();
+  for (const f of (await readdir(dir).catch(() => [])).filter(f => f.endsWith('.json'))) {
+    const raw = await readJson(`${dir}/${f}`, null);
+    if (raw) out.set(f.slice(0, -5), { items: fromPack(raw), built: raw.built });
+  }
+  return out;
+}
+
+/** Union of two answer lists by id (aliases merged, popularity = max), best known first, capped. */
+function unionPools(a = [], b = [], cap = ANSWER_CAP) {
+  const by = new Map();
+  for (const x of [...a, ...b]) {
+    const old = by.get(x.id);
+    if (!old) by.set(x.id, { id: x.id, n: x.n, s: Number(x.s) || 0, a: [...(x.a || [])] });
+    else { old.s = Math.max(old.s, Number(x.s) || 0); for (const al of x.a || []) if (!old.a.includes(al)) old.a.push(al); }
+  }
+  const names = new Set();
+  return [...by.values()].sort((x, y) => y.s - x.s || x.n.localeCompare(y.n))
+    .filter(x => { const k = normalize(x.n); if (names.has(k)) return false; names.add(k); return true; }).slice(0, cap);
+}
+
+async function pack() {
+  const manifest = await readJson(MANIFEST, { version: 0, built: null, packs: {} });
+  const catalog = new Map(CATALOG.map(e => [e.id, e]));
+  const pools = await loadExistingPools(manifest);                 // what the site serves now
+  const builtOf = new Map();
+  const extra = (arg('from', '') || '').split(',').filter(Boolean);
+  for (const dir of [LOOSE, ...extra]) {
+    for (const [id, { items, built }] of await readLooseDir(dir)) {
+      const cap = Math.min(Number(catalog.get(id)?.target) || 2000, ANSWER_CAP);
+      pools.set(id, unionPools(pools.get(id), items, cap));
+      builtOf.set(id, built || today());
+    }
+  }
+  // Blocklisted answers (data/blocklist.json) never reach the site, whichever layout they came from.
+  const block = await readJson('data/blocklist.json', { qids: [], words: [] });
+  const blocked = x => (block.qids || []).includes(x.id) || (block.words || []).some(w => String(x.n).toLowerCase().includes(String(w).toLowerCase()));
+  for (const [id, items] of pools) pools.set(id, items.filter(x => !blocked(x)));
+  // Anchors (data/anchors.json): famous answers every player expects are guaranteed an exact match.
+  const anchors = await readJson('data/anchors.json', {});
+  const pinned = new Set();      // spellings that must survive the alias cap
+  for (const [id, items] of pools) {
+    const rule = anchors[id];
+    if (rule?.anchors?.length) {
+      for (const x of rule.anchors) pinned.add(x);
+      pools.set(id, ensureAnchors(items, { ...rule, people: Boolean(catalog.get(id)?.people) }, id).items);
+    }
+  }
+  // A question may exclude the answers of another ("Name a dinosaur" must not accept birds).
+  for (const [id, items] of pools) {
+    const ex = catalog.get(id)?.exclude;
+    if (ex?.length) {
+      const other = ex.flatMap(o => pools.get(o) || []);
+      const ids = new Set(other.map(x => x.id)), names = new Set(other.flatMap(x => [x.n, ...(x.a || [])]).map(cKey));
+      pools.set(id, items.filter(x => !ids.has(x.id) && !names.has(cKey(x.n))));
+    }
+  }
+  if (process.argv.includes('--prune')) {
+    let dropped = 0;
+    for (const id of [...pools.keys()]) if (!catalog.has(id)) { pools.delete(id); dropped++; }
+    console.log(`Pruned ${dropped} Wikidata questions that are no longer in the catalog.`);
+  }
+
+  // ---- entities: one record per answer for the whole game
+  const ents = new Map();                       // id -> {id, n, s, a:Set}
+  const members = new Map();                    // promptId -> Map(entityId -> override popularity | undefined)
+  const addEnt = (x) => {
+    let e = ents.get(x.id);
+    if (!e) { e = { id: x.id, n: x.n, s: Number(x.s) || 0, a: new Set() }; ents.set(x.id, e); }
+    if ((Number(x.s) || 0) > e.s) { e.s = Number(x.s); }
+    for (const al of x.a || []) if (al && al !== e.n) e.a.add(al);
+    return e;
+  };
+  for (const [id, items] of pools) {
+    const m = new Map();
+    for (const x of items) { addEnt(x); m.set(x.id, undefined); }
+    members.set(id, m);
+  }
+
+  // ---- curated prompts and overlays
+  const curated = await readCurated();
+  for (const p of curated) {
+    if (!p.overlay && catalog.has(p.id)) throw new Error(`curated prompt "${p.id}" has the id of a Wikidata question; rename it or mark it "overlay"`);
+    if (p.overlay && !catalog.has(p.id)) throw new Error(`overlay "${p.id}" names no Wikidata question in js/catalog.js`);
+  }
+  const curatedMeta = {};
+  for (const p of curated) {
+    const m = p.overlay ? (members.get(p.id) || new Map()) : new Map();
+    // keys of the answers already in an overlaid Wikidata pool, so "lion" lands on African Lion instead of a copy
+    const index = new Map();
+    if (p.overlay) for (const eid of m.keys()) { const e = ents.get(eid); for (const k of [e.n, ...e.a]) { const kk = cKey(k); if (kk && !index.has(kk)) index.set(kk, e); } }
+    const top = p.overlay ? Math.max(30, ...[...m.keys()].map(id => ents.get(id).s)) : 100;
+    p.answers.forEach((ans, i) => {
+      const s = curatedS(i, p.answers.length, top);
+      let e = null;
+      if (p.overlay) for (const k of [ans.n, ...ans.a]) { e = index.get(cKey(k)); if (e) break; }
+      if (e) { for (const k of [ans.n, ...ans.a]) if (cKey(k) !== cKey(e.n)) { e.a.add(k); pinned.add(k); } }
+      else e = addEnt({ id: 'c:' + cKey(ans.n).replace(/ /g, '-'), n: display(ans.n), s: 0, a: ans.a });
+      m.set(e.id, Math.max(s, m.has(e.id) && m.get(e.id) !== undefined ? m.get(e.id) : 0, p.overlay ? e.s : 0));
+    });
+    members.set(p.id, m);
+    curatedMeta[p.id] = p.overlay ? { overlay: true, prompt: p.prompt, level: p.level } : { kind: 'curated', prompt: p.prompt, cat: p.cat, level: p.level };
+  }
+  // curated-only entities keep popularity 0 globally; their real scores are the per-question overrides
+
+  // ---- layout: each answer lives with the smallest question that uses it
+  const qsize = id => members.get(id).size;
+  const home = new Map();
+  const order = [...members.keys()].sort((a, b) => qsize(a) - qsize(b) || a.localeCompare(b));
+  for (const q of order) for (const eid of members.get(q).keys()) if (!home.has(eid)) home.set(eid, q);
+  const rank = new Map(order.map((q, i) => [q, i]));
+  const laid = [...ents.values()].filter(e => home.has(e.id))
+    .sort((x, y) => rank.get(home.get(x.id)) - rank.get(home.get(y.id)) || y.s - x.s || String(x.id).localeCompare(String(y.id)));
+  const chunks = [], where = new Map();
+  let cur = null, bytes = 0;
+  for (const e of laid) {
+    if (!cur || bytes >= CHUNK_BYTES) { cur = { v: 4, chunk: chunks.length, ids: [], names: [], s: [], aliases: {} }; chunks.push(cur); bytes = 0; }
+    // Keep the most useful spellings: anchors and curated names first, then plain-Latin ones, shortest first.
+    const useful = x => (pinned.has(x) ? 0 : 2) + (/^[\x20-\x7e]+$/.test(x) ? 0 : 1);
+    const i = cur.ids.length, al = [...e.a].filter(x => x !== e.n).sort((x, y) => useful(x) - useful(y) || x.length - y.length).slice(0, 32);
+    cur.ids.push(idOut(e.id)); cur.names.push(e.n); cur.s.push(e.s);
+    if (al.length) cur.aliases[i] = al;
+    where.set(e.id, [cur.chunk, i]);
+    bytes += 14 + e.n.length + al.join(',').length + al.length * 3;
+  }
+
+  // ---- write
+  await mkdir(`${LINKED_DIR}/q`, { recursive: true });
+  const keep = new Set(), store = { v: 4, chunks: [], entities: laid.length, memberships: 0 };
+  for (const c of chunks) {
+    const raw = JSON.stringify(c), name = `e.${c.chunk}.json`;
+    await writeFile(`${LINKED_DIR}/${name}`, raw); keep.add(name);
+    store.chunks.push({ n: c.ids.length, hash: sha(raw).slice(0, 16), bytes: Buffer.byteLength(raw) });
+  }
+  const packs = {}, keepQ = new Set();
+  for (const [id, m] of members) {
+    if (!m.size) continue;
+    const refs = [...m].map(([eid, s]) => [...where.get(eid), s]);
+    const q = encodeRefs(id, refs), raw = JSON.stringify(q);
+    await writeFile(`${LINKED_DIR}/q/${id}.json`, raw); keepQ.add(`${id}.json`);
+    store.memberships += m.size;
+    const old = manifest.packs[id] || {}, cm = curatedMeta[id] || {};
+    packs[id] = {
+      n: m.size, built: builtOf.get(id) || old.built || today(), source: cm.kind === 'curated' ? 'curated' : 'wikidata',
+      ...(old.quality ? { quality: old.quality } : {}), ...cm,
+      chunks: Object.keys(q.r).map(Number), qhash: sha(raw).slice(0, 16),
+    };
+  }
+  for (const f of await readdir(LINKED_DIR).catch(() => [])) if (f.endsWith('.json') && !keep.has(f)) await rm(`${LINKED_DIR}/${f}`);
+  for (const f of await readdir(`${LINKED_DIR}/q`).catch(() => [])) if (!keepQ.has(f)) await rm(`${LINKED_DIR}/q/${f}`);
+  for (const f of await readdir(LOOSE).catch(() => [])) if (f.endsWith('.json')) await rm(`${LOOSE}/${f}`);
+  const changed = JSON.stringify(Object.values(packs).map(p => p.qhash)) !== JSON.stringify(Object.values(manifest.packs || {}).map(p => p.qhash));
+  const next = { version: (manifest.version || 0) + (changed ? 1 : 0), built: changed ? today() : manifest.built, packs, store };
+  await writeFile(MANIFEST, JSON.stringify(next));
+  console.log(`Packed ${Object.keys(packs).length} questions (${curated.filter(p => !p.overlay).length} curated, ${curated.filter(p => p.overlay).length} overlays) into ${chunks.length} entity chunks: ${laid.length.toLocaleString()} answers stored once, ${store.memberships.toLocaleString()} question memberships.`);
+}
+
 async function unpack() {
   const manifest = await readJson(MANIFEST, { packs: {} });
   await mkdir(LOOSE, { recursive: true });
   let n = 0;
   for (const [id, meta] of Object.entries(manifest.packs)) {
-    if (!meta.shard) continue;
-    const items = await readLinkedPrompt(manifest, id);
-    const pack = toPack({ id, target: ANSWER_CAP }, items);
+    if (meta.kind === 'curated') continue;
+    const items = (await readLinkedPrompt(manifest, id)) || [];
+    // overlay answers (c:...) are re-applied from data/curated on the next pack, so they are not unpacked
+    const pack = toPack({ id, target: ANSWER_CAP }, items.filter(x => !String(x.id).startsWith('c:')));
     pack.built = meta.built || manifest.built || today();
     await writeFile(`${LOOSE}/${id}.json`, JSON.stringify(pack));
     n++;
   }
-  console.log(`Unpacked ${n} questions into ${LOOSE}/ (linked files are kept until the next pack).`);
-}
-
-async function pack() {
-  const manifest = await readJson(MANIFEST, { version: 0, built: null, packs: {} });
-  manifest.shards = manifest.shards || {};
-  const loose = (await readdir(LOOSE).catch(() => [])).filter(f => f.endsWith('.json')).map(f => f.slice(0, -5));
-  const pools = new Map(), builtOf = new Map();
-  for (const id of loose) {
-    const raw = await readJson(`${LOOSE}/${id}.json`, null);
-    if (!raw) continue;
-    pools.set(id, fromPack(raw)); builtOf.set(id, raw.built);
-  }
-  for (const [id, meta] of Object.entries(manifest.packs)) {
-    if (pools.has(id) || !meta.shard) continue;
-    pools.set(id, await readLinkedPrompt(manifest, id));   // untouched questions come from the existing chunks
-  }
-  if (process.argv.includes('--prune')) {
-    const live = new Set(CATALOG.map(e => e.id)); let dropped = 0;
-    for (const id of [...pools.keys()]) if (!live.has(id)) { pools.delete(id); delete manifest.packs[id]; dropped++; }
-    console.log(`Pruned ${dropped} questions that are no longer in the catalog.`);
-  }
-  const plan = planShards([...pools.keys()]);
-  await mkdir(LINKED_DIR, { recursive: true });
-  const oldShards = manifest.shards, newShards = {}, keep = new Set();
-  for (const [shardId, ids] of plan) {
-    const sub = new Map(ids.map(id => [id, pools.get(id)]));
-    const packed = packShard(shardId, sub), files = [];
-    packed.chunks.forEach((chunk, i) => {
-      const raw = JSON.stringify(chunk), name = `${shardId}.${i}.json`;
-      files.push({ n: chunk.ids.length, hash: sha(raw), bytes: Buffer.byteLength(raw), name, raw });
-      keep.add(name);
-    });
-    const prev = oldShards[shardId], same = prev && prev.chunks.length === files.length && prev.chunks.every((c, i) => c.hash === files[i].hash);
-    for (const f of files) {
-      const path = `${LINKED_DIR}/${f.name}`;
-      if (!same) await writeFile(path, f.raw);
-    }
-    newShards[shardId] = { prompts: packed.prompts, chunks: files.map(({ n, hash, bytes }) => ({ n, hash, bytes })), built: same ? prev.built : today() };
-    packed.prompts.forEach((id, bit) => {
-      const old = manifest.packs[id] || {}, { hash, bytes, ...rest } = old, pp = packed.perPrompt[id];
-      manifest.packs[id] = { ...rest, n: pp.n, built: builtOf.get(id) || old.built || manifest.built || today(), source: old.source || 'wikidata', shard: shardId, bit, chunks: pp.chunks };
-    });
-  }
-  // remove chunk files that no longer belong to any shard, and the loose files we just folded in
-  for (const f of await readdir(LINKED_DIR).catch(() => [])) if (f.endsWith('.json') && !keep.has(f)) await rm(`${LINKED_DIR}/${f}`);
-  for (const id of loose) await rm(`${LOOSE}/${id}.json`);
-  manifest.shards = newShards;
-  await writeFile(MANIFEST, JSON.stringify(manifest));
-  const chunks = Object.values(newShards).reduce((s, x) => s + x.chunks.length, 0);
-  console.log(`Packed ${pools.size} questions into ${Object.keys(newShards).length} shards / ${chunks} chunk files.`);
+  console.log(`Unpacked ${n} Wikidata questions into ${LOOSE}/ (curated questions stay in ${CURATED}/).`);
 }
 
 async function stats() {
-  const manifest = await readJson(MANIFEST, { packs: {}, shards: {} });
-  let raw = 0, gz = 0, rows = 0, files = 0;
-  for (const f of await readdir(LINKED_DIR).catch(() => [])) {
-    const t = await readFile(`${LINKED_DIR}/${f}`, 'utf8'); raw += t.length; gz += gzipSync(t).length; files++;
-    rows += JSON.parse(t).ids.length;
+  const manifest = await readJson(MANIFEST, { packs: {} });
+  let raw = 0, gz = 0, files = 0;
+  for (const dir of [LINKED_DIR, `${LINKED_DIR}/q`]) for (const f of await readdir(dir).catch(() => [])) {
+    if (!f.endsWith('.json')) continue;
+    const t = await readFile(`${dir}/${f}`, 'utf8'); raw += t.length; gz += gzipSync(t).length; files++;
   }
-  const memberships = Object.values(manifest.packs).reduce((s, p) => s + (p.n || 0), 0);
-  console.log({ questions: Object.keys(manifest.packs).length, shards: Object.keys(manifest.shards || {}).length, chunkFiles: files,
-    answerRows: rows, memberships, avgQuestionsPerRow: (memberships / Math.max(1, rows)).toFixed(2),
-    rawMB: (raw / 1e6).toFixed(2), gzMB: (gz / 1e6).toFixed(2), bytesPerMembershipGz: (gz / Math.max(1, memberships)).toFixed(1) });
+  const st = manifest.store || {};
+  console.log({ questions: Object.keys(manifest.packs).length, entityChunks: st.chunks?.length, files, answersStoredOnce: st.entities,
+    memberships: st.memberships, avgQuestionsPerAnswer: (st.memberships / Math.max(1, st.entities)).toFixed(2),
+    rawMB: (raw / 1e6).toFixed(2), gzMB: (gz / 1e6).toFixed(2) });
 }
 
 const cmd = process.argv[2];
-if (import.meta.url === `file://${process.argv[1]}`) {
+const entry = String(process.argv[1] || '').replace(/\\/g, '/');
+if (entry && (import.meta.url === `file://${entry}` || import.meta.url === `file:///${entry}`)) {
   if (cmd === 'pack') await pack();
   else if (cmd === 'unpack') await unpack();
   else if (cmd === 'stats') await stats();
-  else { console.error('usage: linked-store.mjs pack | unpack | stats'); process.exit(2); }
+  else { console.error('usage: linked-store.mjs pack [--prune] [--from dirs] | unpack | stats'); process.exit(2); }
 }

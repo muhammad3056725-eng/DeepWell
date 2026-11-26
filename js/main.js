@@ -1,16 +1,16 @@
 // APOGEE entry point: wires the screens to the game rules.
-import { CONFIG, sinkMetres, altitudeLabel } from './config.js?v=space-20261126';
-import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=space-20261126';
-import { loadManifest } from './data.js?v=space-20261126';
-import { prepareDive, examples } from './game.js?v=space-20261126';
-import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js';
-import * as S from './state.js?v=space-20261126';
-import { startScene, triggerAnswerVisual, resetDiveVisual } from './space.js?v=space-20261126';
-import { wake, tone, buzz } from './audio.js?v=space-20261126';
+import { CONFIG, sinkMetres, altitudeLabel } from './config.js?v=apogee-20261127';
+import { matchAnswer, tier, tierClass, blendPoints, utcDate, normalize } from './engine.js?v=apogee-20261127';
+import { loadManifest } from './data.js?v=apogee-20261127';
+import { prepareDive, examples } from './game.js?v=apogee-20261127';
+import { crowdEnabled, crowdStats, crowdSubmit } from './crowd.js?v=apogee-20261127';
+import * as S from './state.js?v=apogee-20261127';
+import { startScene, triggerAnswerVisual, resetDiveVisual } from './space.js?v=apogee-20261127';
+import { wake, tone, buzz } from './audio.js?v=apogee-20261127';
 import {
   $, show, toast, updateDepthUI, renderHome, renderResults,
   buildPackButtons, applySettings, readSettingsUI,
-} from './ui.js?v=space-20261126';
+} from './ui.js?v=apogee-20261127';
 
 let run = null; // the flight in progress
 let timerRaf = 0;
@@ -199,7 +199,9 @@ async function resolve(item, value) {
       crowdSubmit(p.key, key);
     }
     state = 'hit';
-    message = `${item.n} · ${tier(points)} · +${points} pts`;
+    // Partial names and spellings count: say what the answer was counted as ("winston" -> Winston Churchill).
+    const typed = value && !item.keys?.includes(normalize(value)) ? ` (from “${value}”)` : '';
+    message = `${item.n}${typed} · ${tier(points)} · +${points} pts`;
     tone(220 + points * 5, 0.22, 'triangle');
     if (S.store.settings.haptics) buzz(points > 80 ? [30, 30, 60] : 25);
   }

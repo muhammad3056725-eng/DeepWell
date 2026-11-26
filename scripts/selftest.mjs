@@ -1,6 +1,6 @@
 // Offline self-test: node scripts/selftest.mjs
 // Checks the catalog, query builder, matching, rarity and seeded picking. No network needed.
-import { CATALOG, ENTITY_LABELS, entityIdsOf, QUESTION_TARGET } from '../js/catalog.js';
+import { CATALOG, ENTITY_LABELS, entityIdsOf } from '../js/catalog.js';
 import { readAnyPrompt } from './linked-store.mjs';
 import { buildQuery, parseBindings, toPack, fromPack, mergePools, ANSWER_CAP } from '../js/wikidata.js';
 import {
@@ -10,7 +10,8 @@ import {
 import { SEED } from '../js/seed.js';
 import { parseSeed } from '../js/data.js';
 import { cleanPool, applyOverrides, meaningfulChange, rankAliases, ensureAnchors, checkAnchors } from './data-quality.mjs';
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { readCurated } from './linked-store.mjs';
 
 let failed = 0, passed = 0;
 function ok(cond, msg) { if (cond) passed++; else { failed++; console.error('  FAIL:', msg); } }
@@ -24,13 +25,11 @@ for (const e of CATALOG) {
   ok(/^[a-z0-9-]+$/.test(e.id), 'bad id chars ' + e.id);
   ok(entityIdsOf(e).every(q => ENTITY_LABELS.has(q)), 'unregistered Q-id in ' + e.id);
 }
-eq(CATALOG.length, QUESTION_TARGET, 'catalog reaches configured question target');
-eq(CATALOG.length, 10000, 'catalog has exactly 10,000 unique prompts');
+ok(CATALOG.length >= 250, 'catalog keeps at least 250 broad Wikidata prompts');
+ok(!CATALOG.some(e => e.startsWith || /-(?:from|in)-[a-z]/.test(e.id)), 'no narrow "starting with X" or "from <country>" prompts');
 eq(new Set(CATALOG.map(e => e.prompt)).size, CATALOG.length, 'all prompt texts are unique');
 ok(CATALOG.every(e => (e.target ?? e.answerLimit ?? 2000) <= ANSWER_CAP), 'no prompt allows more than the answer cap');
-const foodF = CATALOG.find(e => e.id === 'food-starts-f');
-eq(foodF?.prompt, 'Name a food starting with F', 'food starting with F is included');
-eq(foodF?.answerLimit, 5000, 'food F can use up to 5,000 answers');
+const foodF = { ...CATALOG.find(e => e.id === 'food'), id: 'food-starts-f', startsWith: 'F', target: 5000, answerLimit: 5000 };
 const elementEntry = CATALOG.find(e => e.id === 'chemical-element');
 eq(elementEntry?.answerLimit, 118, 'chemical elements keep their natural 118-answer ceiling');
 
@@ -104,11 +103,42 @@ eq(matchAnswer('C plus plus', languages)?.item.n, 'C++', 'spoken C plus plus ali
 eq(matchAnswer('C sharp', languages)?.item.n, 'C#', 'spoken C sharp alias matches C#');
 ok(matchAnswer('rhine', pool)?.exact, 'exact match ignores case');
 eq(matchAnswer('Donau', pool)?.item.n, 'Danube', 'alias match');
-ok(matchAnswer('Vistla', pool)?.near, 'one-letter typo is a near match');
+eq(matchAnswer('Vistla', pool)?.item.n, 'Vistula', 'a one-letter typo finds the answer');
 eq(matchAnswer('xyz', pool), null, 'nonsense does not match');
-eq(matchAnswer('Rhin', pool)?.near, undefined, 'short fuzzy inputs are not guessed');
+ok(!matchAnswer('Rhin', pool)?.auto, 'short fuzzy inputs are only suggested, never counted automatically');
 const people = buildPool([{ id: 'Q1', n: 'Albert Einstein', s: 90, a: [] }, { id: 'Q2', n: 'Isaac Newton', s: 80, a: [] }], { people: true });
 eq(matchAnswer('Einstein', people)?.item.n, 'Albert Einstein', 'unique surname matches a person');
+
+// ---- partial names, plurals, spacing and spelling (the player rarely types the full official name)
+{
+  const pms = buildPool([
+    { id: 'Q8016', n: 'Winston Churchill', s: 230, a: [] }, { id: 'Q7416', n: 'Margaret Thatcher', s: 160, a: ['Maggie Thatcher'] },
+    { id: 'Q9545', n: 'Tony Blair', s: 140, a: [] }, { id: 'Q1', n: 'William Pitt the Younger', s: 60, a: [] },
+    { id: 'Q2', n: 'William Pitt the Elder', s: 50, a: [] }, { id: 'Q3', n: 'Winston Peters', s: 20, a: [] },
+  ]);
+  const m1 = matchAnswer('winston', pms);
+  ok(m1?.item.n === 'Winston Churchill' && m1.auto, 'a first name alone finds the best-known answer ("winston")');
+  ok(matchAnswer('churchil', pms)?.item.n === 'Winston Churchill', 'surname typo finds the answer');
+  ok(matchAnswer('margret thatcher', pms)?.item.n === 'Margaret Thatcher', 'misspelled full name finds the answer');
+  ok(matchAnswer('pitt', pms)?.near, 'an ambiguous surname asks the player to confirm');
+  const things = buildPool([{ id: 'a', n: 'Empire State Building', s: 120, a: [] }, { id: 'b', n: 'Petronas Towers', s: 90, a: [] },
+    { id: 'c', n: 'Spider-Man', s: 100, a: [] }, { id: 'd', n: 'Strawberry', s: 80, a: [] }, { id: 'e', n: 'Lake Victoria', s: 80, a: [] },
+    { id: 'f', n: 'Lake Superior', s: 70, a: [] }, { id: 'g', n: 'Pyotr Ilyich Tchaikovsky', s: 150, a: [] }]);
+  eq(matchAnswer('empire state', things)?.item.n, 'Empire State Building', 'leading words of a long name');
+  eq(matchAnswer('petronas', things)?.item.n, 'Petronas Towers', 'one distinctive word');
+  eq(matchAnswer('spiderman', things)?.item.n, 'Spider-Man', 'spaces and hyphens do not matter');
+  eq(matchAnswer('strawberries', things)?.item.n, 'Strawberry', 'plurals count');
+  eq(matchAnswer('victoria', things)?.item.n, 'Lake Victoria', 'the distinctive part of a place name');
+  ok(!matchAnswer('lake', things)?.auto, 'a generic word ("lake") never counts on its own');
+  eq(matchAnswer('chaikovsky', things)?.item.n, 'Pyotr Ilyich Tchaikovsky', 'sound-alike spelling of a surname');
+  // ...but never a different word that merely sounds or looks close
+  const actors = buildPool([{ id: 'p', n: 'Joe Pesci', s: 90, a: [] }, { id: 'q', n: 'Poesia Bernesca', s: 5, a: [] }]);
+  eq(matchAnswer('pizza', actors), null, '"pizza" is not Joe Pesci');
+  const tools = buildPool([{ id: 'g', n: 'Glue', s: 50, a: [] }, { id: 'h', n: 'Hammer', s: 90, a: [] }]);
+  eq(matchAnswer('blue', tools), null, '"blue" is not glue (short words need the same first letter)');
+  const shop = buildPool([{ id: 'c:pet-food', n: 'Pet food', s: 40, a: ['dog food', 'cat food'] }, { id: 'c:milk', n: 'Milk', s: 99, a: [] }], { curated: true });
+  ok(!matchAnswer('dog', shop)?.auto, 'everyday lists: "dog" never counts as "dog food" automatically');
+}
 
 // ---- rarity
 const ranked = assignRarity([{ s: 100 }, { s: 80 }, { s: 50 }, { s: 10 }, { s: 5 }]);
@@ -230,6 +260,28 @@ eq(meaningfulChange(overridePool,[...overridePool,{id:'Q9',n:'New answer',s:1,a:
   eq(planDive(entries, mulberry32(9), meta).map(p => p.entry.id).join(), planDive(entries, mulberry32(9), meta).map(p => p.entry.id).join(), 'planDive is deterministic for a seed');
   const thin = planDive(entries.slice(0, 9), mulberry32(3), {}, { count: 7, spares: 2 });
   ok(thin.length >= 7, 'planDive still fills a dive when metadata is missing');
+}
+
+// ---- v4 linked store: every answer stored once; curated prompts and overlays are well formed
+{
+  const MAN = existsSync('data/manifest.json') ? JSON.parse(readFileSync('data/manifest.json', 'utf8')) : { packs: {} };
+  if (MAN.store?.v === 4) {
+    const seenIds = new Set(); let dup = 0;
+    for (const f of readdirSync('data/linked').filter(f => /^e\.\d+\.json$/.test(f))) {
+      for (const id of JSON.parse(readFileSync('data/linked/' + f, 'utf8')).ids) { if (seenIds.has(id)) dup++; seenIds.add(id); }
+    }
+    eq(dup, 0, 'store: no answer is stored twice');
+    eq(seenIds.size, MAN.store.entities, 'store: manifest entity count matches the chunks');
+    const curated = await readCurated();
+    ok(curated.length >= 80, `at least 80 curated survey prompts/overlays (${curated.length})`);
+    for (const p of curated) ok(p.answers.length >= 30, `curated ${p.id} has 30+ answers (${p.answers.length})`);
+    const MUST2 = [['mammal', 'cat'], ['mammal', 'whale'], ['mammal', 'bear'], ['fruit', 'pineapple'], ['fruit', 'watermelon'],
+      ['party-activities', 'dancing'], ['party-activities', 'karaoke'], ['kitchen', 'fridge'], ['bird', 'penguins'], ['hobby', 'reading']];
+    for (const [id, answer] of MUST2) {
+      if (!MAN.packs[id]) { ok(false, 'missing prompt ' + id); continue; }
+      ok(matchAnswer(answer, buildPool(await readAnyPrompt(MAN, id)))?.exact, `${id} accepts "${answer}"`);
+    }
+  }
 }
 
 console.log(`${passed} passed, ${failed} failed. ${CATALOG.length} prompts, ${Object.keys(SEED).length} seed lists.`);

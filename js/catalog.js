@@ -13,7 +13,7 @@
 export const CATEGORIES = [
   'Geography', 'Space', 'Science', 'Nature', 'Food', 'Music', 'Film & TV', 'Literature',
   'Art', 'History', 'Sports', 'Games', 'Technology', 'People', 'Language', 'Mythology',
-  'Body', 'Brands', 'Transport',
+  'Body', 'Brands', 'Transport', 'Everyday', 'Home', 'Party & Fun',
 ];
 
 /** qid -> expected English label fragment (lower-case, matched with "includes"). */
@@ -141,39 +141,7 @@ for (const [q, label, name] of CONTINENTS) {
     `${inst('Q3624078', 'sovereign state')}; ${continent(q, label)}`, { minPool: 8 });
 }
 
-// class x country matrices
-const MATRIX = [
-  ['city', 'Q515', 'city', 'Name a city in', COUNTRIES.map(c => c[2]), { minSL: 5 }],
-  ['river', 'Q4022', 'river', 'Name a river in',
-    ['the United States', 'Canada', 'Germany', 'France', 'India', 'China', 'Russia', 'Brazil', 'Australia',
-      'Italy', 'Spain', 'Poland', 'Pakistan', 'the United Kingdom', 'Japan', 'Turkey', 'Mexico', 'Argentina',
-      'Ukraine', 'Sweden'], {}],
-  ['mountain', 'Q8502', 'mountain', 'Name a mountain in',
-    ['the United States', 'Canada', 'Germany', 'France', 'India', 'China', 'Russia', 'Italy', 'Japan',
-      'Pakistan', 'New Zealand', 'Australia', 'Spain', 'Peru', 'Kenya'], {}],
-  ['lake', 'Q23397', 'lake', 'Name a lake in',
-    ['the United States', 'Canada', 'Germany', 'France', 'Italy', 'Russia', 'Sweden', 'India', 'China',
-      'Pakistan', 'Australia', 'Switzerland'], {}],
-  ['university', 'Q3918', 'university', 'Name a university in',
-    ['the United States', 'the United Kingdom', 'Canada', 'Australia', 'India', 'Pakistan', 'Germany', 'France',
-      'China', 'Japan', 'Italy', 'Spain', 'Brazil', 'Turkey', 'Iran', 'Egypt'], { minSL: 3 }],
-  ['museum', 'Q33506', 'museum', 'Name a museum in',
-    ['the United States', 'the United Kingdom', 'France', 'Germany', 'Italy', 'Spain', 'Russia', 'Japan',
-      'China', 'the Netherlands', 'Canada', 'India'], {}],
-  ['football-club', 'Q476028', 'association football club', 'Name a football club in',
-    ['the United Kingdom', 'Germany', 'Italy', 'Spain', 'France', 'Brazil', 'Argentina', 'the Netherlands',
-      'Portugal', 'Turkey', 'Mexico', 'the United States', 'Russia', 'Ukraine', 'Poland', 'Greece'], { minSL: 2 }],
-];
-// Countries not in the main list need their own ids; register extras here.
-const EXTRA_COUNTRIES = { Switzerland: ['Q39', 'switzerland'] };
-for (const [kind, cls, clsLabel, lead, names, o] of MATRIX) {
-  for (const n of names) {
-    const c = byName(n.replace(/^the /, '')) || (EXTRA_COUNTRIES[n] && [EXTRA_COUNTRIES[n][0], EXTRA_COUNTRIES[n][1], n]);
-    if (!c) continue;
-    add('Geography', `${kind}-in-${slug(n.replace(/^the /, ''))}`, `${lead} ${n}`,
-      `${sub(cls, clsLabel)}; ${country(c[0], c[1])}`, { minPool: 20, ...o });
-  }
-}
+// (Country-by-class prompts such as "Name a city in Peru" were removed: questions stay broad.)
 
 /* ------------------------------------------------------------------- space */
 const SPACE = [
@@ -220,7 +188,8 @@ addTaxon('Nature', 'reptile', 'Name a reptile', 'Q10811', 'reptile', 'Q7432', 's
 addTaxon('Nature', 'amphibian', 'Name an amphibian', 'Q10908', 'amphibian', 'Q7432', 'species', { minSL: 3 });
 addTaxon('Nature', 'insect', 'Name an insect', 'Q1390', 'insect', 'Q7432', 'species', { minSL: 4 });
 addTaxon('Nature', 'flowering-plant', 'Name a flowering plant', 'Q886167', 'flowering plant', 'Q7432', 'species', { minSL: 8 });
-addTaxon('Nature', 'dinosaur', 'Name a dinosaur', 'Q430', 'dinosaur', 'Q34740', 'genus', { minSL: 3 });
+// Birds are dinosaurs in Wikidata's taxonomy; players mean the extinct ones, so Aves (Q5113) is excluded.
+addTaxon('Nature', 'dinosaur', 'Name a dinosaur', 'Q430', 'dinosaur', 'Q34740', 'genus', { minSL: 3, notParent: 'Q5113', exclude: ['bird'] });
 addTaxon('Nature', 'shark', 'Name a shark', 'Q7372', 'shark', 'Q7432', 'species', { minSL: 3, minPool: 15 });
 const NATURE = [
   ['dog-breed', 'Name a dog breed', inst('Q39367', 'dog breed'), { minSL: 3 }],
@@ -358,84 +327,7 @@ const SPORTS = [
 ];
 for (const [id, prompt, pattern, o] of SPORTS) add('Sports', id, prompt, pattern, o);
 
-// Countries added for balance (non-Asia). Asia has full coverage in the lists above; these keep the dataset worldwide.
-const BALANCE = ['Ethiopia', 'Ghana', 'Algeria', 'Tanzania', 'Uganda', 'Tunisia', 'Senegal', 'Cameroon', 'Venezuela', 'Ecuador', 'Cuba',
-  'Bolivia', 'Uruguay', 'Norway', 'Denmark', 'Finland', 'Austria', 'Belgium', 'Czech Republic', 'Hungary', 'Romania', 'Serbia',
-  'Colombia', 'Chile', 'Peru', 'Kenya', 'Morocco', 'Greece', 'Portugal', 'Ukraine', 'Poland', 'Sweden', 'Ireland', 'Canada', 'Australia',
-  'New Zealand', 'the Netherlands', 'South Africa', 'Argentina', 'Mexico', 'Nigeria', 'Egypt', 'Brazil'];
-const BAL_KINDS = new Set(['actor', 'singer', 'writer', 'poet', 'politician', 'painter', 'film-director', 'musician', 'scientist', 'film', 'tv-series', 'band', 'dish', 'newspaper']);
-const withBalance = (kind, names) => BAL_KINDS.has(kind) ? [...names, ...BALANCE.filter(x => !names.includes(x))] : names;
-
-// Nationality splits (a long tail of "Name a X from Y" prompts)
-const NAT = [
-  ['cricketer', 'Q12299841', 'cricketer', 'Name a cricketer from', ['India', 'Pakistan', 'Australia', 'the United Kingdom', 'South Africa', 'New Zealand', 'Bangladesh', 'Sri Lanka', 'Afghanistan', 'Nepal', 'Malaysia'], { minSL: 4 }],
-  ['footballer', 'Q937857', 'association football player', 'Name a footballer from', ['Brazil', 'Argentina', 'France', 'Germany', 'Italy', 'Spain', 'the United Kingdom', 'the Netherlands', 'Portugal', 'Nigeria'], { minSL: 20 }],
-  ['actor', 'Q33999', 'actor', 'Name an actor from', ['the United States', 'the United Kingdom', 'India', 'France', 'Japan', 'Italy', 'Germany', 'South Korea', 'Pakistan', 'Turkey', 'Bangladesh', 'Iran', 'China', 'Indonesia', 'the Philippines', 'Thailand', 'Egypt', 'Sri Lanka', 'Nepal', 'Taiwan', 'Vietnam', 'Israel', 'Iraq', 'Lebanon', 'Malaysia'], { minSL: 20 }],
-  ['singer', 'Q177220', 'singer', 'Name a singer from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'France', 'South Korea', 'Japan', 'Brazil', 'Germany', 'Mexico', 'Turkey', 'Bangladesh', 'Iran', 'China', 'Indonesia', 'the Philippines', 'Thailand', 'Egypt', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Taiwan', 'Vietnam', 'Israel', 'Iraq', 'Lebanon', 'Malaysia', 'Saudi Arabia'], { minSL: 15 }],
-  ['writer', 'Q36180', 'writer', 'Name a writer from', ['the United Kingdom', 'France', 'Russia', 'Germany', 'the United States', 'Japan', 'India', 'Pakistan', 'Italy', 'Spain', 'Argentina', 'Nigeria', 'Egypt', 'Turkey', 'Iran', 'Bangladesh', 'China', 'Indonesia', 'the Philippines', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Israel', 'Iraq', 'Syria', 'Lebanon', 'Vietnam', 'Thailand', 'South Korea', 'Taiwan', 'Malaysia'], { minSL: 20 }],
-  ['poet', 'Q49757', 'poet', 'Name a poet from', ['Pakistan', 'India', 'Iran', 'Russia', 'France', 'Germany', 'the United Kingdom', 'the United States', 'Turkey', 'Egypt', 'Spain', 'Italy', 'Bangladesh', 'Afghanistan', 'China', 'Japan', 'Iraq', 'Israel', 'Lebanon', 'Syria', 'Sri Lanka', 'Nepal', 'Uzbekistan', 'Kazakhstan', 'South Korea', 'Vietnam'], { minSL: 10 }],
-  ['physicist', 'Q169470', 'physicist', 'Name a physicist from', ['Germany', 'the United Kingdom', 'the United States', 'France', 'Italy', 'Russia', 'India', 'Pakistan', 'Japan', 'China', 'Iran', 'South Korea', 'Israel', 'Taiwan', 'Turkey', 'Bangladesh'], { minSL: 10 }],
-  ['painter', 'Q1028181', 'painter', 'Name a painter from', ['France', 'Italy', 'Spain', 'the Netherlands', 'Germany', 'the United Kingdom', 'the United States', 'Russia', 'Japan', 'Mexico', 'India', 'Pakistan', 'China', 'Iran', 'Bangladesh', 'Turkey', 'Iraq', 'Afghanistan', 'Uzbekistan', 'Sri Lanka', 'South Korea'], { minSL: 15 }],
-  ['politician', 'Q82955', 'politician', 'Name a politician from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'France', 'Germany', 'Russia', 'Turkey', 'Iran', 'Egypt', 'Brazil', 'South Africa', 'Bangladesh', 'China', 'Indonesia', 'the Philippines', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Iraq', 'Israel', 'Malaysia', 'Singapore', 'Thailand', 'Vietnam', 'Saudi Arabia', 'Syria', 'Lebanon', 'Japan', 'South Korea', 'Taiwan'], { minSL: 40 }],
-];
-for (const [kind, cls, clsLabel, lead, names, o] of NAT) {
-  for (const n of withBalance(kind, names)) {
-    const c = byName(n.replace(/^the /, ''));
-    if (!c) continue;
-    add('People', `${kind}-from-${slug(n.replace(/^the /, ''))}`, `${lead} ${n}`,
-      `${occ(cls, clsLabel)}; ${citizen(c[0], c[1])}`, { people: true, minPool: 20, limit: 1200, ...o });
-  }
-}
-
-// More people and things "from" a country. Everything here lands in that country's shared answer store
-// (data/linked/c-<country>.*): one answer, many questions.
-const NAT2 = [
-  ['film-director', 'Q2526255', 'film director', 'Name a film director from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'Bangladesh', 'Iran', 'Japan', 'China', 'South Korea', 'France', 'Italy', 'Germany', 'Turkey', 'Egypt', 'Russia', 'Spain', 'Brazil', 'Thailand', 'Indonesia', 'the Philippines', 'Taiwan', 'Israel', 'Sri Lanka'], { minSL: 6 }],
-  ['musician', 'Q639669', 'musician', 'Name a musician from', ['the United States', 'the United Kingdom', 'India', 'Pakistan', 'Bangladesh', 'Iran', 'Japan', 'China', 'South Korea', 'France', 'Germany', 'Turkey', 'Egypt', 'Russia', 'Brazil', 'Indonesia', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Iraq', 'Israel', 'Lebanon'], { minSL: 6 }],
-  ['composer', 'Q36834', 'composer', 'Name a composer from', ['India', 'Pakistan', 'Iran', 'Japan', 'China', 'South Korea', 'Turkey', 'Russia', 'Germany', 'France', 'Italy', 'the United Kingdom', 'the United States', 'Egypt', 'Israel'], { minSL: 6 }],
-  ['scientist', 'Q901', 'scientist', 'Name a scientist from', ['India', 'Pakistan', 'Bangladesh', 'Iran', 'China', 'Japan', 'South Korea', 'Turkey', 'Egypt', 'Israel', 'Russia', 'Germany', 'France', 'the United Kingdom', 'the United States', 'Iraq', 'Taiwan'], { minSL: 6 }],
-  ['journalist', 'Q1930187', 'journalist', 'Name a journalist from', ['India', 'Pakistan', 'Bangladesh', 'Iran', 'China', 'Japan', 'Turkey', 'Egypt', 'Israel', 'Russia', 'the United Kingdom', 'the United States', 'Afghanistan', 'Sri Lanka', 'Nepal'], { minSL: 6 }],
-  ['businessperson', 'Q43845', 'businessperson', 'Name a businessperson from', ['India', 'Pakistan', 'Bangladesh', 'China', 'Japan', 'South Korea', 'Indonesia', 'Malaysia', 'Singapore', 'Saudi Arabia', 'the United Arab Emirates', 'Turkey', 'Iran', 'Egypt', 'Russia', 'the United Kingdom', 'the United States', 'Israel'], { minSL: 6 }],
-  ['screenwriter', 'Q28389', 'screenwriter', 'Name a screenwriter from', ['India', 'Pakistan', 'Iran', 'Japan', 'China', 'South Korea', 'Turkey', 'France', 'Italy', 'the United Kingdom', 'the United States'], { minSL: 6 }],
-];
-for (const [kind, cls, clsLabel, lead, names, o] of NAT2) {
-  for (const n of withBalance(kind, names)) {
-    const c = byName(n.replace(/^the /, ''));
-    if (!c) continue;
-    add('People', `${kind}-from-${slug(n.replace(/^the /, ''))}`, `${lead} ${n}`,
-      `${occ(cls, clsLabel)}; ${citizen(c[0], c[1])}`, { people: true, minPool: 20, limit: 1200, ...o });
-  }
-}
-
-// Things from a country: patterns use "country of origin" (P495) or "country" (P17).
-const origin = (q, l) => `wdt:P495 wd:${reg(q, l)}`;
-const ASIA_AND_WORLD = ['India', 'Pakistan', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Afghanistan', 'Iran', 'Iraq', 'Israel', 'Turkey', 'Saudi Arabia',
-  'China', 'Japan', 'South Korea', 'Taiwan', 'Indonesia', 'Malaysia', 'Thailand', 'Vietnam', 'the Philippines', 'Egypt', 'Russia',
-  'the United States', 'the United Kingdom', 'France', 'Germany', 'Italy', 'Spain', 'Brazil', 'Mexico', 'Nigeria'];
-const THINGS = [
-  // [id kind, class q, class label, joiner, prompt lead, pattern type, category, options]
-  ['film', 'Q11424', 'film', 'from', 'Name a film from', 'origin', 'Film & TV', { minSL: 4 }, ASIA_AND_WORLD],
-  ['tv-series', 'Q5398426', 'television series', 'from', 'Name a TV series from', 'origin', 'Film & TV', { minSL: 4 }, ASIA_AND_WORLD],
-  ['band', 'Q215380', 'musical group', 'from', 'Name a band or music group from', 'origin', 'Music', { minSL: 4 }, ASIA_AND_WORLD],
-  ['dish', 'Q746549', 'dish', 'from', 'Name a dish from', 'origin', 'Food', { minSL: 2, minPool: 15 }, ASIA_AND_WORLD],
-  ['newspaper', 'Q11032', 'newspaper', 'in', 'Name a newspaper in', 'country', 'History', { minSL: 2 }, ASIA_AND_WORLD],
-  ['political-party', 'Q7278', 'political party', 'in', 'Name a political party in', 'country', 'History', { minSL: 3 }, ASIA_AND_WORLD],
-  ['airport', 'Q1248784', 'airport', 'in', 'Name an airport in', 'country', 'Transport', { minSL: 2 }, ASIA_AND_WORLD],
-  ['stadium', 'Q483110', 'stadium', 'in', 'Name a stadium in', 'country', 'Sports', { minSL: 2 }, ASIA_AND_WORLD],
-  ['mosque', 'Q32815', 'mosque', 'in', 'Name a mosque in', 'country', 'History', { minSL: 2 }, ['India', 'Pakistan', 'Bangladesh', 'Iran', 'Iraq', 'Turkey', 'Saudi Arabia', 'Egypt', 'Indonesia', 'Malaysia', 'Afghanistan', 'China', 'the United Kingdom', 'France', 'Germany']],
-  ['hindu-temple', 'Q842402', 'hindu temple', 'in', 'Name a Hindu temple in', 'country', 'History', { minSL: 2, minPool: 15 }, ['India', 'Nepal', 'Sri Lanka', 'Bangladesh', 'Pakistan', 'Indonesia', 'Malaysia', 'the United States', 'the United Kingdom']],
-  ['company', 'Q4830453', 'business', 'in', 'Name a company in', 'country', 'Brands', { minSL: 4 }, ASIA_AND_WORLD],
-  ['bank', 'Q22687', 'bank', 'in', 'Name a bank in', 'country', 'Brands', { minSL: 2, minPool: 15 }, ASIA_AND_WORLD],
-  ['hospital', 'Q16917', 'hospital', 'in', 'Name a hospital in', 'country', 'Body', { minSL: 2 }, ['India', 'Pakistan', 'Bangladesh', 'Sri Lanka', 'Nepal', 'Iran', 'Turkey', 'China', 'Japan', 'the United Kingdom', 'the United States']],
-];
-for (const [kind, cls, clsLabel, join, lead, type, cat, o, names] of THINGS) {
-  for (const n of withBalance(kind, names)) {
-    const c = byName(n.replace(/^the /, ''));
-    if (!c) continue;
-    const place = type === 'origin' ? origin(c[0], c[1]) : country(c[0], c[1]);
-    add(cat, `${kind}-${join}-${slug(n.replace(/^the /, ''))}`, `${lead} ${n}`, `${sub(cls, clsLabel)}; ${place}`, { minPool: 20, ...o });
-  }
-}
+// (Nationality splits such as "Name a poet from Nepal" were removed: questions stay broad.)
 
 /* --------------------------------------------------------- people (global) */
 const PEOPLE = [
@@ -530,7 +422,6 @@ const BRANDS = [
   ['bank', 'Name a bank', inst('Q22687', 'bank'), { minSL: 10 }],
   ['car-manufacturer', 'Name a car manufacturer', inst('Q786820', 'automobile manufacturer'), { minSL: 8 }],
   ['car-model', 'Name a car model', inst('Q3231690', 'car model'), { minSL: 15, limit: 1500 }],
-  ['fashion-brand', 'Name a fashion brand', inst('Q3661311', 'fashion house'), { minSL: 6, minPool: 20 }],
   ['restaurant-chain', 'Name a restaurant chain', inst('Q18534542', 'restaurant chain'), { minSL: 6, minPool: 20 }],
   ['supermarket-chain', 'Name a supermarket chain', inst('Q18043413', 'supermarket chain'), { minSL: 4, minPool: 20 }],
 ];
@@ -545,15 +436,56 @@ const TRANSPORT = [
 ];
 for (const [id, prompt, pattern, o] of TRANSPORT) add('Transport', id, prompt, pattern, o);
 
+
+/* ------------------------------------------------------------ broad additions */
+// More broad, everyday-knowledge prompts. Each id is verified against Wikidata by the build (a wrong id only skips it).
+const MORE = [
+  ['Geography', 'palace', 'Name a palace', sub('Q16560', 'palace'), { minSL: 6 }],
+  ['Geography', 'temple', 'Name a temple', sub('Q44539', 'temple'), { minSL: 6 }],
+  ['Geography', 'church', 'Name a church', sub('Q16970', 'church building'), { minSL: 12 }],
+  ['Geography', 'beach', 'Name a beach', sub('Q40080', 'beach'), { minSL: 4 }],
+  ['Geography', 'cave', 'Name a cave', sub('Q35509', 'cave'), { minSL: 4 }],
+  ['Geography', 'forest', 'Name a forest', sub('Q4421', 'forest'), { minSL: 4 }],
+  ['Geography', 'canal', 'Name a canal', sub('Q12284', 'canal'), { minSL: 4 }],
+  ['Geography', 'town-square', 'Name a famous square or plaza', sub('Q174782', 'square'), { minSL: 6 }],
+  ['People', 'scientist', 'Name a scientist', occ('Q901', 'scientist'), { minSL: 25, people: true }],
+  ['Music', 'musician', 'Name a musician', occ('Q639669', 'musician'), { minSL: 25, people: true }],
+  ['Music', 'singer-songwriter', 'Name a singer-songwriter', occ('Q488205', 'singer-songwriter'), { minSL: 15, people: true }],
+  ['People', 'businessperson', 'Name a businessperson', occ('Q43845', 'businessperson'), { minSL: 20, people: true }],
+  ['People', 'journalist', 'Name a journalist', occ('Q1930187', 'journalist'), { minSL: 25, people: true }],
+  ['People', 'model', 'Name a fashion model', occ('Q4610556', 'model'), { minSL: 15, people: true }],
+  ['People', 'youtuber', 'Name a YouTuber', occ('Q17125263', 'youtuber'), { minSL: 6, people: true }],
+  ['People', 'dancer', 'Name a dancer', occ('Q5716684', 'dancer'), { minSL: 15, people: true }],
+  ['Film & TV', 'tv-presenter', 'Name a TV presenter', occ('Q947873', 'television presenter'), { minSL: 15, people: true }],
+  ['Film & TV', 'screenwriter', 'Name a screenwriter', occ('Q28389', 'screenwriter'), { minSL: 25, people: true }],
+  ['Film & TV', 'film-producer', 'Name a film producer', occ('Q3282637', 'film producer'), { minSL: 25, people: true }],
+  ['Film & TV', 'sitcom', 'Name a sitcom', inst('Q170238', 'sitcom'), { minSL: 6 }],
+  ['Film & TV', 'musical', 'Name a musical', inst('Q2743', 'musical'), { minSL: 5 }],
+  ['Film & TV', 'animated-character', 'Name a cartoon character', inst('Q15711870', 'animated character'), { minSL: 6 }],
+  ['Games', 'video-game-character', 'Name a video game character', inst('Q1569167', 'video game character'), { minSL: 6 }],
+  ['Sports', 'swimmer', 'Name a swimmer', occ('Q10843402', 'swimmer'), { minSL: 15, people: true }],
+  ['Sports', 'cyclist', 'Name a cyclist', occ('Q2309784', 'cyclist'), { minSL: 15, people: true }],
+  ['Sports', 'baseball-player', 'Name a baseball player', occ('Q10871364', 'baseball player'), { minSL: 10, people: true }],
+  ['Sports', 'american-football-player', 'Name an American football player', occ('Q19204627', 'american football player'), { minSL: 8, people: true }],
+  ['Sports', 'ice-hockey-player', 'Name an ice hockey player', occ('Q11774891', 'ice hockey player'), { minSL: 12, people: true }],
+  ['Sports', 'racing-driver', 'Name a racing driver', occ('Q378622', 'racing'), { minSL: 12, people: true }],
+  ['Sports', 'athlete', 'Name a track and field athlete', occ('Q11513337', 'athletics competitor'), { minSL: 20, people: true }],
+  ['Technology', 'social-network', 'Name a social network', inst('Q3220391', 'social networking service'), { minSL: 6, minPool: 15 }],
+  ['Technology', 'smartphone', 'Name a smartphone model', inst('Q19723451', 'smartphone model'), { minSL: 6, minPool: 15 }],
+];
+for (const [cat, id, prompt, pattern, o] of MORE) add(cat, id, prompt, pattern, o);
+addTaxon('Nature', 'fish', 'Name a fish', 'Q127282', 'actinopterygii', 'Q7432', 'species', { minSL: 5 });
+addTaxon('Nature', 'spider', 'Name a spider', 'Q1357', 'spider', 'Q7432', 'species', { minSL: 3, minPool: 15 });
+
 /* ------------------------------------------------------------ list growth */
 // Bigger answer lists: the old limit was 2,000 answers per question and a high popularity floor (minSL) that cut off
 // everything but the best known. Lists now grow to GROW_TARGET answers and reach down to GROW_FLOOR Wikipedia language
 // editions, so players are credited for obscure-but-real answers. The same limits apply to every country and region.
 // Closed sets (planets, chemical elements) keep their natural size: an explicit answerLimit below the default is respected.
 const GROW_TARGET = {
-  People: 10000, Geography: 8000, 'Film & TV': 10000, Music: 8000, Literature: 8000, Sports: 8000, Nature: 8000,
-  Art: 6000, History: 6000, Games: 6000, Food: 5000, Brands: 5000, Transport: 5000, Technology: 5000, Science: 5000,
-  Space: 5000, Language: 5000, Mythology: 4000, Body: 3000,
+  People: 6000, Geography: 6000, 'Film & TV': 6000, Music: 6000, Literature: 5000, Sports: 6000, Nature: 6000,
+  Art: 5000, History: 5000, Games: 5000, Food: 4000, Brands: 4000, Transport: 4000, Technology: 4000, Science: 4000,
+  Space: 4000, Language: 4000, Mythology: 4000, Body: 3000,
 };
 const GROW_FLOOR = 8;
 for (const e of CATALOG) {
@@ -563,45 +495,20 @@ for (const e of CATALOG) {
   e.minSL = Math.min(e.minSL ?? GROW_FLOOR, GROW_FLOOR);
 }
 
-/* --------------------------------------------------------- 10,000 prompt library */
-// Keep the original broad prompts and add letter-constrained forms such as
-// "Name a food starting with F". Each is a distinct prompt with its own query.
-// The hash order distributes omitted letters evenly across categories.
-export const QUESTION_TARGET = 10000;
-export const BASE_CATALOG_COUNT = CATALOG.length;
-const BASE_CATALOG = CATALOG.slice();
-const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-function stableHash(value) {
-  let h = 2166136261;
-  for (let i = 0; i < value.length; i++) { h ^= value.charCodeAt(i); h = Math.imul(h, 16777619); }
-  return h >>> 0;
-}
-const letterVariants = BASE_CATALOG.flatMap(entry =>
-  LETTERS.map(letter => ({ entry, letter, id: `${entry.id}-starts-${letter.toLowerCase()}` }))
-);
-letterVariants.sort((a, b) => stableHash(a.id) - stableHash(b.id) || a.id.localeCompare(b.id));
-const foodF = letterVariants.find(v => v.entry.id === 'food' && v.letter === 'F');
-const orderedVariants = foodF
-  ? [foodF, ...letterVariants.filter(v => v !== foodF)]
-  : letterVariants;
-const variantsNeeded = QUESTION_TARGET - CATALOG.length;
-for (const variant of orderedVariants.slice(0, variantsNeeded)) {
-  if (seen.has(variant.id)) throw new Error('duplicate generated catalog id ' + variant.id);
-  seen.add(variant.id);
-  CATALOG.push({
-    ...variant.entry,
-    id: variant.id,
-    prompt: `${variant.entry.prompt} starting with ${variant.letter}`,
-    startsWith: variant.letter,
-  });
-}
-if (CATALOG.length !== QUESTION_TARGET) {
-  throw new Error(`Expected ${QUESTION_TARGET} prompts, generated ${CATALOG.length}`);
-}
-
 /* ------------------------------------------------------------------ helpers */
+export const BASE_CATALOG_COUNT = CATALOG.length;
 export const CATALOG_BY_ID = new Map(CATALOG.map(e => [e.id, e]));
 
+/** Curated survey-style prompts ("Name something people do at a party") live in data/curated/ and reach the
+ * catalog through the manifest (kind: 'curated'); they have no Wikidata pattern. */
+export function registerCurated(list) {
+  for (const p of list) {
+    if (!p?.id || CATALOG_BY_ID.has(p.id)) continue;
+    const entry = { id: p.id, cat: p.cat || 'Everyday', prompt: p.prompt, kind: 'curated', level: p.level || 2, minPool: 8, target: p.n };
+    CATALOG.push(entry); CATALOG_BY_ID.set(p.id, entry);
+  }
+}
+
 export function entityIdsOf(entry) {
-  return [...new Set(entry.pattern.match(/wd:Q\d+/g) || [])].map(s => s.slice(3));
+  return [...new Set(String(entry.pattern || '').match(/wd:Q\d+/g) || [])].map(s => s.slice(3));
 }

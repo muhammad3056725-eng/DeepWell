@@ -1,10 +1,10 @@
 // Dive preparation: choose prompts, load their answer pools, apply letter variants.
-import { CONFIG } from './config.js?v=space-20261126';
-import { CATALOG, loadRawPool, stableEntries, promptMeta } from './data.js?v=space-20261126';
+import { CONFIG } from './config.js?v=apogee-20261127';
+import { CATALOG, loadRawPool, stableEntries, promptMeta, dataReady } from './data.js?v=apogee-20261127';
 import {
   pickEntries, planDive, mulberry32, hashString, buildPool, deriveLetterPool, chooseVariant,
   promptKey, promptText, utcDate,
-} from './engine.js?v=space-20261126';
+} from './engine.js?v=apogee-20261127';
 
 const historyKey = text => `question:${String(text || '').toLowerCase().replace(/\s+/g, ' ').trim()}`;
 
@@ -42,17 +42,12 @@ async function ready(pick, allowLive) {
   const { entry } = pick;
   try {
     const raw = await loadRawPool(entry, { allowLive });
-    const opts = { people: Boolean(entry.people) };
+    const opts = { people: Boolean(entry.people), curated: raw.source === 'curated' };
     let pool = buildPool(raw.items, opts);
     const minimumItems = Math.min(entry.minPool || 20, 8);
     if (pool.size < minimumItems) return null;
-    const letter = entry.startsWith ? null : chooseVariant(pick, pool, { minPool: CONFIG.MIN_POOL_FOR_LETTER, chance: 0.8 });
-    if (letter) {
-      const sub = deriveLetterPool(pool, letter, opts);
-      if (sub.size >= 8) pool = sub;
-      else return buildPrompt(entry, null, pool, raw.source, pick.level);
-    }
-    return buildPrompt(entry, letter, pool, raw.source, pick.level);
+    // Questions stay broad: no "... starting with X" variants. The whole answer pool counts.
+    return buildPrompt(entry, null, pool, raw.source, pick.level);
   } catch (error) {
     console.warn('[APOGEE] Could not load prompt data for ' + entry.id, error);
     return null;
@@ -78,6 +73,7 @@ function asDive(prompts, count) {
  * Previously used questions are reused only when there are not enough unused prompts/data to fill a dive.
  */
 export async function prepareDive({ mode, category = null, recent = [] }) {
+  await dataReady;
   const count = CONFIG.PROMPTS_PER_DIVE;
   const stable = stableEntries();
   const inCategory = list => category ? list.filter(e => e.cat === category) : list;

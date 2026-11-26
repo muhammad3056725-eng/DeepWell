@@ -45,7 +45,7 @@ jobs:
           });
 
           try {
-            const response = await page.goto('https://deepwell.games/?browser-smoke=' + Date.now(), {
+            const response = await page.goto('https://deepwell.games/deepwell/?browser-smoke=' + Date.now(), {
               waitUntil: 'networkidle',
               timeout: 60000
             });

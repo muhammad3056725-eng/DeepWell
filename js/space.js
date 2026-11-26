@@ -3,8 +3,8 @@
 // ordered (Bayer) dithering, then shown with nearest-neighbour scaling, so every pixel is a crisp square.
 // Nothing is downloaded: sprites are baked from code. The player's altitude (flight units) moves a camera up through
 // the sky, the stratosphere, low orbit, the solar system, interstellar space and out to the galaxies.
-import { CONFIG, ZONES } from './config.js?v=space-20261126';
-import { predatorGulp, rareSparkle } from './audio.js?v=space-20261126';
+import { CONFIG, ZONES } from './config.js?v=apogee-20261127';
+import { predatorGulp, rareSparkle } from './audio.js?v=apogee-20261127';
 
 const canvas = document.getElementById('scene');
 const ctx = canvas?.getContext('2d', { alpha: false });

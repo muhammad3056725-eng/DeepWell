@@ -1,6 +1,6 @@
 // Optional crowd-rarity client. With CONFIG.CROWD_ENDPOINT empty this is a no-op and
 // every score comes from Wikidata alone. See docs/crowd-backend.md for the backend.
-import { CONFIG } from './config.js';
+import { CONFIG } from './config.js?v=apogee-20261127';
 
 export const crowdEnabled = () => Boolean(CONFIG.CROWD_ENDPOINT);
 

@@ -1,30 +1,39 @@
 // Data loading. Source order for a prompt's answer pool:
-//   1. pre-built pack   data/packs/<id>.json  (built from Wikidata by scripts/build-data.mjs)
-//   2. offline seed     js/seed.js            (small hand-curated fallback bundled with the site)
+//   1. linked store     data/linked/ (v4: every answer stored once; see js/linked.js)
+//   2. offline seed     js/seed.js   (small hand-curated fallback bundled with the site)
 //   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Flight)
-import { CONFIG } from './config.js?v=space-20261126';
-import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=space-20261126';
+import { CONFIG } from './config.js?v=apogee-20261127';
+import { CATALOG, CATALOG_BY_ID, registerCurated } from './catalog.js?v=apogee-20261127';
 import { SEED } from './seed.js';
-import { fetchLive, fromPack, ANSWER_CAP } from './wikidata.js?v=space-20261126';
-import { loadLinkedItems } from './linked.js?v=space-20261126';
-import { normalize } from './engine.js?v=space-20261126';
+import { fetchLive, fromPack, ANSWER_CAP } from './wikidata.js?v=apogee-20261127';
+import { loadLinkedItems } from './linked.js?v=apogee-20261127';
+import { normalize } from './engine.js?v=apogee-20261127';
 
 let manifest = { version: 0, built: null, packs: {} };
 let meta = null; // data/prompt-meta.json: per-prompt difficulty level, optional
-const rawCache = new Map(); // entry id -> {items, source}
+const rawCache = new Map(); // entry id -> Promise<{items, source}>
+
+let readyResolve;
+/** Resolves once the manifest (and the curated prompts it lists) is loaded, even if loading failed. */
+export const dataReady = new Promise(r => { readyResolve = r; });
 
 export async function loadManifest() {
   try {
     const res = await fetch(CONFIG.MANIFEST_URL, { cache: 'no-cache' });
-    if (res.ok) {
+    if (res.ok && /json/.test(res.headers.get('content-type') || 'json')) {
       const m = await res.json();
       if (m && typeof m.packs === 'object') manifest = m;
     }
   } catch { /* offline or not built yet: seed only */ }
+  // Curated survey prompts ("Name something people do at a party") reach the catalog through the manifest.
+  registerCurated(Object.entries(manifest.packs).filter(([, p]) => p.kind === 'curated').map(([id, p]) => ({ id, ...p })));
+  // Overlays may give a Wikidata prompt friendlier wording ("Name an insect or bug").
+  for (const [id, p] of Object.entries(manifest.packs)) if (p.overlay && p.prompt && CATALOG_BY_ID.has(id)) CATALOG_BY_ID.get(id).prompt = p.prompt;
   try {
     const res = await fetch(`data/prompt-meta.json?v=${manifest.version || 0}`);
     if (res.ok) meta = await res.json();
   } catch { /* no metadata: every prompt counts as medium */ }
+  readyResolve(manifest);
   return manifest;
 }
 
@@ -43,7 +52,7 @@ export function libraryStats() {
   for (const id of Object.keys(SEED)) {
     if (!hasPack(id)) answers += SEED[id].split('|').length;
   }
-  return { prompts: CATALOG.length, packs, answers, built: manifest.built, stable: stableEntries().length };
+  return { prompts: CATALOG.length, packs, answers, unique: manifest.store?.entities || 0, built: manifest.built, stable: stableEntries().length };
 }
 
 export function parseSeed(entry) {
@@ -66,27 +75,20 @@ export function parseSeed(entry) {
 async function fromPackFile(entry) {
   const meta = manifest.packs[entry.id];
   let items;
-  if (meta?.shard) {
-    // Linked store (v3): the answers live in shared chunk files, one row per answer, many questions per row.
-    items = await loadLinkedItems(meta, manifest);
+  if (manifest.store?.v === 4) {
+    items = await loadLinkedItems(meta, manifest, fetch, entry.id);
   } else {
     const res = await fetch(`${CONFIG.PACK_DIR}/${entry.id}.json?v=${manifest.version || 0}`);
     if (!res.ok) throw new Error('pack ' + res.status);
     items = fromPack(await res.json());
   }
-  if (entry.startsWith) items = items.filter(i => i.n.toLowerCase().startsWith(entry.startsWith.toLowerCase()));
   const answerLimit = Math.max(1, Math.min(Number(entry.target ?? entry.answerLimit) || 2000, ANSWER_CAP));
-  items = items.slice(0, answerLimit);
+  items = items.slice(0, Math.max(answerLimit, items.length));
   if (items.length < Math.min(entry.minPool || 20, 8)) throw new Error('pack too small');
-  return { items, source: 'wikidata' };
+  return { items, source: meta?.kind === 'curated' ? 'curated' : 'wikidata' };
 }
 
-/**
- * Load the raw pool for an entry. Throws if no usable source exists.
- * `allowLive` enables the browser-side Wikidata query as a last resort.
- */
-export async function loadRawPool(entry, { allowLive = false } = {}) {
-  if (rawCache.has(entry.id)) return rawCache.get(entry.id);
+async function load(entry, allowLive) {
   let result = null;
   if (hasPack(entry.id)) {
     try { result = await fromPackFile(entry); } catch { /* fall through */ }
@@ -95,13 +97,25 @@ export async function loadRawPool(entry, { allowLive = false } = {}) {
     const items = parseSeed(entry);
     if (items && items.length >= 8) result = { items, source: 'seed' };
   }
-  if (!result && allowLive) {
+  if (!result && allowLive && entry.kind !== 'curated') {
     const items = await fetchLive(entry, { endpoint: CONFIG.WIKIDATA_ENDPOINT, timeoutMs: CONFIG.LIVE_TIMEOUT_MS });
     if (items.length >= Math.min(entry.minPool || 20, 8)) result = { items, source: 'live' };
   }
   if (!result) throw new Error('no data for ' + entry.id);
-  rawCache.set(entry.id, result);
   return result;
+}
+
+/**
+ * Load the raw pool for an entry. Throws if no usable source exists.
+ * `allowLive` enables the browser-side Wikidata query as a last resort.
+ */
+export function loadRawPool(entry, { allowLive = false } = {}) {
+  if (!rawCache.has(entry.id)) {
+    const p = load(entry, allowLive);
+    rawCache.set(entry.id, p);
+    p.catch(() => rawCache.delete(entry.id));
+  }
+  return rawCache.get(entry.id);
 }
 
 export { CATALOG, CATALOG_BY_ID };

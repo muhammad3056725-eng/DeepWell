@@ -84,8 +84,13 @@ export function ensureAnchors(items,rule={},id='x'){
  const {missing}=checkAnchors(items,rule),injected=[],list=items.map(i=>({...i,a:[...(i.a||[])]}));
  if(list.length<8)return {items:list,injected};
  const fam=famousSitelinks(list);
+ const pool=buildPool(list.map(i=>({id:i.id,n:i.n,a:i.a,s:+i.s||0})));
  for(const x of missing){
   const key=normalizeDataName(x);if(!key)continue;
+  // The game already finds it by a partial name or spelling ("Pope John Paul II" -> John Paul II): add it as an alias
+  // of that answer so it is an exact hit, instead of storing the same answer twice.
+  const near=matchAnswer(x,pool),target=near&&list.find(i=>i.id===near.item.id);
+  if(target){if(!target.a.includes(x))target.a.unshift(x);injected.push({anchor:x,as:'alias of '+target.n});continue;}
   list.push({id:'manual:'+id+':'+slug(x),n:x,s:fam,a:[]});injected.push({anchor:x,as:'new answer'});
  }
  for(const x of rule.mustNot||[]){const k=normalizeDataName(x);const i=list.findIndex(y=>normalizeDataName(y.n)===k);if(i>=0)list.splice(i,1);}

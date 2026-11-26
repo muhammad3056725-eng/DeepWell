@@ -103,7 +103,7 @@ body {
   font-weight: 700;
 }
 
-.card-title { margin: 0; line-height: 1.05; }
+.card-title { margin: 0; line-height: 1.05; overflow-wrap: anywhere; }
 .card-blurb { margin: 0; line-height: 1.55; flex-grow: 1; }
 
 .card-facts {
@@ -178,8 +178,7 @@ body {
 
 .card-nexus {
   background: linear-gradient(170deg, #101c3f 0%, var(--nexus-navy) 55%, #05080f 100%);
-  box-shadow: 0 18px 50px rgba(0, 5, 15, 0.6);
-  font-family: "Courier New", ui-monospace, monospace;
+  box-shadow: 0 18px 50px rgba(0, 5, 15, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .card-nexus .card-kicker { color: var(--nexus-amber); }
 
@@ -192,43 +191,43 @@ body {
 
 .nexus-title {
   font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
   letter-spacing: 0.1em;
-  color: var(--nexus-cyan);
-  text-shadow: 0 0 18px rgba(0, 212, 255, 0.55), 3px 3px 0 rgba(255, 159, 28, 0.35);
+  background: linear-gradient(90deg, #7df3ff 0%, #b8a6ff 55%, #ff7ad9 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.35));
 }
 .card-nexus .card-blurb { color: #c9d8f2; }
 .card-nexus .card-facts { color: #8fb8d8; }
 
 .cta-nexus {
-  background: var(--nexus-amber);
-  color: #231300;
-  border-radius: 6px;
-  box-shadow: 0 0 0 2px #05080f, 0 0 0 4px var(--nexus-amber), 0 10px 22px rgba(255, 159, 28, 0.3);
+  background: linear-gradient(90deg, #22d3ee 0%, #a78bfa 100%);
+  color: #061226;
+  box-shadow: 0 10px 26px rgba(34, 211, 238, 0.35);
 }
 
 /* ---------- Hype Riot card: neon pixel arcade ---------- */
 
 .card-hype {
   background: linear-gradient(165deg, #33093b 0%, #1d0529 52%, var(--hype-deep) 100%);
-  box-shadow: 0 18px 50px rgba(20, 2, 30, 0.65);
-  font-family: "Courier New", ui-monospace, monospace;
+  box-shadow: 0 18px 50px rgba(20, 2, 30, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 .card-hype .card-kicker { color: var(--hype-yellow); }
 
 .hype-title {
   font-size: clamp(2rem, 5vw, 2.8rem);
-  letter-spacing: 0.08em;
-  color: var(--hype-pink);
-  text-shadow: 0 0 18px rgba(255, 46, 136, 0.6), 3px 3px 0 rgba(255, 233, 61, 0.4);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 46, 136, 0.9), 0 0 32px rgba(255, 46, 136, 0.6), 0 0 60px rgba(255, 233, 61, 0.25);
 }
 .card-hype .card-blurb { color: #f3d3ec; }
 .card-hype .card-facts { color: #c99cc9; }
 
 .cta-hype {
-  background: var(--hype-pink);
+  background: linear-gradient(90deg, var(--hype-pink) 0%, #ff8a3d 100%);
   color: #2b0215;
-  border-radius: 6px;
-  box-shadow: 0 0 0 2px var(--hype-deep), 0 0 0 4px var(--hype-pink), 0 10px 22px rgba(255, 46, 136, 0.35);
+  box-shadow: 0 10px 26px rgba(255, 46, 136, 0.4);
 }
 
 /* ---------- Lumen Vault card: Kinetic Obsidian & Liquid Brass ---------- */

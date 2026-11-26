@@ -74,10 +74,11 @@ four files were added: `index.html`, `styles.css` and `hub-bg.svg`
 ## Status (Nov 26, 2026)
 
 All four games are live and verified end-to-end from this hub:
-APOGEE (Deepwell), NEXUS RELAY (casual mystery-guest version,
-dataset grown to 1,021 entities via the Wikidata pipeline),
-HYPE RIOT (solo game; party relay written, not deployed) and
-LUMEN VAULT. Each card on the hub was followed through to its
+APOGEE (Deepwell: broad everyday + knowledge prompts, answers
+stored once), NEXUS RELAY (rebuilt Nov 27 as a catch-the-clues
+multiple-choice game, 682 curated mysteries), HYPE RIOT (high-end
+arena, 122 shows; party relay written, not deployed) and LUMEN
+VAULT (64 proved chambers in 8 wings). Each card on the hub was followed through to its
 game and the game's data files checked live.
 
 ## Standing rule: every game ships a Wikidata dataset build
