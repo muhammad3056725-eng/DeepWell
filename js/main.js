@@ -1,4 +1,4 @@
-// DEEPWELL entry point: wires the screens to the game rules.
+// APOGEE entry point: wires the screens to the game rules.
 import { CONFIG, sinkMetres, altitudeLabel } from './config.js?v=space-20261126';
 import { matchAnswer, tier, tierClass, blendPoints, utcDate } from './engine.js?v=space-20261126';
 import { loadManifest } from './data.js?v=space-20261126';
@@ -270,7 +270,7 @@ function finish() {
 async function share() {
   if (!run) return;
   const marks = run.answers.map(a => (a.points >= 70 ? '◈' : a.points ? '◆' : '·')).join('');
-  const head = run.mode === 'daily' ? `DEEPWELL ${utcDate()} · ${altitudeLabel(run.depth)}` : `DEEPWELL ${altitudeLabel(run.depth)}`;
+  const head = run.mode === 'daily' ? `APOGEE ${utcDate()} · ${altitudeLabel(run.depth)}` : `APOGEE ${altitudeLabel(run.depth)}`;
   const text = `${head}\n${marks}\nCan you fly higher? https://${CONFIG.DOMAIN}`;
   try {
     if (navigator.share) await navigator.share({ title: CONFIG.TITLE, text });

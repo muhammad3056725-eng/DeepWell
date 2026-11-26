@@ -1,4 +1,4 @@
-// DEEPWELL retro pixel-art flight renderer.
+// APOGEE retro pixel-art flight renderer.
 // The whole scene is drawn on a tiny canvas (about 200 x 350 pixels) with single-pixel marks, a fixed colour palette and
 // ordered (Bayer) dithering, then shown with nearest-neighbour scaling, so every pixel is a crisp square.
 // Nothing is downloaded: sprites are baked from code. The player's altitude (flight units) moves a camera up through

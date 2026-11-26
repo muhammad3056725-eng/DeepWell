@@ -1,4 +1,4 @@
-// DEEPWELL question catalog.
+// APOGEE question catalog.
 //
 // Every entry is a prompt ("Name a river") plus a Wikidata pattern that defines
 // the answer pool. Answers, aliases and popularity (Wikipedia language-edition

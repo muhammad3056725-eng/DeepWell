@@ -1,3 +1,6 @@
+# Changes: new name APOGEE (2026-11-26)
+- The game is now called **APOGEE** (the highest point of a flight). Changed on the game page, tab title, share text, result card, hub card and docs. Unchanged on purpose: the domain deepwell.games, the `/deepwell/` URL, the repo name, and the saved-progress key, so nobody loses their stats or streak.
+
 # Changes: pixel-art space flight (2026-11-26)
 - **The sea is gone: DEEPWELL is now a rocket flight.** Rarer answers climb higher: Sky, Stratosphere, Low orbit, Solar system (Moon, Mars, Sun, Jupiter, Saturn, Neptune), Interstellar space (nebulae, pulsar, black hole) and Deep space (galaxies). Readouts are altitudes (km, million km, light-years) instead of metres of depth. Each scoring answer climbs 280 units + 9 per point; a miss climbs nothing and never changes the region.
 - **Retro pixel-art look everywhere.** New renderer `js/space.js` (replaces `js/scene.js`): low-resolution canvas scaled with crisp pixels, ordered dithering, baked pixel sprites (rocket, planets, sun, nebulae, galaxies, black hole with accretion disc), notched pixel borders and stepped animations in the UI.

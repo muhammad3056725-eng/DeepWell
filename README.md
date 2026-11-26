@@ -1,4 +1,6 @@
-# DEEPWELL
+# APOGEE
+
+*(formerly DEEPWELL; the domain deepwell.games, the `/deepwell/` URL and the repository name are unchanged.)*
 
 A rare-answer space flight. Seven prompts, one timer, and the rarer your answer the higher your rocket climbs: sky, orbit, the planets, black holes, other galaxies.
 Static site for **deepwell.games**, served by GitHub Pages. No server and no build step for the game itself.

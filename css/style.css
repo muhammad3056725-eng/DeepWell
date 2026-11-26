@@ -586,3 +586,7 @@ body[data-zone="stratosphere"] .zone-label{color:#0b1740!important;text-shadow:n
 /* results card: solid so planets and text behind it never fight with the numbers */
 #results .panel,#results .modal{background:#0a0f2e!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 body:has(#results.active) .descent-note,body:has(#results.active) .tier-flash{opacity:0!important;transition:none!important}
+
+/* brand and eyebrow on the bright sky: plain navy, no offset shadow (it read as a double print) */
+body[data-zone="sky"] .brand,body[data-zone="sky"] .eyebrow,body:not([data-zone]) .brand,body:not([data-zone]) .eyebrow,
+body[data-zone="stratosphere"] .brand,body[data-zone="stratosphere"] .eyebrow{color:#0b1740!important;text-shadow:none!important}

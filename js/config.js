@@ -1,6 +1,6 @@
-// DEEPWELL configuration. Everything tunable lives here.
+// APOGEE configuration. Everything tunable lives here.
 export const CONFIG = {
-  TITLE: 'DEEPWELL',
+  TITLE: 'APOGEE',
   DOMAIN: 'deepwell.games',
 
   // Flight shape

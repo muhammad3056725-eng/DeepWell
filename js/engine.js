@@ -1,4 +1,4 @@
-// DEEPWELL engine: matching, rarity scoring, prompt picking. Pure functions, no DOM.
+// APOGEE engine: matching, rarity scoring, prompt picking. Pure functions, no DOM.
 
 /* ------------------------------------------------------------- normalising */
 export function normalize(value) {

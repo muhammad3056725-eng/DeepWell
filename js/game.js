@@ -54,7 +54,7 @@ async function ready(pick, allowLive) {
     }
     return buildPrompt(entry, letter, pool, raw.source, pick.level);
   } catch (error) {
-    console.warn('[DEEPWELL] Could not load prompt data for ' + entry.id, error);
+    console.warn('[APOGEE] Could not load prompt data for ' + entry.id, error);
     return null;
   }
 }
