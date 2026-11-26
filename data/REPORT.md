@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-26 · Manifest version: 33
-Packs: 489 · Answers: 375,939 · Pack bytes: 23,106,720 (22.04 MiB) / 60 MiB
+Built: 2026-11-26 · Manifest version: 34
+Packs: 489 · Answers: 377,230 · Pack bytes: 23,189,751 (22.12 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 489 · Answers: 375,939 · Pack bytes: 23,106,720 (22.04 MiB) / 60 MiB
 | Film & TV | 11 | 8735 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
-| Geography | 176 | 148206 | 724 |
+| Geography | 176 | 149497 | 724 |
 | History | 18 | 13503 | 949.5 |
 | Language | 10 | 4383 | 251 |
 | Literature | 12 | 10458 | 971 |
@@ -41,7 +41,6 @@ Packs: 489 · Answers: 375,939 · Pack bytes: 23,106,720 (22.04 MiB) / 60 MiB
 | city-in-ireland | 14 |
 | martial-art | 14 |
 | city-in-portugal | 15 |
-| city-in-japan | 16 |
 | documentary | 16 |
 | shark-starts-t | 17 |
 | play | 18 |
@@ -50,6 +49,7 @@ Packs: 489 · Answers: 375,939 · Pack bytes: 23,106,720 (22.04 MiB) / 60 MiB
 
 | Prompt | Rejected | Rate |
 |---|---:|---:|
+| city-in-japan | 1 | 3.8% |
 | cathedral | 42 | 1.2% |
 | capital | 2 | 0.9% |
 | city-in-egypt | 2 | 0.9% |
@@ -58,6 +58,7 @@ Packs: 489 · Answers: 375,939 · Pack bytes: 23,106,720 (22.04 MiB) / 60 MiB
 | waterfall | 4 | 0.1% |
 | mountain-range | 9 | 0.1% |
 | bird-starts-c | 1 | 0.1% |
+| zoo | 2 | 0.1% |
 | glacier | 4 | 0.1% |
 | city | 7 | 0.1% |
 | strait | 1 | 0.1% |
@@ -65,11 +66,9 @@ Packs: 489 · Answers: 375,939 · Pack bytes: 23,106,720 (22.04 MiB) / 60 MiB
 | amusement-park | 1 | 0.1% |
 | volcano | 1 | 0.1% |
 | skyscraper | 2 | 0.1% |
-| zoo | 1 | 0.1% |
 | airport | 4 | 0.1% |
 | national-park | 1 | 0.0% |
 | country | 0 | 0.0% |
-| island | 0 | 0.0% |
 
 ## Fallback packs
 
@@ -79,18 +78,13 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| city | 5919 | 0 |
-| waterfall | 1167 | 0 |
-| national-park | 1075 | 0 |
-| mountain-range | 5891 | 0 |
-| glacier | 2133 | 0 |
-| canyon | 1 | 0 |
-| airport | 5997 | 1 |
-| stadium | 5820 | 0 |
-| skyscraper | 1599 | 0 |
-| cathedral | 1452 | 0 |
-| lighthouse | 1816 | 0 |
+| zoo | 41 | 0 |
+| historical-country | 965 | 0 |
+| city-in-united-states | 154 | 0 |
+| city-in-united-kingdom | 4 | 0 |
+| city-in-brazil | 119 | 1 |
+| city-in-japan | 10 | 1 |
 
 ## Repository size check
 
-Raw answer data size (data/linked + data/packs): 23,106,720 bytes (22.04 MiB); budget 60 MiB.
+Raw answer data size (data/linked + data/packs): 23,189,751 bytes (22.12 MiB); budget 60 MiB.

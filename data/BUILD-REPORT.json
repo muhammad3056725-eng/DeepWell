@@ -1,173 +1,86 @@
 {
-  "stoppedAt": 31,
+  "stoppedAt": 56,
   "skipped": [],
   "failed": [
-    "mountain: prompt time cap reached",
-    "peninsula: prompt time cap reached"
+    "tower: prompt time cap reached",
+    "university: prompt time cap reached",
+    "city-in-canada: prompt time cap reached",
+    "city-in-australia: prompt time cap reached",
+    "city-in-india: prompt time cap reached",
+    "city-in-italy: prompt time cap reached",
+    "city-in-china: prompt time cap reached"
   ],
-  "built": 25,
-  "unchanged": 4,
+  "built": 10,
+  "unchanged": 8,
   "fallback": [
-    "island",
-    "river",
-    "lake",
-    "bay",
-    "museum",
-    "airport",
-    "bridge",
-    "castle",
-    "mosque"
+    "dam",
+    "railway-station",
+    "city-in-united-states",
+    "city-in-united-kingdom",
+    "city-in-spain",
+    "city-in-brazil",
+    "city-in-japan"
   ],
   "previousRetained": [],
   "rejected": {
-    "city": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 7,
-      "wrongClass": 0
-    },
-    "island": {
+    "dam": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "river": {
-      "invalid": 0,
+    "zoo": {
+      "invalid": 1,
       "blocked": 0,
-      "duplicate": 0,
+      "duplicate": 1,
       "wrongClass": 0
     },
-    "lake": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "volcano": {
+    "amusement-park": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 1,
       "wrongClass": 0
     },
-    "desert": {
+    "railway-station": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "sea": {
+    "historical-country": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "waterfall": {
-      "invalid": 2,
-      "blocked": 0,
-      "duplicate": 2,
-      "wrongClass": 0
-    },
-    "national-park": {
-      "invalid": 1,
+    "city-in-united-states": {
+      "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "mountain-range": {
+    "city-in-united-kingdom": {
       "invalid": 0,
       "blocked": 0,
-      "duplicate": 9,
+      "duplicate": 0,
       "wrongClass": 0
     },
-    "strait": {
+    "city-in-spain": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-brazil": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-japan": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 1,
-      "wrongClass": 0
-    },
-    "bay": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "glacier": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 3,
-      "wrongClass": 0
-    },
-    "canyon": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "archipelago": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "world-heritage": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "museum": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "airport": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 4,
-      "wrongClass": 0
-    },
-    "stadium": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 10,
-      "wrongClass": 0
-    },
-    "bridge": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "castle": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "skyscraper": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 2,
-      "wrongClass": 0
-    },
-    "cathedral": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 41,
-      "wrongClass": 0
-    },
-    "mosque": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "lighthouse": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 3,
       "wrongClass": 0
     }
   }
