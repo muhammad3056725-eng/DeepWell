@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-26 · Manifest version: 37
-Packs: 499 · Answers: 377,714 · Pack bytes: 23,226,400 (22.15 MiB) / 60 MiB
+Built: 2026-11-26 · Manifest version: 38
+Packs: 504 · Answers: 378,344 · Pack bytes: 23,257,421 (22.18 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 499 · Answers: 377,714 · Pack bytes: 23,226,400 (22.15 MiB) / 60 MiB
 | Film & TV | 11 | 8735 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
-| Geography | 186 | 149981 | 540.5 |
+| Geography | 191 | 150611 | 481 |
 | History | 18 | 13503 | 949.5 |
 | Language | 10 | 4383 | 251 |
 | Literature | 12 | 10458 | 971 |
@@ -81,17 +81,12 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| city-in-malaysia | 51 | 0 |
-| city-in-kazakhstan | 41 | 0 |
-| city-in-uzbekistan | 13 | 0 |
-| city-in-taiwan | 207 | 0 |
-| city-in-jordan | 42 | 0 |
-| city-in-mongolia | 28 | 0 |
-| city-in-cambodia | 28 | 0 |
-| city-in-bhutan | 11 | 0 |
-| city-in-ethiopia | 42 | 0 |
-| city-in-ghana | 18 | 0 |
+| city-in-senegal | 26 | 0 |
+| city-in-cameroon | 70 | 0 |
+| city-in-belgium | 141 | 0 |
+| city-in-hungary | 76 | 0 |
+| city-in-romania | 317 | 0 |
 
 ## Repository size check
 
-Raw answer data size (data/linked + data/packs): 23,226,400 bytes (22.15 MiB); budget 60 MiB.
+Raw answer data size (data/linked + data/packs): 23,257,421 bytes (22.18 MiB); budget 60 MiB.
