@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-26 · Manifest version: 36
-Packs: 489 · Answers: 377,233 · Pack bytes: 23,190,847 (22.12 MiB) / 60 MiB
+Built: 2026-11-26 · Manifest version: 37
+Packs: 499 · Answers: 377,714 · Pack bytes: 23,226,400 (22.15 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 489 · Answers: 377,233 · Pack bytes: 23,190,847 (22.12 MiB) / 60 MiB
 | Film & TV | 11 | 8735 | 952 |
 | Food | 14 | 3414 | 134 |
 | Games | 6 | 3887 | 760.5 |
-| Geography | 176 | 149500 | 724 |
+| Geography | 186 | 149981 | 540.5 |
 | History | 18 | 13503 | 949.5 |
 | Language | 10 | 4383 | 251 |
 | Literature | 12 | 10458 | 971 |
@@ -34,16 +34,19 @@ Packs: 489 · Answers: 377,233 · Pack bytes: 23,190,847 (22.12 MiB) / 60 MiB
 | dwarf-planet | 6 |
 | shark-starts-v | 8 |
 | university-in-australia | 10 |
+| city-in-bhutan | 11 |
 | country-south-america | 12 |
 | country-oceania | 12 |
 | city-in-colombia | 12 |
 | shark-starts-r | 12 |
+| city-in-uzbekistan | 13 |
 | city-in-ireland | 14 |
 | martial-art | 14 |
 | city-in-portugal | 15 |
 | documentary | 16 |
 | shark-starts-t | 17 |
 | play | 18 |
+| city-in-ghana | 18 |
 
 ## 20 highest rejection rates
 
@@ -78,8 +81,17 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| city-in-chile | 4 | 1 |
+| city-in-malaysia | 51 | 0 |
+| city-in-kazakhstan | 41 | 0 |
+| city-in-uzbekistan | 13 | 0 |
+| city-in-taiwan | 207 | 0 |
+| city-in-jordan | 42 | 0 |
+| city-in-mongolia | 28 | 0 |
+| city-in-cambodia | 28 | 0 |
+| city-in-bhutan | 11 | 0 |
+| city-in-ethiopia | 42 | 0 |
+| city-in-ghana | 18 | 0 |
 
 ## Repository size check
 
-Raw answer data size (data/linked + data/packs): 23,190,847 bytes (22.12 MiB); budget 60 MiB.
+Raw answer data size (data/linked + data/packs): 23,226,400 bytes (22.15 MiB); budget 60 MiB.

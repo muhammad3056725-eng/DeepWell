@@ -1,38 +1,84 @@
 {
-  "stoppedAt": 91,
+  "stoppedAt": 110,
   "skipped": [
-    "city-in-iraq (pool too small; previous retained)",
-    "city-in-united-arab-emirates (pool too small; previous retained)"
+    "city-in-singapore (pool too small; previous retained)",
+    "city-in-kuwait (pool too small; previous retained)",
+    "city-in-uganda (pool too small; previous retained)"
   ],
   "failed": [
-    "city-in-south-korea: prompt time cap reached",
-    "city-in-new-zealand: prompt time cap reached",
-    "city-in-greece: prompt time cap reached",
-    "city-in-portugal: prompt time cap reached",
-    "city-in-ukraine: prompt time cap reached",
-    "city-in-colombia: prompt time cap reached",
-    "city-in-kenya: prompt time cap reached",
-    "city-in-bangladesh: prompt time cap reached",
-    "city-in-sri-lanka: prompt time cap reached",
-    "city-in-nepal: prompt time cap reached",
-    "city-in-afghanistan: This operation was aborted",
-    "city-in-israel: prompt time cap reached"
+    "city-in-myanmar: prompt time cap reached",
+    "city-in-lebanon: This operation was aborted",
+    "city-in-syria: prompt time cap reached",
+    "city-in-qatar: prompt time cap reached",
+    "city-in-algeria: prompt time cap reached",
+    "city-in-tanzania: This operation was aborted"
   ],
-  "built": 2,
-  "unchanged": 2,
+  "built": 10,
+  "unchanged": 0,
   "fallback": [
-    "city-in-chile",
-    "city-in-peru"
+    "city-in-kazakhstan",
+    "city-in-uzbekistan",
+    "city-in-jordan",
+    "city-in-ethiopia",
+    "city-in-ghana"
   ],
   "previousRetained": [],
   "rejected": {
-    "city-in-chile": {
+    "city-in-malaysia": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-peru": {
+    "city-in-kazakhstan": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-uzbekistan": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-taiwan": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-jordan": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-mongolia": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-cambodia": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-bhutan": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-ethiopia": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "city-in-ghana": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
