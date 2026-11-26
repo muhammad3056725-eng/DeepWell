@@ -50,3 +50,23 @@ Hub and Deepwell are live and verified. The NEXUS RELAY card is
 wired, but the Nexus-Relay repo push is still pending: it awaits the
 owner adding Nexus-Relay to the Muse GitHub App's repository
 access.
+
+## Standing rule: every game ships a Wikidata dataset build
+
+Owner standing rule (Nov 26, 2026): every game in this hub ships
+with a dataset-build workflow whose data is sourced and grown from
+Wikidata. The workflow rebuilds the game's dataset, validates it
+with the game's tests, publishes versioned dataset releases, and
+reports the real counts from each run (no inflated numbers).
+
+NEXUS RELAY, HYPE RIOT and LUMEN VAULT are all being built to this
+rule. Deepwell is expected to mirror it: whoever maintains the
+Deepwell game should give it the same Wikidata dataset build —
+sourced/grown from Wikidata, rebuilt and validated by tests,
+released as versioned datasets, with real counts reported per run.
+
+Note: `.github/workflows/` files cannot be pushed by the Muse
+GitHub App (it lacks the Workflows permission), so each game's
+workflow file is pasted into its repo by the owner. If Deepwell
+gets a dataset-build workflow, expect the owner to paste the file
+in the same way.
