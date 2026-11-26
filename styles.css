@@ -1,20 +1,26 @@
 /* deepwell.games — game-selection hub.
-   Clean UI only (owner directive, Nov 26, 2026): two selectable game
-   cards, zero images — no advertising poster, no graphic hero. Each
-   game's identity is carried by colour and typography alone:
-   Deepwell's deep-sea descent on the left, Nexus Relay's Hi-Bit CRT
-   console on the right. No build step, no external assets. */
+   Clean UI (owner directive, Nov 26, 2026): two selectable game
+   cards over a code-drawn pixel SPACE backdrop (hub-bg.svg —
+   starfield, nebulae, a ringed planet, radar rings and a telemetry
+   grid, drawn in code; NOT the advertising poster, which stays off
+   this page). Both games are space games (owner correction, Nov 26,
+   2026): APOGEE (Deepwell) is a trivia space flight, NEXUS RELAY a
+   deep-space telemetry deduction. Each card's identity is carried
+   by colour and typography: Apogee's violet nebula flight on the
+   left, Nexus Relay's Hi-Bit CRT console on the right. No build
+   step; the only asset is the background SVG. */
 
 :root {
-  --abyss: #02070d;
-  --deep-teal: #06303e;
-  --glow-teal: #35e0c8;
-  --foam: #d9f6ff;
+  --abyss: #020309;
+  --apogee-deep: #171038;
+  --apogee-violet: #8b7fe8;
+  --apogee-glow: #a99cff;
+  --starlight: #efeaff;
   --nexus-navy: #0b132b;
   --nexus-cyan: #00d4ff;
   --nexus-amber: #ff9f1c;
   --ink: #e8f1f5;
-  --muted: #8fa8b5;
+  --muted: #97a0bd;
 }
 
 * { box-sizing: border-box; }
@@ -24,9 +30,14 @@ body {
   min-height: 100vh;
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   color: var(--ink);
+  /* Pixel space backdrop (hub-bg.svg) under a dark scrim so the
+     header, cards and footer stay sharp and readable on top. */
   background:
-    radial-gradient(1200px 500px at 50% -10%, #0a2e3f 0%, transparent 60%),
-    linear-gradient(180deg, #04121f 0%, var(--abyss) 70%);
+    radial-gradient(1200px 500px at 50% -10%, rgba(64, 44, 140, 0.35) 0%, transparent 60%),
+    linear-gradient(180deg, rgba(2, 3, 10, 0.58) 0%, rgba(2, 3, 10, 0.80) 100%),
+    url("hub-bg.svg") center / cover no-repeat,
+    var(--abyss);
+  background-attachment: fixed;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -43,7 +54,7 @@ body {
   font-size: 1.05rem;
   letter-spacing: 0.35em;
   text-transform: uppercase;
-  color: var(--glow-teal);
+  color: var(--apogee-glow);
 }
 .domain-tld { color: var(--muted); }
 
@@ -108,53 +119,52 @@ body {
   transition: transform 120ms ease, box-shadow 120ms ease;
 }
 .cta:hover, .cta:focus-visible { transform: translateY(-2px); }
-.cta:focus-visible { outline: 3px solid var(--foam); outline-offset: 3px; }
+.cta:focus-visible { outline: 3px solid var(--starlight); outline-offset: 3px; }
 
-/* ---------- Deepwell card: deep sea ---------- */
+/* ---------- Apogee (Deepwell) card: nebula space flight ---------- */
 
 .card-deepwell {
-  background: linear-gradient(165deg, #0a4356 0%, var(--deep-teal) 45%, #02141f 100%);
-  box-shadow: 0 18px 50px rgba(0, 20, 30, 0.55);
+  background: linear-gradient(165deg, #2a1c5c 0%, var(--apogee-deep) 48%, #070714 100%);
+  box-shadow: 0 18px 50px rgba(5, 2, 25, 0.6);
 }
-.card-deepwell .card-kicker { color: var(--glow-teal); }
+.card-deepwell .card-kicker { color: var(--apogee-glow); }
 
 .deepwell-title {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
   font-size: clamp(2.2rem, 5vw, 3rem);
-  letter-spacing: 0.06em;
-  color: var(--foam);
-  text-shadow: 0 4px 24px rgba(53, 224, 200, 0.35);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  color: var(--starlight);
+  text-shadow: 0 0 26px rgba(139, 127, 232, 0.55);
 }
-.card-deepwell .card-blurb { color: #c4e6ef; }
-.card-deepwell .card-facts { color: #9fd3de; }
+.card-deepwell .card-blurb { color: #cfc8f2; }
+.card-deepwell .card-facts { color: #a79fd0; }
 
 .cta-deepwell {
-  background: var(--glow-teal);
-  color: #02303a;
-  box-shadow: 0 8px 24px rgba(53, 224, 200, 0.35);
+  background: var(--apogee-violet);
+  color: #0d0830;
+  box-shadow: 0 8px 24px rgba(139, 127, 232, 0.4);
 }
 
-/* CSS bubbles rising through the Deepwell card */
-.bubbles { position: absolute; inset: 0; pointer-events: none; }
-.bubble {
+/* CSS stars twinkling inside the Apogee card */
+.stars { position: absolute; inset: 0; pointer-events: none; }
+.star {
   position: absolute;
-  bottom: -24px;
   border-radius: 50%;
-  border: 1.5px solid rgba(217, 246, 255, 0.5);
-  background: radial-gradient(circle at 32% 30%, rgba(255,255,255,0.5), rgba(255,255,255,0.05) 60%);
-  animation: rise linear infinite;
+  background: #ffffff;
+  box-shadow: 0 0 6px 1px rgba(220, 225, 255, 0.8);
+  animation: twinkle 2.8s ease-in-out infinite alternate;
 }
-.b1 { left: 12%; width: 14px; height: 14px; animation-duration: 9s; }
-.b2 { left: 30%; width: 8px;  height: 8px;  animation-duration: 7s; animation-delay: 1.4s; }
-.b3 { left: 55%; width: 18px; height: 18px; animation-duration: 11s; animation-delay: 0.6s; }
-.b4 { left: 72%; width: 9px;  height: 9px;  animation-duration: 8s; animation-delay: 2.2s; }
-.b5 { left: 86%; width: 13px; height: 13px; animation-duration: 10s; animation-delay: 3s; }
-.b6 { left: 44%; width: 6px;  height: 6px;  animation-duration: 6.5s; animation-delay: 4s; }
+.s1 { left: 14%; top: 16%; width: 3px; height: 3px; }
+.s2 { left: 34%; top: 62%; width: 2px; height: 2px; animation-delay: 0.7s; }
+.s3 { left: 58%; top: 12%; width: 2px; height: 2px; animation-delay: 1.3s; }
+.s4 { left: 74%; top: 44%; width: 3px; height: 3px; animation-delay: 0.4s; }
+.s5 { left: 88%; top: 20%; width: 2px; height: 2px; animation-delay: 1.8s; }
+.s6 { left: 46%; top: 82%; width: 2px; height: 2px; animation-delay: 2.2s; }
 
-@keyframes rise {
-  from { transform: translateY(0); opacity: 0; }
-  12%  { opacity: 1; }
-  to   { transform: translateY(-430px); opacity: 0; }
+@keyframes twinkle {
+  from { opacity: 0.25; }
+  to   { opacity: 1; }
 }
 
 /* ---------- Nexus Relay card: CRT console ---------- */
@@ -199,6 +209,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .bubble { animation: none; opacity: 0.5; }
+  .star { animation: none; opacity: 0.7; }
   .cta { transition: none; }
 }

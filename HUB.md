@@ -1,8 +1,15 @@
 # deepwell.games hub — note for whoever maintains the Deepwell game
 
 deepwell.games root is no longer the game itself. It is a clean
-game-selection interface: two cards (Deepwell + NEXUS RELAY), no
-poster, no images. A visitor picks a card and is sent to that game.
+game-selection interface: two cards (Deepwell + NEXUS RELAY) over a
+code-drawn pixel-space background (`hub-bg.svg`). No advertising
+poster is used. A visitor picks a card and is sent to that game.
+
+Note on theme: Deepwell (in-game title APOGEE) is a SPACE flight
+trivia game — the rarer your answer, the higher you fly. Its poster
+art is ocean-styled, but the game itself is space (owner
+correction, Nov 26, 2026). Do not describe or theme it as a
+sea/ocean game.
 
 ## Two games, two repositories
 
@@ -33,8 +40,9 @@ poster, no images. A visitor picks a card and is sent to that game.
 ## The game itself is not modified
 
 No Deepwell game file was changed or deleted for this setup. Only
-three files were added: `index.html` and `styles.css` at the repo
-root (the hub) and `deepwell/index.html` (the entry point).
+four files were added: `index.html`, `styles.css` and `hub-bg.svg`
+(the pixel-space background) at the repo root (the hub) and
+`deepwell/index.html` (the entry point).
 
 ## Status (Nov 26, 2026)
 
