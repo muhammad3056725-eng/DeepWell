@@ -1,6 +1,6 @@
 # DEEPWELL data report
 
-Built: 2026-11-26 · Manifest version: 34
+Built: 2026-11-26 · Manifest version: 35
 Packs: 489 · Answers: 377,230 · Pack bytes: 23,189,751 (22.12 MiB) / 60 MiB
 
 ## Category coverage
@@ -78,12 +78,6 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
-| zoo | 41 | 0 |
-| historical-country | 965 | 0 |
-| city-in-united-states | 154 | 0 |
-| city-in-united-kingdom | 4 | 0 |
-| city-in-brazil | 119 | 1 |
-| city-in-japan | 10 | 1 |
 
 ## Repository size check
 

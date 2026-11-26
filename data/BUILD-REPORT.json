@@ -1,86 +1,32 @@
 {
-  "stoppedAt": 56,
+  "stoppedAt": 73,
   "skipped": [],
   "failed": [
-    "tower: prompt time cap reached",
-    "university: prompt time cap reached",
-    "city-in-canada: prompt time cap reached",
-    "city-in-australia: prompt time cap reached",
-    "city-in-india: prompt time cap reached",
-    "city-in-italy: prompt time cap reached",
-    "city-in-china: prompt time cap reached"
+    "city-in-russia: prompt time cap reached",
+    "city-in-turkey: prompt time cap reached",
+    "city-in-south-africa: prompt time cap reached",
+    "city-in-poland: prompt time cap reached",
+    "city-in-sweden: prompt time cap reached",
+    "city-in-indonesia: prompt time cap reached"
   ],
-  "built": 10,
-  "unchanged": 8,
+  "built": 2,
+  "unchanged": 9,
   "fallback": [
-    "dam",
-    "railway-station",
-    "city-in-united-states",
-    "city-in-united-kingdom",
-    "city-in-spain",
-    "city-in-brazil",
-    "city-in-japan"
+    "city-in-argentina",
+    "city-in-saudi-arabia"
   ],
   "previousRetained": [],
   "rejected": {
-    "dam": {
+    "city-in-argentina": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "zoo": {
-      "invalid": 1,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "amusement-park": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "railway-station": {
+    "city-in-saudi-arabia": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
-      "wrongClass": 0
-    },
-    "historical-country": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-united-states": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-united-kingdom": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-spain": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-brazil": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-japan": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 1,
       "wrongClass": 0
     }
   }
