@@ -1,109 +1,91 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#041522">
-<title>DEEPWELL — a rare-answer descent</title>
-<meta name="description" content="Seven prompts. One breath. The rarer your answer, the deeper you dive. A daily rare-answer trivia game.">
-<meta property="og:title" content="DEEPWELL">
-<meta property="og:description" content="Seven prompts. One breath. Go deeper by thinking sideways.">
-<meta property="og:url" content="https://deepwell.games/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2306131e'/%3E%3Cpath d='M12 34 40 22 54 34 40 46Z' fill='%2368e2e8'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="css/style.css?v=linked-20261125">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>deepwell.games — Choose Your Game</title>
+<meta name="description" content="Two free browser games on one domain: DEEPWELL, the rare-answer trivia descent, and NEXUS RELAY, the retro signal-triangulation deduction game. Pick one and play — no downloads, no sign-up.">
+<meta property="og:title" content="deepwell.games — Choose Your Game">
+<meta property="og:description" content="DEEPWELL: the rarer your answer, the deeper you dive. NEXUS RELAY: six probes, five-axis telemetry, one sealed entity. Both free, both in your browser.">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<canvas id="scene" aria-hidden="true"></canvas><div id="vignette"></div>
-<main class="app">
-<header class="topbar"><div class="brand">DEEPWELL</div><div class="depth-status"><span class="zone-label" id="zoneLabel">Sunlight zone</span><div class="depth-chip" id="topDepth">0 m below</div></div></header>
 
-<section class="screen active home" id="home"><div>
-<p class="eyebrow">A rare-answer descent</p><h1 class="hero-title">DEEPWELL</h1>
-<p class="hero-sub">Seven prompts. One breath. The rarer your answer, the deeper you dive.</p>
-<div class="actions">
-<button class="button primary" id="dailyBtn">Daily Dive</button>
-<button class="button" id="endlessBtn">Endless Dive</button>
-<button class="button secondary" id="packsBtn">Themed Packs</button>
-<button class="button secondary" id="howBtn">How to play</button>
-<button class="button secondary" id="statsBtn">Stats</button>
-<button class="button secondary" id="settingsBtn">Settings</button>
-<a class="button secondary star-btn" href="https://github.com/muhammad3056725-eng/DeepWell" target="_blank" rel="noopener noreferrer" aria-label="Star DEEPWELL on GitHub (opens in a new tab)"><span aria-hidden="true">★</span> Star on GitHub</a>
-</div>
-<div class="tiny" id="countdown"></div><div class="library" id="library"></div>
-</div></section>
+<header class="site-head">
+  <p class="domain">deepwell<span class="domain-tld">.games</span></p>
+  <h1>CHOOSE YOUR GAME</h1>
+  <p class="tagline">Two games live on this domain. One takes you down. One takes you deep into the signal.</p>
+</header>
 
-<section class="screen game" id="game">
-<div class="depth-gauge" id="depthGauge" aria-hidden="true">
-  <div class="gauge-heading">DESCENT</div>
-  <div class="gauge-track">
-    <i class="gauge-band sunlight"></i><i class="gauge-band twilight"></i>
-    <i class="gauge-band midnight"></i><i class="gauge-band abyss"></i>
-    <span class="gauge-marker" id="depthMarker"></span>
-  </div>
-  <div class="gauge-scale"><span>0</span><span>400</span><span>1,500</span><span>3,500</span><span>7,000 m</span></div>
-  <div class="gauge-value" id="depthGaugeValue">0 m</div>
-</div>
-<div class="game-grid">
-<div class="panel prompt-panel">
-<div class="steps" id="steps" aria-hidden="true"></div>
-<div class="progress-row"><span id="roundLabel">PROMPT 1 / 7</span><span class="src-badge" id="srcBadge"></span><span id="modeLabel">DAILY DIVE</span></div>
-<div class="prompt" id="promptText"></div>
-<div class="timer"><i id="timerBar"></i></div>
-<div class="lifeline-row"><button class="lifeline" id="swapBtn" type="button" aria-label="Swap this question for another (once per dive)">↻ Swap question <span id="swapLeft">1</span></button></div>
-<div class="answer-row"><input id="answerInput" autocomplete="off" autocapitalize="words" spellcheck="false" aria-label="Your answer" placeholder="Type one answer..."><button class="button primary submit" id="submitBtn">Submit</button></div>
-<div class="confirm" id="confirmBox"><span>Did you mean <b id="confirmName"></b>?</span><button class="button primary" id="confirmYes">Yes</button><button class="button secondary" id="confirmNo">No</button></div>
-<div class="feedback" id="feedback" aria-live="polite"></div>
-</div>
-</div></section>
+<main class="picker">
 
-<section class="screen modal-screen" id="results"><div class="panel modal result-card">
-<p class="eyebrow">Dive complete</p><h2 id="resultHeading">The well remembers.</h2>
-<div class="score" id="resultScore">0 m</div><p id="resultCopy"></p>
-<div class="result-grid"><div><div class="stat-label">Streak</div><strong id="resultStreak">0 days</strong></div><div><div class="stat-label">Best depth</div><strong id="resultBest">0 m</strong></div><div><div class="stat-label">Answers</div><strong id="resultAnswers">0 / 7</strong></div></div>
-<div class="dive-log" id="diveLog" aria-label="Dive log"></div>
-<div class="breakdown" id="breakdown"></div>
-<div class="actions"><button class="button primary" id="shareBtn">Share result</button><button class="button" id="againBtn">Dive again</button><button class="button secondary wide" id="resultHomeBtn">Return home</button><a class="button secondary star-btn wide" href="https://github.com/muhammad3056725-eng/DeepWell" target="_blank" rel="noopener noreferrer" aria-label="Star DEEPWELL on GitHub (opens in a new tab)"><span aria-hidden="true">★</span> Star on GitHub</a></div>
-</div></section>
+  <!-- DEEPWELL — the trivia descent. Lives in its OWN repository and
+       is served from this repo's Pages at its own path; this hub
+       only links to it. The link target is configured in the GAME_URLS
+       script at the bottom. -->
+  <article class="card card-deepwell">
+    <div class="bubbles" aria-hidden="true">
+      <span class="bubble b1"></span><span class="bubble b2"></span>
+      <span class="bubble b3"></span><span class="bubble b4"></span>
+      <span class="bubble b5"></span><span class="bubble b6"></span>
+    </div>
+    <p class="card-kicker">🌊 THE RARE-ANSWER TRIVIA DESCENT</p>
+    <h2 class="card-title deepwell-title">DEEPWELL</h2>
+    <p class="card-blurb">
+      A trivia game where the obvious answer is the shallow one. Name what
+      everyone else would miss — the rarer your answer, the deeper you dive.
+    </p>
+    <ul class="card-facts">
+      <li>Trivia · rare answers score deeper</li>
+      <li>100% free · no downloads</li>
+    </ul>
+    <a class="cta cta-deepwell" id="link-deepwell" href="deepwell/">DIVE IN ▾</a>
+  </article>
 
-<section class="screen modal-screen" id="how"><div class="panel modal">
-<div class="close-row"><button class="close" data-home aria-label="Close">×</button></div>
-<p class="eyebrow">Field notes</p><h2>Think beyond the obvious.</h2>
-<p>Each dive gives you seven prompts and a short timer. Every valid answer earns depth, and the less obvious it is, the more it earns. Repeats and misses score zero.</p>
-<p><strong>How rarity works.</strong> Answer pools come from Wikidata. An answer's rarity is how well known it is among everything that fits the prompt, measured by how many Wikipedia language editions have an article about it. Naming the Nile earns little; naming the Vistula earns a lot. When enough players have answered a prompt, real player data is blended in.</p>
-<p>Type an answer and press Enter. A near match asks you to confirm, and the timer waits for you.</p>
-<button class="button primary wide" data-home>Ready to descend</button>
-</div></section>
+  <!-- NEXUS RELAY — signal triangulation. Lives in its OWN repository
+       (this one) and is served from its own GitHub Pages URL; this hub
+       only links to it. Target configured in GAME_URLS below. -->
+  <article class="card card-nexus">
+    <div class="scanlines" aria-hidden="true"></div>
+    <p class="card-kicker">📡 SIGNAL TRIANGULATION · EST. 1994</p>
+    <h2 class="card-title nexus-title">NEXUS&nbsp;RELAY</h2>
+    <p class="card-blurb">
+      You are the Signal Archivist. A mystery entity is sealed inside the
+      graph: six probes, five-axis telemetry — era, distance, domain, hops,
+      notability — and one Overclock surge to chain the proof.
+    </p>
+    <ul class="card-facts">
+      <li>Deduction · retro Hi-Bit pixel console</li>
+      <li>Daily broadcast · endless · hardcore</li>
+    </ul>
+    <a class="cta cta-nexus" id="link-nexus" href="https://muhammad3056725-eng.github.io/Nexus-Relay/">OPEN CONSOLE ▶</a>
+  </article>
 
-<section class="screen modal-screen" id="packs"><div class="panel modal">
-<div class="close-row"><button class="close" data-home aria-label="Close">×</button></div>
-<p class="eyebrow">Choose a current</p><h2>Themed packs</h2>
-<div class="actions cat-grid" id="packActions"></div>
-<p class="notice">Each pack is a seven-prompt dive drawn from one category.</p>
-</div></section>
-
-<section class="screen modal-screen" id="stats"><div class="panel modal">
-<div class="close-row"><button class="close" data-home aria-label="Close">×</button></div>
-<p class="eyebrow">Your logbook</p><h2>Stats</h2>
-<div class="stats-list" id="statsList"></div>
-<p class="notice">Your logbook is stored in this browser only. No account is needed.</p>
-</div></section>
-
-<section class="screen modal-screen" id="settings"><div class="panel modal">
-<div class="close-row"><button class="close" data-home aria-label="Close">×</button></div>
-<p class="eyebrow">Instrument panel</p><h2>Settings</h2>
-<div class="settings-grid">
-<label class="setting">Sound <input type="range" id="soundSetting" min="0" max="1" step=".1"></label>
-<label class="setting">Haptics <input type="checkbox" id="hapticSetting"></label>
-<label class="setting">Reduced motion <input type="checkbox" id="motionSetting"></label>
-<label class="setting">Color-safe palette <input type="checkbox" id="colorSetting"></label>
-<label class="setting">Timer length (Endless and packs) <select id="timerSetting"><option value="15">15 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option><option value="45">45 seconds</option></select></label>
-<label class="setting">Text size <select id="textSetting"><option value="1">Standard</option><option value="1.12">Large</option><option value="1.25">Extra large</option></select></label><label class="setting">Graphics quality <select id="graphicsSetting"><option value="auto">Auto</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></label>
-</div>
-<p class="notice">Daily Dive is one personalized 20-second challenge per day. Questions are chosen to avoid your recent dives and reset at 00:00 UTC.</p>
-</div></section>
 </main>
-<div class="toast" id="toast"></div><div id="live" aria-live="polite"></div>
-<script type="module" src="js/main.js?v=linked-20261125"></script>
-<noscript><p style="position:relative;z-index:3;padding:24px;color:#e7fbff">DEEPWELL needs JavaScript.</p></noscript>
+
+<script>
+  /* ================================================================
+     GAME LINK CONFIG — the only lines that ever need editing here.
+     Each game stays in its OWN repository and is served from its own
+     URL; this hub links to those served URLs and loads nothing local.
+       Deepwell   — this repo's Pages, at its own path /deepwell/ (one tap).
+       Nexus Relay — this repo's GitHub Pages URL. If the subdomain is
+                     set up instead, change the value to
+                     "https://nexus.deepwell.games/".
+     The anchors above carry the same URLs as static fallbacks, so the
+     page works even with JavaScript disabled.
+     ================================================================ */
+  const GAME_URLS = {
+    deepwell: "deepwell/",
+    nexusRelay: "https://muhammad3056725-eng.github.io/Nexus-Relay/"
+  };
+  document.getElementById("link-deepwell").href = GAME_URLS.deepwell;
+  document.getElementById("link-nexus").href = GAME_URLS.nexusRelay;
+</script>
+
+<footer class="site-foot">
+  <p>Both games are free, run entirely in your browser, and need no downloads or sign-up.</p>
+</footer>
+
 </body>
 </html>
