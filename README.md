@@ -28,3 +28,5 @@ Run the **Build question data** workflow once to fill `data/packs/`.
 ## Add a question type
 
 Add one entry in `js/catalog.js`. Register every Q-id through `inst(...)`, `occ(...)` and the other helpers so the build can verify it against Wikidata, then rebuild that pack: `node scripts/build-data.mjs --only your-id`.
+
+**Hub note:** deepwell.games root is a two-game selection hub (this game + NEXUS RELAY) — see [HUB.md](HUB.md) before moving the game entry point or the root asset folders.
