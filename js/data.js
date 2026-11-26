@@ -1,13 +1,13 @@
 // Data loading. Source order for a prompt's answer pool:
 //   1. pre-built pack   data/packs/<id>.json  (built from Wikidata by scripts/build-data.mjs)
 //   2. offline seed     js/seed.js            (small hand-curated fallback bundled with the site)
-//   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Dive)
-import { CONFIG } from './config.js?v=linked-20261125';
-import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=linked-20261125';
+//   3. live Wikidata    queried from the browser (Endless mode only, never for the Daily Flight)
+import { CONFIG } from './config.js?v=space-20261126';
+import { CATALOG, CATALOG_BY_ID } from './catalog.js?v=space-20261126';
 import { SEED } from './seed.js';
-import { fetchLive, fromPack, ANSWER_CAP } from './wikidata.js?v=linked-20261125';
-import { loadLinkedItems } from './linked.js?v=linked-20261125';
-import { normalize } from './engine.js?v=linked-20261125';
+import { fetchLive, fromPack, ANSWER_CAP } from './wikidata.js?v=space-20261126';
+import { loadLinkedItems } from './linked.js?v=space-20261126';
+import { normalize } from './engine.js?v=space-20261126';
 
 let manifest = { version: 0, built: null, packs: {} };
 let meta = null; // data/prompt-meta.json: per-prompt difficulty level, optional
@@ -32,7 +32,7 @@ export const promptMeta = () => meta;
 export const hasPack = id => Boolean(manifest.packs[id]);
 export const hasSeed = id => typeof SEED[id] === 'string';
 
-/** Entries that can be served without a live query: the only ones the Daily Dive may use. */
+/** Entries that can be served without a live query: the only ones the Daily Flight may use. */
 export function stableEntries() {
   return CATALOG.filter(e => hasPack(e.id) || hasSeed(e.id));
 }

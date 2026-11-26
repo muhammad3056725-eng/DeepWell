@@ -499,3 +499,94 @@ body.descending .descent-note{opacity:1;transition-delay:1.5s}
 .descent-note small{display:block;margin-top:8px;font-size:clamp(26px,7vw,40px);font-weight:900;letter-spacing:.06em;color:#fff;text-shadow:0 0 22px rgba(120,220,255,.65),0 2px 12px rgba(0,10,30,.8)}
 @keyframes descentPulse{0%,100%{opacity:.55;transform:translateY(0)}50%{opacity:1;transform:translateY(4px)}}
 body.reduced .game-grid,body.reduced .descent-note{transition:none}
+
+/* =====================================================================================================
+   RETRO PIXEL-ART LOOK (flight theme). Flat colours, hard edges, notched pixel borders, hard drop shadows,
+   stepped animations, monospace type. No glass, glow, gradients or blur. Overrides everything above.
+   ===================================================================================================== */
+:root{--px-ink:#f4f1ff;--px-bg:#05061a;--px-panel:#0b1133;--px-btn:#16236e;--px-line:#4a63e8;--zone-accent:#ffd166;--zone-2:#ff8a5c;--zone-glow:transparent}
+body[data-zone="sky"]{--zone-accent:#ffd166;--zone-2:#ff8a5c}
+body[data-zone="stratosphere"]{--zone-accent:#7ec8ff;--zone-2:#4a63e8}
+body[data-zone="orbit"]{--zone-accent:#5de0ff;--zone-2:#2a9df4}
+body[data-zone="solar"]{--zone-accent:#ffb02e;--zone-2:#ff5a36}
+body[data-zone="interstellar"]{--zone-accent:#c68bff;--zone-2:#6a5cff}
+body[data-zone="galaxy"]{--zone-accent:#ff7ad9;--zone-2:#7fe3ff}
+html,body{background:var(--px-bg);color:var(--px-ink)}
+body,button,input,select,textarea{font-family:"Courier New",ui-monospace,Menlo,Consolas,monospace;-webkit-font-smoothing:none;font-smooth:never}
+#scene{image-rendering:pixelated;image-rendering:crisp-edges;filter:none;position:fixed;left:0;top:0}
+#vignette{display:none}
+body,.hero-sub,.prompt,.stat-label,.notice,p,li,label{text-shadow:none}
+.brand{color:var(--zone-accent);text-shadow:3px 3px 0 #000;letter-spacing:.3em;font-weight:900}
+.hero-title{background:none;-webkit-background-clip:border-box;background-clip:border-box;color:var(--zone-accent);text-shadow:4px 4px 0 #000,-2px -2px 0 var(--zone-2);filter:none;letter-spacing:.14em}
+.eyebrow,.zone-label{color:var(--zone-accent);text-shadow:2px 2px 0 #000;letter-spacing:.18em}
+.hero-sub{color:var(--px-ink)}
+.panel,.modal,.prompt-panel{background:var(--px-panel);backdrop-filter:none;-webkit-backdrop-filter:none;border:0;border-radius:0;
+  box-shadow:4px 0 0 0 var(--zone-accent),-4px 0 0 0 var(--zone-accent),0 4px 0 0 var(--zone-accent),0 -4px 0 0 var(--zone-accent),10px 10px 0 0 rgba(0,0,0,.55)}
+.prompt-panel:before{display:none}
+.button,.lifeline,.close{border:0;border-radius:0;background:var(--px-btn);color:var(--px-ink);text-transform:uppercase;letter-spacing:.08em;font-weight:800;filter:none;
+  box-shadow:4px 0 0 0 var(--px-line),-4px 0 0 0 var(--px-line),0 4px 0 0 var(--px-line),0 -4px 0 0 var(--px-line),0 8px 0 0 #000;transition:none;margin-block:4px}
+.button:hover,.button:focus-visible,.lifeline:hover{background:#1f33a0;box-shadow:4px 0 0 0 var(--zone-accent),-4px 0 0 0 var(--zone-accent),0 4px 0 0 var(--zone-accent),0 -4px 0 0 var(--zone-accent),0 8px 0 0 #000;transform:none;filter:none}
+.button:active,.lifeline:active{transform:translateY(4px);box-shadow:4px 0 0 0 var(--px-line),-4px 0 0 0 var(--px-line),0 4px 0 0 var(--px-line),0 -4px 0 0 var(--px-line),0 4px 0 0 #000}
+.button.primary,#game .button.primary,#game .submit,.button#dailyBtn,.button#endlessBtn,.button#packsBtn{background:var(--zone-accent);color:#05061a;
+  box-shadow:4px 0 0 0 #fff,-4px 0 0 0 #fff,0 4px 0 0 #fff,0 -4px 0 0 #fff,0 8px 0 0 #000}
+.button.primary:hover,.button.primary:focus-visible,#game .submit:hover,.button#dailyBtn:hover,.button#endlessBtn:hover,.button#packsBtn:hover{background:#fff;filter:none}
+.button.secondary,.button:not(.primary){background:var(--px-btn);border:0}
+.button:not(.primary):hover{background:#1f33a0;border:0}
+a.button.star-btn span{color:#ffd166;filter:none}
+.answer-row input{background:#02030f;color:#fff;border:0;border-radius:0;caret-color:var(--zone-accent);box-shadow:4px 0 0 0 var(--zone-accent),-4px 0 0 0 var(--zone-accent),0 4px 0 0 var(--zone-accent),0 -4px 0 0 var(--zone-accent)}
+.answer-row input:focus{border:0;box-shadow:4px 0 0 0 #fff,-4px 0 0 0 #fff,0 4px 0 0 #fff,0 -4px 0 0 #fff}
+.timer{background:#1a2150;border-radius:0;height:10px}
+.timer>i{background:var(--zone-accent);box-shadow:none;border-radius:0}
+.depth-chip{background:var(--px-panel);border:0;border-radius:0;color:var(--zone-accent);font-weight:800;letter-spacing:.08em;text-transform:uppercase;box-shadow:3px 0 0 0 var(--zone-accent),-3px 0 0 0 var(--zone-accent),0 3px 0 0 var(--zone-accent),0 -3px 0 0 var(--zone-accent),6px 6px 0 0 rgba(0,0,0,.5)}
+.steps i{border-radius:0;height:10px;border:2px solid var(--zone-accent);background:transparent;box-shadow:none;animation:none}
+.steps i.now{background:#1a2150;box-shadow:none;animation:pxBlink 1s steps(2) infinite}
+.steps i.done{background:currentColor;box-shadow:none}
+.steps i.miss{border-style:solid;border-color:#5c6490;background:#2a2f55}
+@keyframes pxBlink{50%{opacity:.35}}
+.zone-banner b,.tier-flash b,.descent-note small,.descent-note b{text-shadow:4px 4px 0 #000;filter:none}
+.zone-banner small,.tier-flash small{text-shadow:2px 2px 0 #000}
+.zone-banner.show{animation:zoneBanner 3.6s steps(24) forwards}
+.tier-flash.show{animation:tierFlash 1.6s steps(16) forwards}
+.game-grid{transition:opacity 1s steps(5),transform 1.6s steps(8),filter 0s}
+body.descending .game-grid{filter:none;transform:translateY(16px)}
+.descent-note{transition:opacity .8s steps(4)}
+.descent-note b{animation:none}
+/* flight gauge: ground at the bottom, galaxies at the top */
+.depth-gauge{text-shadow:2px 2px 0 #000}
+.gauge-track{border:0;border-radius:0;background:#0b1133;box-shadow:3px 0 0 0 #fff,-3px 0 0 0 #fff,0 3px 0 0 #fff,0 -3px 0 0 #fff}
+.gauge-band{border-radius:0}
+.gauge-band.galaxy{top:0;height:20%;background:#ff7ad9}
+.gauge-band.interstellar{top:20%;height:20%;background:#c68bff}
+.gauge-band.solar{top:40%;height:30%;background:#ffb02e}
+.gauge-band.orbit{top:70%;height:15%;background:#5de0ff}
+.gauge-band.stratosphere{top:85%;height:10%;background:#7ec8ff}
+.gauge-band.sky{top:95%;bottom:0;height:auto;background:#ffd166}
+.gauge-marker{width:15px;height:15px;border-radius:0;border:3px solid #fff;background:var(--zone-accent);box-shadow:3px 3px 0 #000;transition:top .85s steps(10)}
+.gauge-value,.gauge-heading{letter-spacing:.06em}
+.dive-log svg{shape-rendering:crispEdges}
+.dl-halo{display:none}
+.toast,.stat,.result-grid>div{border-radius:0;box-shadow:none;backdrop-filter:none}
+/* The earlier theme blocks use id selectors and media queries; the pixel look wins with !important on the shape properties. */
+.panel,.modal,#game .prompt-panel,.depth-chip,.button,.lifeline,.close,.src-badge,.lifeline span,.answer-row input,.toast,.confirm,.confirm button,.cat-grid .button,.stat,.result-grid>div{border-radius:0 !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
+.panel,.modal,#game .prompt-panel{background:var(--px-panel) !important;border:0 !important;
+  box-shadow:4px 0 0 0 var(--zone-accent),-4px 0 0 0 var(--zone-accent),0 4px 0 0 var(--zone-accent),0 -4px 0 0 var(--zone-accent),10px 10px 0 0 rgba(0,0,0,.55) !important}
+#game .prompt-panel{margin-inline:6px}
+.src-badge{border:2px solid var(--zone-accent) !important;background:transparent !important;color:var(--zone-accent) !important}
+.lifeline{border:0 !important;background:var(--px-btn) !important;color:var(--px-ink) !important}
+.lifeline span{background:var(--zone-accent) !important;color:#05061a !important}
+.depth-chip{border:0 !important;background:var(--px-panel) !important}
+.answer-row input{border:0 !important;background:#02030f !important}
+body:has(#game.active) .zone-label{color:var(--zone-accent)}
+
+/* readable label on the bright daytime sky: no offset shadow (it looked like a double print) */
+body[data-zone="sky"] .zone-label,body:not([data-zone]) .zone-label{color:#0b1740!important;text-shadow:none!important}
+
+/* label on bright sky zones: no offset shadow */
+body[data-zone="stratosphere"] .zone-label{color:#0b1740!important;text-shadow:none!important}
+/* results card: solid so planets and text behind it never fight with the numbers */
+#results .panel,#results .modal{background:#0a0f2e!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+body:has(#results.active) .descent-note,body:has(#results.active) .tier-flash{opacity:0!important;transition:none!important}
+
+/* brand and eyebrow on the bright sky: plain navy, no offset shadow (it read as a double print) */
+body[data-zone="sky"] .brand,body[data-zone="sky"] .eyebrow,body:not([data-zone]) .brand,body:not([data-zone]) .eyebrow,
+body[data-zone="stratosphere"] .brand,body[data-zone="stratosphere"] .eyebrow{color:#0b1740!important;text-shadow:none!important}
