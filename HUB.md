@@ -1,10 +1,13 @@
 # deepwell.games hub — note for whoever maintains the Deepwell game
 
-deepwell.games root is no longer the game itself. It is a clean
-game-selection interface: four cards (Deepwell + NEXUS RELAY +
-HYPE RIOT + LUMEN VAULT) over a code-drawn pixel-space background
-(`hub-bg.svg`). No advertising poster is used. A visitor picks a
-card and is sent to that game.
+deepwell.games root is no longer the game itself. It is a console-style
+"SELECT YOUR GAME" menu: four illustrated posters (Deepwell/APOGEE +
+NEXUS RELAY + HYPE RIOT + LUMEN VAULT), each with its name plate and a
+play button, over a code-drawn pixel-space background (`hub-bg.svg`).
+The poster art lives in `hub/*.svg` (drawn in code; Lumen Vault's is
+smooth vector on purpose, the other three are pixel art). Hovering or
+focusing a poster fills the info bar; arrow keys move between posters.
+A visitor picks a poster and is sent to that game.
 
 Note on theme: Deepwell (in-game title APOGEE) is a SPACE flight
 trivia game — the rarer your answer, the higher you fly. Its poster
