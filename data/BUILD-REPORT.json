@@ -1,63 +1,50 @@
 {
-  "stoppedAt": 129,
-  "skipped": [
-    "city-in-tunisia (pool too small; previous retained)",
-    "city-in-finland (pool too small; previous retained)",
-    "city-in-czech-republic (pool too small; previous retained)",
-    "city-in-fiji (pool too small; previous retained)"
-  ],
+  "stoppedAt": 26,
+  "skipped": [],
   "failed": [
-    "city-in-venezuela: prompt time cap reached",
-    "city-in-ecuador: This operation was aborted",
-    "city-in-cuba: This operation was aborted",
-    "city-in-bolivia: prompt time cap reached",
-    "city-in-uruguay: prompt time cap reached",
-    "city-in-norway: prompt time cap reached",
-    "city-in-denmark: prompt time cap reached",
-    "city-in-austria: prompt time cap reached",
-    "city-in-serbia: This operation was aborted"
+    "island: prompt time cap reached",
+    "mountain: prompt time cap reached",
+    "lake: prompt time cap reached",
+    "waterfall: prompt time cap reached",
+    "mountain-range: prompt time cap reached",
+    "peninsula: prompt time cap reached",
+    "bay: prompt time cap reached",
+    "museum: prompt time cap reached",
+    "airport: prompt time cap reached",
+    "stadium: prompt time cap reached"
   ],
-  "built": 6,
-  "unchanged": 0,
+  "built": 5,
+  "unchanged": 11,
   "fallback": [
-    "city-in-senegal",
-    "city-in-belgium",
-    "city-in-hungary",
-    "river-in-united-states"
+    "city"
   ],
   "previousRetained": [],
   "rejected": {
-    "city-in-senegal": {
+    "city": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-cameroon": {
+    "volcano": {
       "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "national-park": {
+      "invalid": 1,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "city-in-belgium": {
+    "strait": {
       "invalid": 0,
       "blocked": 0,
-      "duplicate": 0,
+      "duplicate": 1,
       "wrongClass": 0
     },
-    "city-in-hungary": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "city-in-romania": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "river-in-united-states": {
+    "world-heritage": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,

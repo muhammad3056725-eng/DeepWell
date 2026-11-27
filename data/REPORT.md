@@ -1,7 +1,7 @@
 # DEEPWELL data report
 
-Built: 2026-11-26 · Manifest version: 44
-Packs: 347 · Answers: 235,115 · Pack bytes: 13,587,375 (12.96 MiB) / 60 MiB
+Built: 2026-11-27 · Manifest version: 46
+Packs: 347 · Answers: 227,512 · Pack bytes: 13,244,948 (12.63 MiB) / 60 MiB
 
 ## Category coverage
 
@@ -13,7 +13,7 @@ Packs: 347 · Answers: 235,115 · Pack bytes: 13,587,375 (12.96 MiB) / 60 MiB
 | Film & TV | 12 | 15113 | 949.5 |
 | Food | 14 | 3753 | 162 |
 | Games | 6 | 3916 | 761 |
-| Geography | 44 | 82665 | 998.5 |
+| Geography | 44 | 75062 | 998.5 |
 | History | 18 | 13556 | 949.5 |
 | Language | 10 | 4585 | 251 |
 | Literature | 12 | 10458 | 971 |
@@ -44,20 +44,20 @@ Packs: 347 · Answers: 235,115 · Pack bytes: 13,587,375 (12.96 MiB) / 60 MiB
 |---|---:|---:|
 | cathedral | 42 | 1.2% |
 | capital | 2 | 0.9% |
-| stadium | 11 | 0.1% |
-| waterfall | 4 | 0.1% |
+| stadium | 11 | 0.2% |
 | mountain-range | 9 | 0.1% |
+| waterfall | 4 | 0.1% |
 | zoo | 2 | 0.1% |
 | glacier | 4 | 0.1% |
-| city | 7 | 0.1% |
 | strait | 1 | 0.1% |
 | lighthouse | 3 | 0.1% |
+| airport | 4 | 0.1% |
 | amusement-park | 1 | 0.1% |
 | volcano | 1 | 0.1% |
 | skyscraper | 2 | 0.1% |
-| airport | 4 | 0.1% |
 | national-park | 1 | 0.0% |
 | country | 0 | 0.0% |
+| city | 0 | 0.0% |
 | island | 0 | 0.0% |
 | river | 0 | 0.0% |
 | mountain | 0 | 0.0% |
@@ -71,7 +71,12 @@ None recorded.
 
 | Prompt | Added | Removed |
 |---|---:|---:|
+| city | 0 | 1918 |
+| volcano | 1 | 0 |
+| national-park | 7 | 0 |
+| strait | 2 | 0 |
+| world-heritage | 1 | 0 |
 
 ## Repository size check
 
-Raw answer data size (data/linked + data/packs): 13,587,375 bytes (12.96 MiB); budget 60 MiB.
+Raw answer data size (data/linked + data/packs): 13,244,948 bytes (12.63 MiB); budget 60 MiB.
