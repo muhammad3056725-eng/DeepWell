@@ -1,33 +1,16 @@
-/* deepwell.games — game-selection hub.
-   Clean UI (owner directive, Nov 26, 2026): four selectable game
-   cards over a code-drawn pixel SPACE backdrop (hub-bg.svg —
-   starfield, nebulae, a ringed planet, radar rings and a telemetry
-   grid, drawn in code; NOT the advertising poster, which stays off
-   this page). Each card's identity is carried by colour and
-   typography: Apogee's violet nebula flight, Nexus Relay's Hi-Bit
-   CRT console, Hype Riot's neon pixel arcade, and Lumen Vault's
-   Kinetic Obsidian & Liquid Brass. No build step; the only asset
-   is the background SVG. */
+/* deepwell.games — the game menu.
+   A console-style "select your game" screen: one big illustrated poster per
+   game (art in /hub, drawn in code), the game's name on a plate underneath,
+   and an info bar that follows the selected poster. No build step. */
 
 :root {
-  --abyss: #020309;
-  --apogee-deep: #171038;
-  --apogee-violet: #8b7fe8;
-  --apogee-glow: #a99cff;
-  --starlight: #efeaff;
-  --nexus-navy: #0b132b;
-  --nexus-cyan: #00d4ff;
-  --nexus-amber: #ff9f1c;
-  --hype-pink: #ff2e88;
-  --hype-yellow: #ffe93d;
-  --hype-deep: #16041f;
-  --lumen-obsidian: #0b0d14;
-  --lumen-glass: #161a26;
-  --lumen-brass: #e5c17b;
-  --lumen-cream: #f7f3ea;
-  --lumen-teal: #3fe0c5;
-  --ink: #e8f1f5;
-  --muted: #97a0bd;
+  --ink: #f3f1ff;
+  --muted: #a7a3c7;
+  --apogee: #a99cff;  --apogee-2: #ffb199;
+  --nexus: #00d4ff;   --nexus-2: #ff9f1c;
+  --hype: #ff2e88;    --hype-2: #ffe93d;
+  --lumen: #e5c17b;   --lumen-2: #3fe0c5;
+  --mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Courier New", monospace;
 }
 
 * { box-sizing: border-box; }
@@ -35,237 +18,111 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-family: var(--mono);
   color: var(--ink);
-  /* Pixel space backdrop (hub-bg.svg) under a dark scrim so the
-     header, cards and footer stay sharp and readable on top. */
   background:
-    radial-gradient(1200px 500px at 50% -10%, rgba(64, 44, 140, 0.35) 0%, transparent 60%),
-    linear-gradient(180deg, rgba(2, 3, 10, 0.58) 0%, rgba(2, 3, 10, 0.80) 100%),
-    url("hub-bg.svg") center / cover no-repeat,
-    var(--abyss);
-  background-attachment: fixed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 3rem 1.25rem 2rem;
+    radial-gradient(ellipse at 50% 0%, rgba(120, 90, 255, .22), transparent 60%),
+    linear-gradient(rgba(5, 6, 15, .72), rgba(5, 6, 15, .9)),
+    url("hub-bg.svg") center / cover fixed no-repeat,
+    #05060f;
+  padding: max(18px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
 }
 
 /* ---------- header ---------- */
-
-.site-head { text-align: center; max-width: 44rem; }
-
+.site-head { text-align: center; max-width: 1180px; margin: 0 auto 18px; }
 .domain {
-  margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.05rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--apogee-glow);
+  margin: 0 0 6px; font-size: .95rem; letter-spacing: .32em; text-transform: uppercase; color: var(--muted);
 }
-.domain-tld { color: var(--muted); }
-
-.site-head h1 {
-  margin: 0.6rem 0 0.4rem;
-  font-size: clamp(2rem, 6vw, 3.4rem);
-  letter-spacing: 0.12em;
-  font-weight: 800;
+.domain-tld { color: var(--hype-2); }
+h1 {
+  margin: 0; font-size: clamp(1.35rem, 5.2vw, 2.6rem); letter-spacing: .12em; line-height: 1.15;
+  text-shadow: 3px 3px 0 #2a1a75, 6px 6px 0 rgba(0, 0, 0, .45);
 }
+h1 .arrow { color: var(--hype-2); font-size: .7em; display: inline-block; animation: nudge 1s steps(2) infinite; }
+h1 .arrow.flip { animation-delay: .5s; }
+@keyframes nudge { 50% { transform: translateX(4px); } }
+.tagline { margin: 8px 0 0; color: var(--muted); font-size: clamp(.7rem, 3vw, .9rem); letter-spacing: .06em; }
 
-.tagline { margin: 0; color: var(--muted); font-size: 1.05rem; }
-
-/* ---------- picker grid ---------- */
-
-.picker {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 84rem;
-  margin-top: 2.5rem;
+/* ---------- poster grid ---------- */
+.menu {
+  max-width: 1180px; margin: 0 auto;
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
 }
+@media (min-width: 980px) { .menu { grid-template-columns: repeat(4, 1fr); gap: 22px; } }
 
-.card {
-  position: relative;
+.poster {
+  --c1: var(--apogee); --c2: var(--apogee-2);
+  position: relative; display: block; text-decoration: none; color: inherit;
+  background: #0a0a18;
+  border: 4px solid var(--c1);
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px #000, 6px 6px 0 2px #000, 0 0 26px -4px var(--c1);
   overflow: hidden;
-  border-radius: 18px;
-  padding: 2rem 1.75rem 1.75rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  border: 1px solid rgba(255, 255, 255, 0.09);
+  transition: transform .18s steps(4), box-shadow .18s steps(4);
+  -webkit-tap-highlight-color: transparent;
+}
+.p-nexus { --c1: var(--nexus); --c2: var(--nexus-2); }
+.p-hype  { --c1: var(--hype);  --c2: var(--hype-2); }
+.p-lumen { --c1: var(--lumen); --c2: var(--lumen-2); border-radius: 14px; }
+
+.art { display: block; aspect-ratio: 4 / 5; overflow: hidden; background: #000; }
+.art img { display: block; width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; transition: transform .35s ease; }
+.p-lumen .art img { image-rendering: auto; }
+
+/* name plate under the art */
+.plate {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 10px 6px 12px; text-align: center;
+  background: linear-gradient(#0d0d1f, #05050e);
+  border-top: 4px solid var(--c1);
+}
+.name {
+  font-weight: 900; font-size: clamp(.86rem, 3.7vw, 1.6rem); letter-spacing: .05em; white-space: nowrap; line-height: 1.05;
+  color: var(--c2); text-shadow: 2px 2px 0 #000, 0 0 14px var(--c1);
+}
+.p-lumen .name { font-family: Georgia, "Times New Roman", serif; letter-spacing: .1em; }
+.tag { font-size: clamp(.6rem, 2.5vw, .8rem); color: var(--muted); letter-spacing: .06em; }
+.go {
+  margin-top: 5px; padding: 5px 10px; font-weight: 800; font-size: clamp(.58rem, 2.2vw, .8rem); letter-spacing: .06em; white-space: nowrap;
+  color: #0a0a18; background: var(--c1); box-shadow: 0 3px 0 #000; border-radius: 3px;
 }
 
-.card-kicker {
-  margin: 0;
-  font-size: 0.78rem;
-  letter-spacing: 0.22em;
-  font-weight: 700;
+/* selected / hover / focus */
+.poster:hover, .poster:focus-visible, .poster.is-selected:focus-visible { transform: translateY(-6px) scale(1.015); }
+.poster:hover, .poster:focus-visible {
+  box-shadow: 0 0 0 2px #000, 8px 10px 0 2px #000, 0 0 40px 2px var(--c1);
 }
-
-.card-title { margin: 0; line-height: 1.05; overflow-wrap: anywhere; }
-.card-blurb { margin: 0; line-height: 1.55; flex-grow: 1; }
-
-.card-facts {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-size: 0.9rem;
-  display: grid;
-  gap: 0.3rem;
+.poster:hover .art img, .poster:focus-visible .art img { transform: scale(1.06); }
+.poster:focus-visible { outline: 3px dashed var(--c2); outline-offset: 4px; }
+.poster:active { transform: translateY(2px); }
+@media (hover: hover) and (min-width: 980px) {
+  .poster.is-selected { box-shadow: 0 0 0 2px #000, 6px 6px 0 2px #000, 0 0 34px 0 var(--c1); }
 }
-
-.cta {
-  align-self: flex-start;
-  margin-top: 0.6rem;
-  padding: 0.8rem 1.5rem;
-  border-radius: 999px;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-decoration: none;
-  transition: transform 120ms ease, box-shadow 120ms ease;
+/* shine sweep */
+.poster::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, .22) 50%, transparent 62%);
+  transform: translateX(-120%);
 }
-.cta:hover, .cta:focus-visible { transform: translateY(-2px); }
-.cta:focus-visible { outline: 3px solid var(--starlight); outline-offset: 3px; }
+.poster:hover::after, .poster:focus-visible::after { transform: translateX(120%); transition: transform .7s ease; }
 
-/* ---------- Apogee (Deepwell) card: nebula space flight ---------- */
-
-.card-deepwell {
-  background: linear-gradient(165deg, #2a1c5c 0%, var(--apogee-deep) 48%, #070714 100%);
-  box-shadow: 0 18px 50px rgba(5, 2, 25, 0.6);
+/* ---------- info bar ---------- */
+.info {
+  --c1: var(--apogee);
+  max-width: 1180px; margin: 22px auto 0; padding: 14px 18px;
+  border: 3px solid var(--c1); border-radius: 6px; background: rgba(5, 6, 15, .86);
+  box-shadow: 4px 4px 0 #000;
 }
-.card-deepwell .card-kicker { color: var(--apogee-glow); }
-
-.deepwell-title {
-  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  font-size: clamp(2.2rem, 5vw, 3rem);
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  color: var(--starlight);
-  text-shadow: 0 0 26px rgba(139, 127, 232, 0.55);
-}
-.card-deepwell .card-blurb { color: #cfc8f2; }
-.card-deepwell .card-facts { color: #a79fd0; }
-
-.cta-deepwell {
-  background: var(--apogee-violet);
-  color: #0d0830;
-  box-shadow: 0 8px 24px rgba(139, 127, 232, 0.4);
-}
-
-/* CSS stars twinkling inside the Apogee card */
-.stars { position: absolute; inset: 0; pointer-events: none; }
-.star {
-  position: absolute;
-  border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 0 6px 1px rgba(220, 225, 255, 0.8);
-  animation: twinkle 2.8s ease-in-out infinite alternate;
-}
-.s1 { left: 14%; top: 16%; width: 3px; height: 3px; }
-.s2 { left: 34%; top: 62%; width: 2px; height: 2px; animation-delay: 0.7s; }
-.s3 { left: 58%; top: 12%; width: 2px; height: 2px; animation-delay: 1.3s; }
-.s4 { left: 74%; top: 44%; width: 3px; height: 3px; animation-delay: 0.4s; }
-.s5 { left: 88%; top: 20%; width: 2px; height: 2px; animation-delay: 1.8s; }
-.s6 { left: 46%; top: 82%; width: 2px; height: 2px; animation-delay: 2.2s; }
-
-@keyframes twinkle {
-  from { opacity: 0.25; }
-  to   { opacity: 1; }
-}
-
-/* ---------- Nexus Relay card: CRT console ---------- */
-
-.card-nexus {
-  background: linear-gradient(170deg, #101c3f 0%, var(--nexus-navy) 55%, #05080f 100%);
-  box-shadow: 0 18px 50px rgba(0, 5, 15, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-.card-nexus .card-kicker { color: var(--nexus-amber); }
-
-.scanlines {
-  position: absolute; inset: 0; pointer-events: none;
-  background: repeating-linear-gradient(
-    0deg, rgba(255,255,255,0.045) 0 1px, transparent 1px 3px);
-  mix-blend-mode: overlay;
-}
-
-.nexus-title {
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  background: linear-gradient(90deg, #7df3ff 0%, #b8a6ff 55%, #ff7ad9 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  filter: drop-shadow(0 0 18px rgba(0, 212, 255, 0.35));
-}
-.card-nexus .card-blurb { color: #c9d8f2; }
-.card-nexus .card-facts { color: #8fb8d8; }
-
-.cta-nexus {
-  background: linear-gradient(90deg, #22d3ee 0%, #a78bfa 100%);
-  color: #061226;
-  box-shadow: 0 10px 26px rgba(34, 211, 238, 0.35);
-}
-
-/* ---------- Hype Riot card: neon pixel arcade ---------- */
-
-.card-hype {
-  background: linear-gradient(165deg, #33093b 0%, #1d0529 52%, var(--hype-deep) 100%);
-  box-shadow: 0 18px 50px rgba(20, 2, 30, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-.card-hype .card-kicker { color: var(--hype-yellow); }
-
-.hype-title {
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 900;
-  letter-spacing: 0.06em;
-  color: #fff;
-  text-shadow: 0 0 10px rgba(255, 46, 136, 0.9), 0 0 32px rgba(255, 46, 136, 0.6), 0 0 60px rgba(255, 233, 61, 0.25);
-}
-.card-hype .card-blurb { color: #f3d3ec; }
-.card-hype .card-facts { color: #c99cc9; }
-
-.cta-hype {
-  background: linear-gradient(90deg, var(--hype-pink) 0%, #ff8a3d 100%);
-  color: #2b0215;
-  box-shadow: 0 10px 26px rgba(255, 46, 136, 0.4);
-}
-
-/* ---------- Lumen Vault card: Kinetic Obsidian & Liquid Brass ---------- */
-
-.card-lumen {
-  background: linear-gradient(170deg, var(--lumen-glass) 0%, var(--lumen-obsidian) 60%, #05060a 100%);
-  border: 1px solid rgba(229, 193, 123, 0.35);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.14);
-}
-.card-lumen .card-kicker { color: var(--lumen-brass); }
-
-.lumen-title {
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: var(--lumen-brass);
-  text-shadow: 0 0 22px rgba(229, 193, 123, 0.4);
-}
-.card-lumen .card-blurb { color: var(--lumen-cream); }
-.card-lumen .card-facts { color: #b8ab8d; }
-
-.cta-lumen {
-  background: linear-gradient(180deg, #f2d79a 0%, var(--lumen-brass) 55%, #c9a24f 100%);
-  color: #241a04;
-  box-shadow: 0 10px 24px rgba(229, 193, 123, 0.3);
-}
+.i-nexus { --c1: var(--nexus); } .i-hype { --c1: var(--hype); } .i-lumen { --c1: var(--lumen); }
+.info-kicker { margin: 0 0 6px; color: var(--c1); font-weight: 800; letter-spacing: .12em; font-size: .85rem; }
+.info-blurb { margin: 0 0 8px; line-height: 1.5; font-size: .95rem; }
+.info-facts { margin: 0; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+@media (max-width: 979px) { .info { display: none; } }
 
 /* ---------- footer ---------- */
-
-.site-foot {
-  margin-top: 2.5rem;
-  color: var(--muted);
-  font-size: 0.92rem;
-  text-align: center;
-}
+.site-foot { max-width: 1180px; margin: 22px auto 0; text-align: center; color: var(--muted); font-size: .78rem; }
+.site-foot p { margin: 0; }
 
 @media (prefers-reduced-motion: reduce) {
-  .star { animation: none; opacity: 0.7; }
-  .cta { transition: none; }
+  .poster, .art img, .poster::after, h1 .arrow { transition: none !important; animation: none !important; }
 }

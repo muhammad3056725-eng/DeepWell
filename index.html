@@ -2,108 +2,83 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>deepwell.games — Choose Your Game</title>
 <meta name="description" content="Four free browser games on one domain: APOGEE, the rare-answer trivia space flight; NEXUS RELAY, the catch-the-clues mystery game; HYPE RIOT, the 90-second arena game show; and LUMEN VAULT, the tactile puzzle-adventure. Pick one and play — no downloads, no sign-up.">
 <meta property="og:title" content="deepwell.games — Choose Your Game">
 <meta property="og:description" content="APOGEE: the rarer your answer, the higher you fly. NEXUS RELAY: catch the clues, name the mystery. HYPE RIOT: 90 seconds, 3 mini-rounds, one roaring crowd. LUMEN VAULT: solve the locks, pour the light. All free, all in your browser.">
-<link rel="stylesheet" href="styles.css">
+<meta name="theme-color" content="#05060f">
+<link rel="stylesheet" href="styles.css?v=menu-20261127">
 </head>
 <body>
 
 <header class="site-head">
   <p class="domain">deepwell<span class="domain-tld">.games</span></p>
-  <h1>CHOOSE YOUR GAME</h1>
-  <p class="tagline">Four games live on this domain — a flight to the stars, a signal to decode, a 90-second riot, and a vault full of light.</p>
+  <h1><span class="arrow" aria-hidden="true">▶</span> SELECT YOUR GAME <span class="arrow flip" aria-hidden="true">◀</span></h1>
+  <p class="tagline">Four free games · tap a poster to play</p>
 </header>
 
-<main class="picker">
+<main class="menu" id="menu">
 
-  <!-- APOGEE (Deepwell) — the rare-answer trivia SPACE flight. Lives
-       in its OWN repository and is served from this repo's Pages at
-       its own path; this hub only links to it. The link target is
-       configured in the GAME_URLS script at the bottom. -->
-  <article class="card card-deepwell">
-    <div class="stars" aria-hidden="true">
-      <span class="star s1"></span><span class="star s2"></span>
-      <span class="star s3"></span><span class="star s4"></span>
-      <span class="star s5"></span><span class="star s6"></span>
-    </div>
-    <p class="card-kicker">🚀 THE RARE-ANSWER TRIVIA ASCENT</p>
-    <h2 class="card-title deepwell-title">APOGEE</h2>
-    <p class="card-blurb">
-      Broad, everyday questions — name a mammal, a skyscraper, something
-      people do at a party. Type it your way: the rarer your answer, the
-      higher your rocket flies.
-    </p>
-    <ul class="card-facts">
-      <li>Trivia · 340+ questions · 200,000+ answers</li>
-      <li>100% free · no downloads</li>
-    </ul>
-    <a class="cta cta-deepwell" id="link-deepwell" href="deepwell/">BLAST OFF ▴</a>
-  </article>
+  <!-- Each poster is one link. Targets are set in the GAME_URLS script at
+       the bottom; the hrefs here are the same URLs as static fallbacks.
+       Keep the ids (link-deepwell / link-nexus / link-hype / link-lumen). -->
 
-  <!-- NEXUS RELAY — signal triangulation. Lives in its OWN repository
-       (this one) and is served from its own GitHub Pages URL; this hub
-       only links to it. Target configured in GAME_URLS below. -->
-  <article class="card card-nexus">
-    <p class="card-kicker">📡 CATCH THE CLUES · NAME THE MYSTERY</p>
-    <h2 class="card-title nexus-title">NEXUS RELAY</h2>
-    <p class="card-blurb">
-      A mystery transmission arrives one clue at a time — vague first,
-      obvious last. Pick the right answer from four cards as early as you
-      dare. Wrong picks just reveal the next clue, so every round is
-      winnable.
-    </p>
-    <ul class="card-facts">
-      <li>Clue game · 680+ famous mysteries · 13 channels</li>
-      <li>Daily broadcast · quick play · endless</li>
-    </ul>
-    <a class="cta cta-nexus" id="link-nexus" href="https://muhammad3056725-eng.github.io/Nexus-Relay/">TUNE IN ▶</a>
-  </article>
+  <a class="poster p-apogee" id="link-deepwell" href="deepwell/"
+     data-kicker="🚀 THE RARE-ANSWER TRIVIA ASCENT"
+     data-blurb="Broad, everyday questions — name a mammal, a skyscraper, something people do at a party. Type it your way: the rarer your answer, the higher your rocket flies."
+     data-facts="Trivia · 340+ questions · 200,000+ answers  ·  100% free">
+    <span class="art"><img src="hub/apogee.svg" alt="" width="160" height="200"></span>
+    <span class="plate">
+      <span class="name">APOGEE</span>
+      <span class="tag">Rare-answer space flight</span>
+      <span class="go">BLAST OFF ▴</span>
+    </span>
+  </a>
 
-  <!-- HYPE RIOT — the 90-second pixel game show. Lives in its OWN
-       repository (Hype-Riot) and is served from its own GitHub Pages
-       URL; this hub only links to it. Target configured in
-       GAME_URLS below. -->
-  <article class="card card-hype">
-    <p class="card-kicker">⚡ THE 90-SECOND GAME SHOW</p>
-    <h2 class="card-title hype-title">HYPE RIOT</h2>
-    <p class="card-blurb">
-      Light up a roaring arena in 90 seconds — rapid-fire Top 5
-      brainstorms, Fact or Cap?!, and a one-line pitch finale while the
-      crowd's hype meter climbs. Fast fingers, faster brain.
-    </p>
-    <ul class="card-facts">
-      <li>Arcade trivia · 120+ shows · 6,400+ answers</li>
-      <li>Daily Riot · Quick Arcade · Brainstorm Blitz</li>
-    </ul>
-    <a class="cta cta-hype" id="link-hype" href="https://muhammad3056725-eng.github.io/Hype-Riot/">START THE RIOT ▶</a>
-  </article>
+  <a class="poster p-nexus" id="link-nexus" href="https://muhammad3056725-eng.github.io/Nexus-Relay/"
+     data-kicker="📡 CATCH THE CLUES · NAME THE MYSTERY"
+     data-blurb="A mystery transmission arrives one clue at a time — vague first, obvious last. Pick the right answer from four cards as early as you dare. Wrong picks just reveal the next clue, so every round is winnable."
+     data-facts="Clue game · 680+ famous mysteries · 13 channels  ·  Daily · Quick · Endless">
+    <span class="art"><img src="hub/nexus.svg" alt="" width="160" height="200"></span>
+    <span class="plate">
+      <span class="name">NEXUS RELAY</span>
+      <span class="tag">Catch the clues</span>
+      <span class="go">TUNE IN ▶</span>
+    </span>
+  </a>
 
-  <!-- LUMEN VAULT — the tactile puzzle-adventure. Lives in its OWN
-       repository (Lumen-Vault) and is served from its own GitHub
-       Pages URL (note: the served path is /Lumen-vault/); this hub
-       only links to it. Target configured in GAME_URLS below. Its
-       identity is Kinetic Obsidian & Liquid Brass — deliberately
-       zero pixel art. -->
-  <article class="card card-lumen">
-    <p class="card-kicker">🔆 THE TACTILE PUZZLE VAULT</p>
-    <h2 class="card-title lumen-title">LUMEN VAULT</h2>
-    <p class="card-blurb">
-      A calm puzzle-adventure in obsidian and liquid brass. Solve
-      Venn locks, chrono gears, resonance forges and deduction
-      astrolabes to pour light through 64 chambers in 8 wings — and
-      collect a Wonder Artifact Card from every one.
-    </p>
-    <ul class="card-facts">
-      <li>Puzzle-adventure · trivia-logic + brainstorming</li>
-      <li>No timers · no fail screens · Daily Grand Vault</li>
-    </ul>
-    <a class="cta cta-lumen" id="link-lumen" href="https://muhammad3056725-eng.github.io/Lumen-vault/">ENTER THE VAULT ▶</a>
-  </article>
+  <a class="poster p-hype" id="link-hype" href="https://muhammad3056725-eng.github.io/Hype-Riot/"
+     data-kicker="⚡ THE 90-SECOND GAME SHOW"
+     data-blurb="Light up a roaring arena in 90 seconds — rapid-fire Top 5 brainstorms, Fact or Cap?!, and a one-line pitch finale while the crowd's hype meter climbs. Fast fingers, faster brain."
+     data-facts="Arcade trivia · 120+ shows · 6,400+ answers  ·  Daily Riot · Quick Arcade · Brainstorm Blitz">
+    <span class="art"><img src="hub/hype.svg" alt="" width="160" height="200"></span>
+    <span class="plate">
+      <span class="name">HYPE RIOT</span>
+      <span class="tag">90-second game show</span>
+      <span class="go">START THE RIOT ▶</span>
+    </span>
+  </a>
+
+  <a class="poster p-lumen" id="link-lumen" href="https://muhammad3056725-eng.github.io/Lumen-vault/"
+     data-kicker="🔆 THE TACTILE PUZZLE VAULT"
+     data-blurb="A calm puzzle-adventure in obsidian and liquid brass. Solve Venn locks, chrono gears, resonance forges and deduction astrolabes to pour light through 64 chambers in 8 wings — and collect a Wonder Artifact Card from every one."
+     data-facts="Puzzle-adventure · trivia-logic + brainstorming  ·  No timers · Daily Grand Vault">
+    <span class="art"><img src="hub/lumen.svg" alt="" width="160" height="200"></span>
+    <span class="plate">
+      <span class="name">LUMEN VAULT</span>
+      <span class="tag">Tactile puzzle vault</span>
+      <span class="go">ENTER THE VAULT ▶</span>
+    </span>
+  </a>
 
 </main>
+
+<section class="info" id="info" aria-live="polite" hidden>
+  <p class="info-kicker" id="infoKicker"></p>
+  <p class="info-blurb" id="infoBlurb"></p>
+  <p class="info-facts" id="infoFacts"></p>
+</section>
 
 <script>
   /* ================================================================
@@ -131,6 +106,36 @@
   document.getElementById("link-nexus").href = GAME_URLS.nexusRelay;
   document.getElementById("link-hype").href = GAME_URLS.hypeRiot;
   document.getElementById("link-lumen").href = GAME_URLS.lumenVault;
+
+  /* Menu behaviour: the focused / hovered poster fills the info bar (wide
+     screens), and the arrow keys move between posters like a game menu. */
+  (function () {
+    var posters = Array.prototype.slice.call(document.querySelectorAll(".poster"));
+    var info = document.getElementById("info");
+    function show(p) {
+      posters.forEach(function (x) { x.classList.toggle("is-selected", x === p); });
+      document.getElementById("infoKicker").textContent = p.dataset.kicker;
+      document.getElementById("infoBlurb").textContent = p.dataset.blurb;
+      document.getElementById("infoFacts").textContent = p.dataset.facts;
+      info.className = "info " + p.className.split(" ")[1].replace("p-", "i-");
+    }
+    info.hidden = false;
+    posters.forEach(function (p) {
+      p.addEventListener("pointerenter", function (e) { if (e.pointerType === "mouse") show(p); });
+      p.addEventListener("focus", function () { show(p); });
+    });
+    show(posters[0]);
+    document.addEventListener("keydown", function (e) {
+      var keys = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 2, ArrowUp: -2 };
+      if (!(e.key in keys)) return;
+      var i = posters.indexOf(document.activeElement);
+      if (i < 0) i = posters.findIndex(function (x) { return x.classList.contains("is-selected"); });
+      var cols = getComputedStyle(document.getElementById("menu")).gridTemplateColumns.split(" ").length;
+      var step = (e.key === "ArrowDown" || e.key === "ArrowUp") ? (cols > 1 ? cols : 1) * (keys[e.key] > 0 ? 1 : -1) : keys[e.key];
+      var n = Math.max(0, Math.min(posters.length - 1, i + step));
+      posters[n].focus(); e.preventDefault();
+    });
+  })();
 </script>
 
 <footer class="site-foot">
