@@ -1,53 +1,149 @@
 {
-  "stoppedAt": 26,
-  "skipped": [],
-  "failed": [
-    "island: prompt time cap reached",
-    "mountain: prompt time cap reached",
-    "lake: prompt time cap reached",
-    "waterfall: prompt time cap reached",
-    "mountain-range: prompt time cap reached",
-    "peninsula: prompt time cap reached",
-    "bay: prompt time cap reached",
-    "museum: prompt time cap reached",
-    "airport: prompt time cap reached",
-    "stadium: prompt time cap reached"
+  "stoppedAt": 99,
+  "skipped": [
+    "elementary-particle (pool too small; previous retained)",
+    "vitamin (pool too small; previous retained)",
+    "flowering-plant (pool too small; previous retained)"
   ],
-  "built": 5,
-  "unchanged": 11,
+  "failed": [
+    "railway-station: prompt time cap reached",
+    "reptile: This operation was aborted",
+    "insect: This operation was aborted",
+    "dinosaur: Wikidata retry limit reached"
+  ],
+  "built": 21,
+  "unchanged": 45,
   "fallback": [
-    "city"
+    "tower",
+    "food",
+    "instrument"
   ],
   "previousRetained": [],
   "rejected": {
-    "city": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "volcano": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "national-park": {
+    "cathedral": {
       "invalid": 1,
       "blocked": 0,
+      "duplicate": 41,
+      "wrongClass": 0
+    },
+    "lighthouse": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 3,
+      "wrongClass": 0
+    },
+    "tower": {
+      "invalid": 0,
+      "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "strait": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 1,
-      "wrongClass": 0
-    },
-    "world-heritage": {
+    "university": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
+      "wrongClass": 0
+    },
+    "historical-country": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "asteroid": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "space-probe": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "space-telescope": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "exoplanet": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "mineral": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "discipline": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "theory": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "mammal": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 3,
+      "wrongClass": 0
+    },
+    "bird": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "amphibian": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "shark": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "food": {
+      "invalid": 0,
+      "blocked": 2,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "dish": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "instrument": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "music-genre": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "album": {
+      "invalid": 10,
+      "blocked": 0,
+      "duplicate": 38,
       "wrongClass": 0
     }
   }
