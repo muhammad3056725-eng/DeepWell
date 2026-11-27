@@ -1,149 +1,461 @@
 {
-  "stoppedAt": 99,
+  "stoppedAt": 248,
   "skipped": [
-    "elementary-particle (pool too small; previous retained)",
-    "vitamin (pool too small; previous retained)",
-    "flowering-plant (pool too small; previous retained)"
+    "opera (pool too small; previous retained)",
+    "symphony (pool too small; previous retained)",
+    "superhero (pool too small; previous retained)",
+    "novel (pool too small; previous retained)",
+    "poem (pool too small; previous retained)",
+    "saint (pool too small; previous retained)",
+    "infectious-disease (pool too small; previous retained)",
+    "video-game-console (pool too small; previous retained)",
+    "pokemon (pool too small; previous retained)",
+    "temple (pool too small; previous retained)"
   ],
   "failed": [
-    "railway-station: prompt time cap reached",
-    "reptile: This operation was aborted",
-    "insect: This operation was aborted",
-    "dinosaur: Wikidata retry limit reached"
+    "painting: prompt time cap reached",
+    "church: prompt time cap reached",
+    "forest: prompt time cap reached"
   ],
-  "built": 21,
-  "unchanged": 45,
+  "built": 72,
+  "unchanged": 64,
   "fallback": [
-    "tower",
-    "food",
-    "instrument"
+    "politician",
+    "palace",
+    "beach"
   ],
   "previousRetained": [],
   "rejected": {
-    "cathedral": {
-      "invalid": 1,
+    "singer": {
+      "invalid": 0,
       "blocked": 0,
-      "duplicate": 41,
+      "duplicate": 0,
       "wrongClass": 0
     },
-    "lighthouse": {
+    "composer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "guitarist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "pianist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "conductor": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "film": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 30,
+      "wrongClass": 0
+    },
+    "animated-film": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "tv-series": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 24,
+      "wrongClass": 0
+    },
+    "film-director": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "actor": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "tv-network": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "comic-series": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "manga": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "writer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "novelist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "poet": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "playwright": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "sculpture": {
+      "invalid": 0,
+      "blocked": 1,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "art-movement": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "art-museum": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "painter": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "sculptor": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "photographer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "architect": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "fashion-designer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "battle": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 2,
+      "wrongClass": 0
+    },
+    "dynasty": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "treaty": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "archaeological-site": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "monarch": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "explorer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "politician": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "philosopher": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "inventor": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "sport": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "football-club-world": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "footballer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "basketball-player": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "chess-player": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "boxer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "physicist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "chemist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "mathematician": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "biologist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "astronomer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "computer-scientist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "economist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 1,
+      "wrongClass": 0
+    },
+    "psychologist": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "engineer": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "language": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "religion": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "ethnic-group": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 2,
+      "wrongClass": 0
+    },
+    "profession": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "martial-art": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "deity": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "legendary-creature": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "religious-text": {
+      "invalid": 0,
+      "blocked": 0,
+      "duplicate": 0,
+      "wrongClass": 0
+    },
+    "video-game": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 3,
       "wrongClass": 0
     },
-    "tower": {
+    "card-game": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "university": {
+    "programming-language": {
+      "invalid": 2,
+      "blocked": 0,
+      "duplicate": 11,
+      "wrongClass": 0
+    },
+    "website": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "historical-country": {
+    "mobile-app": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "asteroid": {
+    "web-browser": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "space-probe": {
+    "invention": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "space-telescope": {
+    "brand": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "exoplanet": {
+    "company": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "mineral": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "discipline": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "theory": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "mammal": {
+    "car-model": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 3,
       "wrongClass": 0
     },
-    "bird": {
+    "airline": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "amphibian": {
+    "aircraft-model": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "shark": {
+    "palace": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "food": {
-      "invalid": 0,
-      "blocked": 2,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "dish": {
+    "beach": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
       "wrongClass": 0
     },
-    "instrument": {
+    "cave": {
       "invalid": 0,
       "blocked": 0,
       "duplicate": 0,
-      "wrongClass": 0
-    },
-    "music-genre": {
-      "invalid": 0,
-      "blocked": 0,
-      "duplicate": 0,
-      "wrongClass": 0
-    },
-    "album": {
-      "invalid": 10,
-      "blocked": 0,
-      "duplicate": 38,
       "wrongClass": 0
     }
   }
